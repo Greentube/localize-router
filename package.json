@@ -1,0 +1,88 @@
+{
+  "name": "localize-router",
+  "version": "0.1.0",
+  "description": "An implementation of routes localization for Angular 2",
+  "scripts": {
+    "test": "tsc && karma start",
+    "test-watch": "tsc && concurrently \"tsc -w\" \"karma start karma.conf.js\"",
+    "commit": "npm run prepublish && npm test && git-cz",
+    "prepublish": "ngc && node make.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/meeroslav/localize-router.git"
+  },
+  "keywords": [
+    "angular",
+    "angular2",
+    "translate",
+    "localize",
+    "routes",
+    "i18n"
+  ],
+  "author": "Miroslav Jonas",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/meeroslav/localize-router/issues"
+  },
+  "main": "bundles/localize-router.js",
+  "module": "localize-router.js",
+  "typings": "./localize-router.d.ts",
+  "homepage": "https://github.com/meeroslav/localize-router",
+  "peerDependencies": {
+    "@angular/core": "^2.0.0",
+    "@angular/http": "^2.0.0",
+    "@angular/router": "^3.0.0",
+    "rxjs": "^5.0.0-beta.12",
+    "ng2-translate": "^3.0.0"
+  },
+  "devDependencies": {
+    "@angular/common": "2.1.0",
+    "@angular/compiler": "2.1.0",
+    "@angular/compiler-cli": "2.1.0",
+    "@angular/core": "2.1.0",
+    "@angular/http": "2.1.0",
+    "@angular/router": "3.1.0",
+    "@angular/platform-browser": "2.1.0",
+    "@angular/platform-browser-dynamic": "2.1.0",
+    "@angular/platform-server": "2.1.0",
+    "ng2-translate": "3.1.2",
+    "@types/jasmine": "2.5.35",
+    "@types/node": "6.0.45",
+    "awesome-typescript-loader": "2.2.4",
+    "codelyzer": "1.0.0-beta.1",
+    "commitizen": "2.8.6",
+    "concurrently": "3.1.0",
+    "core-js": "2.4.1",
+    "cz-conventional-changelog": "1.2.0",
+    "istanbul-instrumenter-loader": "0.2.0",
+    "jasmine-core": "2.5.2",
+    "karma": "1.3.0",
+    "karma-chrome-launcher": "2.0.0",
+    "karma-coverage": "1.1.1",
+    "karma-jasmine": "1.0.2",
+    "karma-mocha-reporter": "^2.1.0",
+    "karma-sourcemap-loader": "^0.3.7",
+    "karma-webpack": "^1.8.0",
+    "reflect-metadata": "0.1.8",
+    "rxjs": "5.0.0-beta.12",
+    "semantic-release": "4.3.5",
+    "source-map-loader": "0.1.5",
+    "systemjs": "0.19.39",
+    "systemjs-builder": "0.15.32",
+    "ts-helpers": "1.1.1",
+    "tslint": "3.15.1",
+    "tslint-loader": "2.1.5",
+    "typescript": "2.0.3",
+    "webpack": "2.1.0-beta.21",
+    "zone.js": "0.6.25"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  },
+  "dependencies": {
+    "@types/es6-promise": "0.0.32"
+  }
+}
