@@ -77,7 +77,7 @@ export class LocalizeRouterPipe implements PipeTransform {
       this.value = route;
       this.lastKey = key;
       this._ref.markForCheck();
-    }
+    };
   }
 
   /**
