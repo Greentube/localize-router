@@ -38,7 +38,6 @@ export function initializeLocalizeRouterFactory(routes: Routes) {
   return (loader: LocalizeLoader) => () => loader.load(routes);
 }
 
-
 @NgModule({
   imports: [HttpModule, RouterModule, TranslateModule],
   declarations: [LocalizeRouterPipe],

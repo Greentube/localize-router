@@ -38,7 +38,7 @@ export abstract class LocalizeLoader {
   /**
    * Initialize language and routes
    * @param routes
-   * @returns {Promise<T>}
+   * @returns {Promise<any>}
    */
   protected init(routes: Routes): Promise<any> {
     this.originalRouteNames = JSON.parse(JSON.stringify(routes));
@@ -173,7 +173,7 @@ export class LocalizeManualLoader extends LocalizeLoader {
   }
 
   load(routes: Routes): Promise<any> {
-    return new Promise((resolve: any, reject: any) => {
+    return new Promise((resolve: any) => {
       this.routes = routes;
 
       this.init(this.routes).then(resolve);
@@ -195,7 +195,7 @@ export class LocalizeStaticLoader extends LocalizeLoader {
   }
 
   load(routes: Routes): Promise<any> {
-    return new Promise((resolve: any, reject: any) => {
+    return new Promise((resolve: any) => {
       this.http.get(`${this.path}`)
         .map((res: Response) => res.json())
         .subscribe((data: ILocalizeRouteConfig) => {
@@ -220,11 +220,10 @@ export class LocalizeRouterService {
   /**
    * CTOR
    * @param loader
-   * @param translate
    * @param router
-   * @param location
    */
   constructor(public loader: LocalizeLoader, private router: Router) {
+    console.log(this.loader.routes);
     this.router.resetConfig(this.loader.routes);
     this.router.events.subscribe(this._routeChanged());
     this.routerEvents = new Subject<string>();
@@ -234,7 +233,6 @@ export class LocalizeRouterService {
    * Change language and navigate to translated route
    * @param lang
    */
-
   changeLanguage(lang: string) {
     if (lang !== this.loader.currentLang) {
       let currentTree = this.router.parseUrl(location.pathname);
@@ -253,7 +251,7 @@ export class LocalizeRouterService {
    * Translate route to current language
    * If new language is explicitly provided then replace language part in url with new language
    * @param route
-   * @param language
+   * @param appendLanguage
    * @returns {Observable<string>}
    */
   translateRoute(route: string, appendLanguage?: boolean): Observable<string> {
@@ -276,6 +274,6 @@ export class LocalizeRouterService {
         /** Fire route change event */
         this.routerEvents.next(lang);
       }
-    }
+    };
   }
 }
