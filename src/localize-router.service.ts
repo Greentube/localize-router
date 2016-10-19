@@ -101,23 +101,23 @@ export abstract class LocalizeLoader {
     return observable.toPromise();
   }
 
-  translateRoute(route: string): Observable<string> {
-    let routeParts = route.split('/');
+  translateRoute(path: string): Observable<string> {
+    let pathSegments = path.split('/');
 
     /** collect observables  */
-    let routeObservables: Observable<any>[] = routeParts.map((part: string) =>
+    let routeObservables: Observable<any>[] = pathSegments.map((part: string) =>
       part.length ?
         this.translate.get(this.prefix + part) :
         Observable.of(part));
 
     return new Observable<string>((observer: Observer<string>) => {
-      Observable.forkJoin(routeObservables).subscribe((parts: Array<string>) => {
-        for (let i = 0; i < parts.length; i++) {
-          if (parts[i] === this.prefix + routeParts[i]) {
-            parts[i] = routeParts[i];
+      Observable.forkJoin(routeObservables).subscribe((translatedSegments: Array<string>) => {
+        for (let i = 0; i < translatedSegments.length; i++) {
+          if (translatedSegments[i] === this.prefix + pathSegments[i]) {
+            translatedSegments[i] = pathSegments[i];
           }
         }
-        observer.next(parts.join('/'));
+        observer.next(translatedSegments.join('/'));
         observer.complete();
       });
     });
@@ -223,7 +223,6 @@ export class LocalizeRouterService {
    * @param router
    */
   constructor(public loader: LocalizeLoader, private router: Router) {
-    console.log(this.loader.routes);
     this.router.resetConfig(this.loader.routes);
     this.router.events.subscribe(this._routeChanged());
     this.routerEvents = new Subject<string>();
@@ -250,12 +249,20 @@ export class LocalizeRouterService {
   /**
    * Translate route to current language
    * If new language is explicitly provided then replace language part in url with new language
-   * @param route
+   * @param path
    * @param appendLanguage
    * @returns {Observable<string>}
    */
-  translateRoute(route: string, appendLanguage?: boolean): Observable<string> {
-    return this.loader.translateRoute(appendLanguage ? `/${this.loader.currentLang}${route}` : route);
+  translateRoute(path: string, appendLanguage?: boolean): Observable<string> {
+    let startsWithBackslash = path.length && path.indexOf('/') === 0;
+    if (appendLanguage === void 0) {
+      appendLanguage = startsWithBackslash;
+    }
+    let interpolated = appendLanguage ?
+      startsWithBackslash ? `/${this.loader.currentLang}${path}` : `/${this.loader.currentLang}/${path}` :
+      path;
+
+    return this.loader.translateRoute(interpolated);
   }
 
   /**
