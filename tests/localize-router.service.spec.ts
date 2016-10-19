@@ -1,24 +1,49 @@
 import {Injector} from "@angular/core";
 import {XHRBackend, HttpModule} from "@angular/http";
 import {MockBackend, MockConnection} from "@angular/http/testing";
-import {
-  LocalizeRouterService,} from '../src/localize-router.service';
+import { LocalizeRouterService } from '../src/localize-router.service';
 import {LocalizeRouterModule} from '../src/localize-router.module';
 import {getTestBed, TestBed} from "@angular/core/testing";
-import {RouterModule} from "@angular/router";
-import {TranslateModule} from "ng2-translate";
+import {Routes, NavigationStart, Router} from "@angular/router";
+import {Observable, Subject} from "rxjs";
+import {TranslateService} from "ng2-translate";
 
-xdescribe('LocalizeRouterService', () => {
+class FakeTranslateService {
+  defLang: string;
+  currentLang: string;
+
+  content: any = {};
+
+  setDefaultLang(lang: string) { this.defLang = lang; }
+  getDefaultLang() { return this.defLang; }
+  use(lang: string) { this.currentLang = lang; }
+  get(input: string) { return Observable.of(this.content[input] || input); }
+}
+
+class FakeRouter {
+  routes: Routes;
+  events: Subject<NavigationStart | string> = new Subject<NavigationStart | string>();
+
+  resetConfig(routes: Routes) { this.routes = routes; }
+  parseUrl(input: string) { return input; }
+}
+
+describe('LocalizeRouterService', () => {
   let injector: Injector;
   let backend: MockBackend;
   let localizeRouterService: LocalizeRouterService;
   let connection: MockConnection; // this will be set when a new connection is emitted from the backend.
+  let routes: Routes;
 
   beforeEach(() => {
+    routes = [{ path: '', redirectTo: 'some/path' }];
+
     TestBed.configureTestingModule({
-      imports: [HttpModule, TranslateModule.forRoot(), LocalizeRouterModule.forRoot([]), RouterModule.forRoot([])],
+      imports: [HttpModule, LocalizeRouterModule.forRoot(routes)],
       providers: [
-        {provide: XHRBackend, useClass: MockBackend}
+        {provide: XHRBackend, useClass: MockBackend},
+        {provide: Router, useClass: FakeRouter},
+        {provide: TranslateService, useClass: FakeTranslateService}
       ]
     });
     injector = getTestBed();

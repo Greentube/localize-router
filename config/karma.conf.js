@@ -4,7 +4,7 @@ module.exports = function (config) {
   var configuration = {
     basePath: '',
 
-    frameworks: ['jasmine', 'source-map-support'],
+    frameworks: ['jasmine'],
 
     // list of files to exclude
     exclude: [],
