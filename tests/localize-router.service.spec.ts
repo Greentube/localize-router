@@ -3,7 +3,7 @@ import {XHRBackend, HttpModule} from "@angular/http";
 import {MockBackend, MockConnection} from "@angular/http/testing";
 import {LocalizeRouterService, LocalizeLoader, LocalizeManualLoader} from '../src/localize-router.service';
 import {LocalizeRouterModule} from '../src/localize-router.module';
-import {getTestBed, TestBed} from "@angular/core/testing";
+import {getTestBed, TestBed, fakeAsync, tick} from "@angular/core/testing";
 import {Routes, Router, Event, NavigationStart, NavigationEnd} from "@angular/router";
 import {Observable, Subject} from "rxjs";
 import {TranslateService} from "ng2-translate";
@@ -12,7 +12,10 @@ class FakeTranslateService {
   defLang: string;
   currentLang: string;
 
-  content: any = {};
+  content: any = {
+    'PREFIX.home': 'home_TR',
+    'PREFIX.about': 'about_TR'
+  };
 
   setDefaultLang(lang: string) { this.defLang = lang; }
   getDefaultLang() { return this.defLang; }
@@ -27,6 +30,8 @@ class FakeRouter extends Router {
   resetConfig(routes: Routes) { this.routes = routes; }
   get events(): Observable<Event> { return this.fakeRouterEvents; }
 }
+
+class DummyComponent {}
 
 describe('LocalizeRouterService', () => {
   let injector: Injector;
@@ -204,6 +209,9 @@ describe('LocalizeLoader', () => {
   let translate: TranslateService;
 
   let fakeLocation = { pathname: '' };
+  let routes: Routes;
+  let locales: string[];
+  let prefix = 'PREFIX.';
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -212,6 +220,14 @@ describe('LocalizeLoader', () => {
         {provide: location, useValue: fakeLocation}
       ]
     });
+    routes = [
+      { path: '', redirectTo: 'some/path' },
+      { path: 'some/path', children: [
+        { path: '', redirectTo: 'nothing' },
+        { path: 'else/:id', redirectTo: 'nothing/else' }
+      ]}
+    ];
+    locales = ['en', 'de', 'fr'];
     injector = getTestBed();
     translate = injector.get(TranslateService);
     loader = new LocalizeManualLoader(translate);
@@ -234,25 +250,128 @@ describe('LocalizeLoader', () => {
   });
 
   it('should set locales on init', () => {
-    let locales = ['a', 'b', 'c'];
-    loader = new LocalizeManualLoader(translate, locales, 'my prefix');
+    loader = new LocalizeManualLoader(translate, locales, prefix);
     expect(loader.locales).toEqual(locales);
   });
 
   it('should extract language from url on getLocationLang', () => {
-    let locales = ['en', 'de', 'fr'];
-    loader = new LocalizeManualLoader(translate, locales, 'my prefix');
+    loader = new LocalizeManualLoader(translate, locales, prefix);
 
     expect(loader.getLocationLang('/en/some/path/after')).toEqual('en');
     expect(loader.getLocationLang('de/some/path/after')).toEqual('de');
   });
 
   it('should return null on getLocationLang if lang not found', () => {
-    let locales = ['en', 'de', 'fr'];
-    loader = new LocalizeManualLoader(translate, locales, 'my prefix');
+    loader = new LocalizeManualLoader(translate, locales, prefix);
 
     expect(loader.getLocationLang('/se/some/path/after')).toEqual(null);
     expect(loader.getLocationLang('rs/some/path/after')).toEqual(null);
   });
 
+  it('should call translateRoutes on init if locales passed', fakeAsync(() => {
+    loader = new LocalizeManualLoader(translate, locales, prefix);
+    spyOn(loader, 'translateRoutes').and.callThrough();
+
+    loader.load([]);
+    tick();
+    expect(loader.translateRoutes).toHaveBeenCalled();
+  }));
+
+  it('should not call translateRoutes on init if no locales', fakeAsync(() => {
+    loader = new LocalizeManualLoader(translate, [], prefix);
+    spyOn(loader, 'translateRoutes').and.callThrough();
+
+    loader.load(routes);
+    tick();
+    expect(loader.translateRoutes).not.toHaveBeenCalled();
+  }));
+
+  it('should set language from navigator params', fakeAsync(() => {
+    loader = new LocalizeManualLoader(translate, locales, prefix);
+    spyOn(loader, 'translateRoutes').and.callThrough();
+
+    (<any>navigator)['__defineGetter__']('language', function () { return 'de-AT'; });
+
+    routes = [];
+    loader.load(routes);
+    tick();
+    expect(routes[0]).toEqual({path: '', redirectTo: 'de', pathMatch: 'full'});
+    expect(routes[1]).toEqual({path: 'de', children: []});
+    expect(loader.currentLang).toEqual('de');
+    expect(translate.currentLang).toEqual('de');
+  }));
+
+  it('should pick first language from locales if navigator language not recognized', fakeAsync(() => {
+    loader = new LocalizeManualLoader(translate, locales, prefix);
+    spyOn(loader, 'translateRoutes').and.callThrough();
+
+    (<any>navigator)['__defineGetter__']('language', function () { return 'sr-sp'; });
+
+    routes = [];
+    loader.load(routes);
+    tick();
+    expect(routes[0].redirectTo).toEqual('en');
+    expect(loader.currentLang).toEqual('en');
+    expect(translate.currentLang).toEqual('en');
+  }));
+
+  it('should translate path', fakeAsync(() => {
+    loader = new LocalizeManualLoader(translate, locales, prefix);
+    spyOn(loader, 'translateRoutes').and.callThrough();
+    (<any>navigator)['__defineGetter__']('language', function () { return 'sr-sp'; });
+
+    routes = [{path: 'home', component: DummyComponent }];
+    loader.load(routes);
+    tick();
+    expect(routes[1].children[0].path).toEqual('home_TR');
+  }));
+
+  it('should not translate path if translation not found', fakeAsync(() => {
+    loader = new LocalizeManualLoader(translate, locales, prefix);
+    spyOn(loader, 'translateRoutes').and.callThrough();
+    (<any>navigator)['__defineGetter__']('language', function () { return 'sr-sp'; });
+
+    routes = [{path: 'abc', component: DummyComponent }];
+    loader.load(routes);
+    tick();
+    expect(routes[1].children[0].path).toEqual('abc');
+  }));
+
+  it('should translate redirectTo', fakeAsync(() => {
+    loader = new LocalizeManualLoader(translate, locales, prefix);
+    spyOn(loader, 'translateRoutes').and.callThrough();
+    (<any>navigator)['__defineGetter__']('language', function () { return 'sr-sp'; });
+
+    routes = [{redirectTo: 'home' }];
+    loader.load(routes);
+    tick();
+    expect(routes[1].children[0].redirectTo).toEqual('home_TR');
+  }));
+
+  it('should translate complex path segments', fakeAsync(() => {
+    loader = new LocalizeManualLoader(translate, locales, prefix);
+    spyOn(loader, 'translateRoutes').and.callThrough();
+    (<any>navigator)['__defineGetter__']('language', function () { return 'sr-sp'; });
+
+    routes = [{path: '/home/about', component: DummyComponent }];
+    loader.load(routes);
+    tick();
+    expect(routes[1].children[0].path).toEqual('/home_TR/about_TR');
+  }));
+
+  it('should translate children', fakeAsync(() => {
+    loader = new LocalizeManualLoader(translate, locales, prefix);
+    spyOn(loader, 'translateRoutes').and.callThrough();
+    (<any>navigator)['__defineGetter__']('language', function () { return 'sr-sp'; });
+
+    routes = [
+      {path: 'home', children: [
+        {path: 'about', component: DummyComponent }
+      ]}
+    ];
+    loader.load(routes);
+    tick();
+    expect(routes[1].children[0].path).toEqual('home_TR');
+    expect(routes[1].children[0].children[0].path).toEqual('about_TR');
+  }));
 });
