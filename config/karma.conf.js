@@ -21,7 +21,7 @@ module.exports = function (config) {
     // Webpack Config at ./webpack.test.js
     webpack: testWebpackConfig,
 
-    reporters: ['mocha', 'coverage'],
+    reporters: ['mocha', 'coverage', 'progress'],
 
     coverageReporter: {
       dir: 'coverage/',

@@ -4,7 +4,7 @@ import {MockBackend, MockConnection} from "@angular/http/testing";
 import {LocalizeRouterService, LocalizeLoader, LocalizeManualLoader} from '../src/localize-router.service';
 import {LocalizeRouterModule} from '../src/localize-router.module';
 import {getTestBed, TestBed} from "@angular/core/testing";
-import {Routes, Router, UrlTree, Event, NavigationStart, NavigationEnd} from "@angular/router";
+import {Routes, Router, Event, NavigationStart, NavigationEnd} from "@angular/router";
 import {Observable, Subject} from "rxjs";
 import {TranslateService} from "ng2-translate";
 
@@ -25,8 +25,6 @@ class FakeRouter extends Router {
   fakeRouterEvents: Subject<Event> = new Subject<Event>();
 
   resetConfig(routes: Routes) { this.routes = routes; }
-  parseUrl(input: string): UrlTree { return null; }
-
   get events(): Observable<Event> { return this.fakeRouterEvents; }
 }
 
@@ -172,6 +170,32 @@ describe('LocalizeRouterService', () => {
     (router as FakeRouter).fakeRouterEvents.next(new NavigationEnd(1, '/en/new/path', '/en/new/path'));
     expect(loader.translateRoutes).not.toHaveBeenCalled();
   });
+
+  it('should throw on changeLanguage', () => {
+    localizeRouterService = new LocalizeRouterService(loader, router);
+    loader.currentLang = 'de';
+    loader.locales = ['de', 'en'];
+    loader.routes = routes;
+    spyOn(router, 'parseUrl').and.returnValue(null);
+    spyOn(loader, 'translateRoutes').and.returnValue(Promise.resolve('en'));
+
+    expect(() => {
+      localizeRouterService.changeLanguage('en');
+    }).toThrowError('Not implemented yet');
+  });
+
+  it('should not throw on changeLanguage if same language', () => {
+    localizeRouterService = new LocalizeRouterService(loader, router);
+    loader.currentLang = 'de';
+    loader.locales = ['de', 'en'];
+    loader.routes = routes;
+    spyOn(router, 'parseUrl').and.returnValue(null);
+    spyOn(loader, 'translateRoutes').and.returnValue(Promise.resolve('en'));
+
+    expect(() => {
+      localizeRouterService.changeLanguage('de');
+    }).not.toThrow();
+  });
 });
 
 describe('LocalizeLoader', () => {
@@ -179,10 +203,13 @@ describe('LocalizeLoader', () => {
   let loader: LocalizeManualLoader;
   let translate: TranslateService;
 
+  let fakeLocation = { pathname: '' };
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
-        {provide: TranslateService, useClass: FakeTranslateService}
+        {provide: TranslateService, useClass: FakeTranslateService},
+        {provide: location, useValue: fakeLocation}
       ]
     });
     injector = getTestBed();
@@ -211,4 +238,21 @@ describe('LocalizeLoader', () => {
     loader = new LocalizeManualLoader(translate, locales, 'my prefix');
     expect(loader.locales).toEqual(locales);
   });
+
+  it('should extract language from url on getLocationLang', () => {
+    let locales = ['en', 'de', 'fr'];
+    loader = new LocalizeManualLoader(translate, locales, 'my prefix');
+
+    expect(loader.getLocationLang('/en/some/path/after')).toEqual('en');
+    expect(loader.getLocationLang('de/some/path/after')).toEqual('de');
+  });
+
+  it('should return null on getLocationLang if lang not found', () => {
+    let locales = ['en', 'de', 'fr'];
+    loader = new LocalizeManualLoader(translate, locales, 'my prefix');
+
+    expect(loader.getLocationLang('/se/some/path/after')).toEqual(null);
+    expect(loader.getLocationLang('rs/some/path/after')).toEqual(null);
+  });
+
 });

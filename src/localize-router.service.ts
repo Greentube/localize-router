@@ -76,7 +76,6 @@ export abstract class LocalizeLoader {
 
   private _translateRouteTree(routes: Routes, originals: Routes): Promise<any> {
     let promises: Promise<any>[] = [];
-
     routes.forEach((route: Route, index: number) => {
       let original = originals[index];
       if (route.path) {
@@ -144,8 +143,7 @@ export abstract class LocalizeLoader {
    * @private
    */
   getLocationLang(url?: string): string {
-    let currentPath = location.pathname.slice(1); // strip off starting backslash
-    let pathSlices = (url || currentPath).split('/');
+    let pathSlices = (url || location.pathname).split('/');
 
     if (pathSlices.length > 1 && this.locales.indexOf(pathSlices[1]) !== -1) {
       return pathSlices[1];
@@ -243,6 +241,7 @@ export class LocalizeRouterService {
         // silently change the url
         history.pushState(null, '', newUrl);
       });
+      throw new Error('Not implemented yet');
     }
   }
 
