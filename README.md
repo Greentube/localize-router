@@ -152,28 +152,28 @@ class MyComponent {
 ### LocalizeRouterService
 #### Properties:
 - `routerEvents`: An EventEmitter to listen to language change event
-    ```ts
-    localizeService.routerEvents.subscribe((language: string) => {
-        // do something with language
-    });
-    ```
+```ts
+localizeService.routerEvents.subscribe((language: string) => {
+    // do something with language
+});
+```
 - `loader`: Used instance of LocalizeLoader
-    ```ts
-    let selectedLanguage = localizeService.loader.currentLang;
-    ```ts
+```ts
+let selectedLanguage = localizeService.loader.currentLang;
+```
 #### Methods:
 - `translateRoute(path: string, prependLanguage?: boolean): Observable<string>`: Translates given path. If `prependLanguage` is true or `path` starts with backslash and `prependLanguage` not set then path is prepended with currently set language. 
-    ```ts
-    localizeService.translateRoute('', true).subscribe((res: string) => {
-        // res equals e.g. '/en'
-    });
-    localizeService.translateRoute('', false).subscribe((res: string) => {
-        // res equals ''
-    });
-    localizeService.translateRoute('/').subscribe((res: string) => {
-        // res equals e.g. '/en'
-    });    
-    ```
+```ts
+localizeService.translateRoute('', true).subscribe((res: string) => {
+    // res equals e.g. '/en'
+});
+localizeService.translateRoute('', false).subscribe((res: string) => {
+    // res equals ''
+});
+localizeService.translateRoute('/').subscribe((res: string) => {
+    // res equals e.g. '/en'
+});    
+```
 ### LocalizeLoader
 #### Properties:
 - `locales`: Array of used language codes
