@@ -100,7 +100,7 @@ export abstract class LocalizeLoader {
     return observable.toPromise();
   }
 
-  translateRoute(path: string): Observable<string> {
+  public translateRoute(path: string): Observable<string> {
     let pathSegments = path.split('/');
 
     /** collect observables  */
@@ -234,9 +234,9 @@ export class LocalizeRouterService {
     if (lang !== this.loader.currentLang) {
       let currentTree = this.router.parseUrl(location.pathname);
       let newUrl = location.pathname;
-      console.log(currentTree);
+      // console.log(currentTree);
       this.loader.translateRoutes(lang).then(() => {
-        console.log('done translating');
+        // console.log('done translating');
 
         // silently change the url
         history.pushState(null, '', newUrl);
@@ -249,15 +249,15 @@ export class LocalizeRouterService {
    * Translate route to current language
    * If new language is explicitly provided then replace language part in url with new language
    * @param path
-   * @param appendLanguage
+   * @param prependLanguage
    * @returns {Observable<string>}
    */
-  translateRoute(path: string, appendLanguage?: boolean): Observable<string> {
+  translateRoute(path: string, prependLanguage?: boolean): Observable<string> {
     let startsWithBackslash = path.length && path.indexOf('/') === 0;
-    if (appendLanguage === void 0) {
-      appendLanguage = startsWithBackslash;
+    if (prependLanguage === void 0) {
+      prependLanguage = startsWithBackslash;
     }
-    let interpolated = appendLanguage ?
+    let interpolated = prependLanguage ?
       startsWithBackslash ? `/${this.loader.currentLang}${path}` : `/${this.loader.currentLang}/${path}` :
       path;
 

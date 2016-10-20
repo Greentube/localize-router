@@ -15,18 +15,7 @@ import {TranslateModule, TranslateService} from 'ng2-translate';
  * @returns {LocalizeStaticLoader}
  */
 export function localizeLoaderFactory(translate: TranslateService, http: Http) {
-  return new LocalizeStaticLoader(translate, http);
-}
-
-/**
- * Helper function for manual loader setting
- * @param translate
- * @param locales
- * @param prefix
- * @returns {LocalizeManualLoader}
- */
-export function localizeManualLoaderFactory(translate: TranslateService, locales: Array<string>, prefix: string) {
-  return new LocalizeManualLoader(translate, locales, prefix);
+  return new LocalizeStaticLoader(translate, http, 'assets/locales.json');
 }
 
 /**
