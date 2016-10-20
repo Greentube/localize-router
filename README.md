@@ -179,9 +179,11 @@ localizeService.translateRoute('/').subscribe((res: string) => {
 - `locales`: Array of used language codes
 - `currentLang`: Currently selected language
 - `routes`: Currently used translated routes
+
 #### Methods:
 - `translateRoutes(language: string): Promise<any>`: Translates all the routes and sets language and current language across the application.
 - `translateRoute(path: string): Observable<string>`: Translates single path
 - `getLocationLang(url?: string): string`: Extracts language from current url if matching defined locales
+
 ## License
 Licensed under MIT
