@@ -1,4 +1,4 @@
-import {Injector} from "@angular/core";
+import {Injector, ApplicationRef} from "@angular/core";
 import {XHRBackend, HttpModule} from "@angular/http";
 import {MockBackend, MockConnection} from "@angular/http/testing";
 import {LocalizeRouterService, LocalizeLoader, LocalizeManualLoader} from '../src/localize-router.service';
@@ -31,6 +31,12 @@ class FakeRouter extends Router {
   get events(): Observable<Event> { return this.fakeRouterEvents; }
 }
 
+class FakeApplicationRef {
+  componentTypes: any[];
+
+  constructor(){ this.componentTypes = [DummyComponent]; }
+}
+
 class DummyComponent {}
 
 describe('LocalizeRouterService', () => {
@@ -38,25 +44,28 @@ describe('LocalizeRouterService', () => {
   let backend: MockBackend;
   let loader: LocalizeLoader;
   let router: Router;
+  let appRef: ApplicationRef;
   let localizeRouterService: LocalizeRouterService;
   let connection: MockConnection; // this will be set when a new connection is emitted from the backend.
   let routes: Routes;
 
   beforeEach(() => {
-    routes = [{ path: '', redirectTo: 'some/path' }];
+    routes = [{ path: '', component: DummyComponent }];
 
     TestBed.configureTestingModule({
       imports: [HttpModule, LocalizeRouterModule.forRoot(routes)],
       providers: [
         {provide: XHRBackend, useClass: MockBackend},
         {provide: Router, useClass: FakeRouter},
-        {provide: TranslateService, useClass: FakeTranslateService}
+        {provide: TranslateService, useClass: FakeTranslateService},
+        {provide: ApplicationRef, useClass: FakeApplicationRef}
       ]
     });
     injector = getTestBed();
     backend = injector.get(XHRBackend);
     loader = injector.get(LocalizeLoader);
     router = injector.get(Router);
+    appRef = injector.get(ApplicationRef);
     // sets the connection when someone tries to access the backend with an xhr request
     backend.connections.subscribe((c: MockConnection) => connection = c);
   });
@@ -70,13 +79,13 @@ describe('LocalizeRouterService', () => {
 
   it('is defined', () => {
     expect(LocalizeRouterService).toBeDefined();
-    localizeRouterService = new LocalizeRouterService(loader, router);
+    localizeRouterService = new LocalizeRouterService(loader, router, appRef);
     expect(localizeRouterService).toBeDefined();
     expect(localizeRouterService instanceof LocalizeRouterService).toBeTruthy();
   });
 
   it('should initialize routerEvents', () => {
-    localizeRouterService = new LocalizeRouterService(loader, router);
+    localizeRouterService = new LocalizeRouterService(loader, router, appRef);
     expect(localizeRouterService.routerEvents).toBeDefined();
   });
 
@@ -85,12 +94,12 @@ describe('LocalizeRouterService', () => {
     loader.routes = routes;
     spyOn(router, 'resetConfig').and.callThrough();
 
-    localizeRouterService = new LocalizeRouterService(loader, router);
+    localizeRouterService = new LocalizeRouterService(loader, router, appRef);
     expect(router.resetConfig).toHaveBeenCalledWith(routes);
   });
 
   it('should call loader translateRoute', () => {
-    localizeRouterService = new LocalizeRouterService(loader, router);
+    localizeRouterService = new LocalizeRouterService(loader, router, appRef);
     let testString = 'result/path';
     spyOn(loader, 'translateRoute').and.returnValue(Observable.of(testString));
 
@@ -101,7 +110,7 @@ describe('LocalizeRouterService', () => {
   });
 
   it('should append language if root route', () => {
-    localizeRouterService = new LocalizeRouterService(loader, router);
+    localizeRouterService = new LocalizeRouterService(loader, router, appRef);
     loader.currentLang = 'de';
     spyOn(loader, 'translateRoute').and.stub();
 
@@ -110,7 +119,7 @@ describe('LocalizeRouterService', () => {
   });
 
   it('should append language if second param is true', () => {
-    localizeRouterService = new LocalizeRouterService(loader, router);
+    localizeRouterService = new LocalizeRouterService(loader, router, appRef);
     loader.currentLang = 'de';
     spyOn(loader, 'translateRoute').and.stub();
 
@@ -119,7 +128,7 @@ describe('LocalizeRouterService', () => {
   });
 
   it('should append language if second param is true and is root route', () => {
-    localizeRouterService = new LocalizeRouterService(loader, router);
+    localizeRouterService = new LocalizeRouterService(loader, router, appRef);
     loader.currentLang = 'de';
     spyOn(loader, 'translateRoute').and.stub();
 
@@ -128,7 +137,7 @@ describe('LocalizeRouterService', () => {
   });
 
   it('should not append language if second param is false', () => {
-    localizeRouterService = new LocalizeRouterService(loader, router);
+    localizeRouterService = new LocalizeRouterService(loader, router, appRef);
     loader.currentLang = 'de';
     spyOn(loader, 'translateRoute').and.stub();
 
@@ -137,7 +146,7 @@ describe('LocalizeRouterService', () => {
   });
 
   it('should translate routes if language had changed on route event', () => {
-    localizeRouterService = new LocalizeRouterService(loader, router);
+    localizeRouterService = new LocalizeRouterService(loader, router, appRef);
     loader.currentLang = 'de';
     loader.locales = ['de', 'en'];
     spyOn(loader, 'translateRoutes').and.stub();
@@ -147,7 +156,7 @@ describe('LocalizeRouterService', () => {
   });
 
   it('should not translate routes if language not found', () => {
-    localizeRouterService = new LocalizeRouterService(loader, router);
+    localizeRouterService = new LocalizeRouterService(loader, router, appRef);
     loader.currentLang = 'de';
     loader.locales = ['de', 'en'];
     spyOn(loader, 'translateRoutes').and.stub();
@@ -157,7 +166,7 @@ describe('LocalizeRouterService', () => {
   });
 
   it('should not translate routes if language is same', () => {
-    localizeRouterService = new LocalizeRouterService(loader, router);
+    localizeRouterService = new LocalizeRouterService(loader, router, appRef);
     loader.currentLang = 'de';
     loader.locales = ['de', 'en'];
     spyOn(loader, 'translateRoutes').and.stub();
@@ -167,7 +176,7 @@ describe('LocalizeRouterService', () => {
   });
 
   it('should not translate routes if not NavigationStart', () => {
-    localizeRouterService = new LocalizeRouterService(loader, router);
+    localizeRouterService = new LocalizeRouterService(loader, router, appRef);
     loader.currentLang = 'de';
     loader.locales = ['de', 'en'];
     spyOn(loader, 'translateRoutes').and.stub();
@@ -176,31 +185,38 @@ describe('LocalizeRouterService', () => {
     expect(loader.translateRoutes).not.toHaveBeenCalled();
   });
 
-  it('should throw on changeLanguage', () => {
-    localizeRouterService = new LocalizeRouterService(loader, router);
+  // it('should set new url', fakeAsync(() => {
+  //   localizeRouterService = new LocalizeRouterService(loader, router, appRef);
+  //   loader.currentLang = 'de';
+  //   loader.locales = ['de', 'en'];
+  //   loader.routes = [{ path: 'en', component: DummyComponent, children: [
+  //     {path: 'about', children: [
+  //       {path:'', component: DummyComponent},
+  //       {path:':id', component: DummyComponent}
+  //     ]},
+  //   ]}];
+  //   spyOn(router, 'parseUrl').and.returnValue(null);
+  //   spyOn(loader, 'translateRoutes').and.returnValue(Promise.resolve('en'));
+  //   spyOn(history, 'pushState').and.stub();
+  //
+  //   localizeRouterService.changeLanguage('de');
+  //   tick();
+  //   expect(history.pushState).toHaveBeenCalled();
+  // }));
+
+  it('should not set new url if same language', fakeAsync(() => {
+    localizeRouterService = new LocalizeRouterService(loader, router, appRef);
     loader.currentLang = 'de';
     loader.locales = ['de', 'en'];
     loader.routes = routes;
     spyOn(router, 'parseUrl').and.returnValue(null);
     spyOn(loader, 'translateRoutes').and.returnValue(Promise.resolve('en'));
+    spyOn(history, 'pushState').and.stub();
 
-    expect(() => {
-      localizeRouterService.changeLanguage('en');
-    }).toThrowError('Not implemented yet');
-  });
-
-  it('should not throw on changeLanguage if same language', () => {
-    localizeRouterService = new LocalizeRouterService(loader, router);
-    loader.currentLang = 'de';
-    loader.locales = ['de', 'en'];
-    loader.routes = routes;
-    spyOn(router, 'parseUrl').and.returnValue(null);
-    spyOn(loader, 'translateRoutes').and.returnValue(Promise.resolve('en'));
-
-    expect(() => {
-      localizeRouterService.changeLanguage('de');
-    }).not.toThrow();
-  });
+    localizeRouterService.changeLanguage('de');
+    tick();
+    expect(history.pushState).not.toHaveBeenCalled();
+  }));
 });
 
 describe('LocalizeLoader', () => {

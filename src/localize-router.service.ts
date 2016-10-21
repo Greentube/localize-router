@@ -1,11 +1,12 @@
-import {Injectable, Inject} from '@angular/core';
+import {Injectable, Inject, ApplicationRef} from '@angular/core';
 import {Http, Response} from '@angular/http';
-import {Routes, Router, Route, NavigationStart} from '@angular/router';
+import {Routes, Router, Route, NavigationStart, ActivatedRouteSnapshot, RouterStateSnapshot} from '@angular/router';
 import {TranslateService} from 'ng2-translate';
 import {Observable} from 'rxjs/Observable';
 import {Observer} from 'rxjs/Observer';
 import {Subject} from "rxjs/Subject";
 import 'rxjs/add/observable/forkJoin';
+import {recognize} from "@angular/router/src/recognize";
 
 interface ILocalizeRouteConfig {
   locales: Array<string>;
@@ -220,7 +221,7 @@ export class LocalizeRouterService {
    * @param loader
    * @param router
    */
-  constructor(public loader: LocalizeLoader, private router: Router) {
+  constructor(public loader: LocalizeLoader, private router: Router, private appRef: ApplicationRef) {
     this.router.resetConfig(this.loader.routes);
     this.router.events.subscribe(this._routeChanged());
     this.routerEvents = new Subject<string>();
@@ -233,16 +234,41 @@ export class LocalizeRouterService {
   changeLanguage(lang: string) {
     if (lang !== this.loader.currentLang) {
       let currentTree = this.router.parseUrl(location.pathname);
-      let newUrl = location.pathname;
-      // console.log(currentTree);
-      this.loader.translateRoutes(lang).then(() => {
-        // console.log('done translating');
 
-        // silently change the url
-        history.pushState(null, '', newUrl);
+      recognize(this.appRef.componentTypes[0], this.loader.routes, currentTree, location.pathname).subscribe((s: RouterStateSnapshot) =>{
+        this.loader.translateRoutes(lang).then(() => {
+          let newUrl = this.traverseRouteSnapshot(s.root);
+          history.pushState(null, '', newUrl);
+        });
       });
-      throw new Error('Not implemented yet');
     }
+  }
+
+  /**
+   * Traverses through the tree to assemble new translated url
+   * @param snapshot
+   * @returns {string}
+   */
+  private traverseRouteSnapshot(snapshot: ActivatedRouteSnapshot): string {
+    if (snapshot.firstChild) {
+      return this.parseSegmentValue(snapshot) + '/' + this.traverseRouteSnapshot(snapshot.firstChild);
+    }
+    return this.parseSegmentValue(snapshot);
+  }
+
+  /**
+   * Extracts new segment value based on routeConfig and url
+   * @param snapshot
+   * @returns {any}
+   */
+  private parseSegmentValue(snapshot: ActivatedRouteSnapshot): string {
+    if (snapshot.routeConfig) {
+      let subPathSegments = snapshot.routeConfig.path.split('/');
+      return subPathSegments.
+      map((s: string, i: number) => s.indexOf(':') === 0 ? snapshot.url[i].path : s).
+      join('/');
+    }
+    return '';
   }
 
   /**

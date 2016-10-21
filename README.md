@@ -11,6 +11,7 @@ Based on an extension of [ng2-translate](https://github.com/ocombe/ng2-translate
         - [JSON config file](#json-config-file)
         - [Manual initialization](#manual-initialization)
     - [How it works](#how-it-works)
+        - [ng2-translate integration](#ng2-translate-integration)
     - [Pipe](#pipe)
     - [Service](#service)
 - [API](#api)
@@ -119,6 +120,18 @@ http://yourpath/home -> http://yourpath/en/home
 If no language is provided in the url path, application uses default path - language set in the browser or first locale in the config.
 Make sure you therefore place most common language (e.g. 'en') as a first string in the array of locales.
 
+#### ng2-translate integration
+
+`LocalizeRouter` depends on `ng2-translate` and automatically initializes it with selected locales.
+Following code is run on `LocalizeLoader` init:
+```ts
+this.translate.setDefaultLang(languageOfBrowser || firstLanguageFromConfig);
+// ...
+this.translate.use(languageFromUrl || languageOfBrowser || firstLanguageFromConfig);
+```
+
+Both `languageOfBrowser` and `languageFromUrl` are cross-checked with locales from config.
+
 ### Pipe
 
 `LocalizeRouterPipe` is used to translate `routerLink` directive's content. Pipe can be appended to partial strings in the routerLink's definition or to entire array element:
@@ -173,6 +186,11 @@ localizeService.translateRoute('', false).subscribe((res: string) => {
 localizeService.translateRoute('/').subscribe((res: string) => {
     // res equals e.g. '/en'
 });    
+```
+- `changeLanguage(lang: string)`: Translates current url to given language and changes the application's language
+For german language and route defined as `:lang/users/:user_name/profile`
+```
+yoursite.com/en/users/Miroslav%20Jonas/profile -> yoursite.com/de/benutzer/Miroslav%20Jonas/profil
 ```
 ### LocalizeLoader
 #### Properties:
