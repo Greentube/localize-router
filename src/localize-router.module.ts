@@ -1,30 +1,30 @@
 import {NgModule, ModuleWithProviders, APP_INITIALIZER} from '@angular/core';
 import {HttpModule, Http} from '@angular/http';
 import {
-  LocalizeRouterService, LocalizeLoader, LocalizeStaticLoader,
-  LocalizeManualLoader
+  LocalizeRouterService, LocalizeParser, StaticParserLoader,
+  ManualParserLoader
 } from './localize-router.service';
 import {RouterModule, Routes} from '@angular/router';
 import {LocalizeRouterPipe} from './localize-router.pipe';
 import {TranslateModule, TranslateService} from 'ng2-translate';
 
 /**
- * Helper function for loading external loader
+ * Helper function for loading external parser
  * @param translate
  * @param http
- * @returns {LocalizeStaticLoader}
+ * @returns {StaticParserLoader}
  */
 export function localizeLoaderFactory(translate: TranslateService, http: Http) {
-  return new LocalizeStaticLoader(translate, http, 'assets/locales.json');
+  return new StaticParserLoader(translate, http, 'assets/locales.json');
 }
 
 /**
  * Helper function for localize router initialization
  * @param routes
- * @returns {(loader:LocalizeLoader)=>()=>Promise<any>}
+ * @returns {(parser:LocalizeParser)=>()=>Promise<any>}
  */
 export function initializeLocalizeRouterFactory(routes: Routes) {
-  return (loader: LocalizeLoader) => () => loader.load(routes);
+  return (loader: LocalizeParser) => () => loader.load(routes);
 }
 
 @NgModule({
@@ -36,14 +36,14 @@ export class LocalizeRouterModule {
   static forRoot(
     routes: Routes,
     localizeLoader: any = {
-      provide: LocalizeLoader,
+      provide: LocalizeParser,
       useFactory: localizeLoaderFactory,
       deps: [TranslateService, Http]
   }): ModuleWithProviders {
     let localizeInitiator: any = {
       provide: APP_INITIALIZER,
       useFactory: initializeLocalizeRouterFactory(routes),
-      deps: [LocalizeLoader],
+      deps: [LocalizeParser],
       multi: true
     };
 

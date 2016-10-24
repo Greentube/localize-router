@@ -28,18 +28,17 @@ export class LocalizeRouterPipe implements PipeTransform {
   /**
    * Transform current url to localized one
    * @param query
-   * @param rootMarker
    * @returns {string}
    */
   transform(query: string | Array<any>): any {
-    if(!query || query.length === 0 || !this.localize.loader.currentLang) {
+    if(!query || query.length === 0 || !this.localize.parser.currentLang) {
       return query;
     }
-    if(this.equals(query, this.lastKey) && this.equals(this.lastLanguage, this.localize.loader.currentLang)) {
+    if(this.equals(query, this.lastKey) && this.equals(this.lastLanguage, this.localize.parser.currentLang)) {
       return this.value;
     }
     this.lastKey = query;
-    this.lastLanguage = this.localize.loader.currentLang;
+    this.lastLanguage = this.localize.parser.currentLang;
     this.updateValue(query);
 
     return this.value;
@@ -48,7 +47,6 @@ export class LocalizeRouterPipe implements PipeTransform {
   /**
    * Translate key and update values
    * @param key
-   * @param isRoot
    */
   private updateValue(key: string | Array<any>) {
     let translateBatch: Array<Observable<any>> = [];

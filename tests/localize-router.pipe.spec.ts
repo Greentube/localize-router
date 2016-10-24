@@ -14,18 +14,18 @@ class FakeChangeDetectorRef extends ChangeDetectorRef {
   reattach(): void {  }
 }
 
-class DummyLocalizeLoader { currentLang: string; }
+class DummyLocalizeParser { currentLang: string; }
 
 class FakeLocalizeRouterService {
   routerEvents: Subject<string> = new Subject<string>();
-  loader: DummyLocalizeLoader;
+  parser: DummyLocalizeParser;
 
   constructor() {
-    this.loader = new DummyLocalizeLoader();
+    this.parser = new DummyLocalizeParser();
   }
 
   translateRoute(route: string, appendLanguage?: boolean): Observable<string> {
-    return Observable.of((appendLanguage ? this.loader.currentLang : '') + route + '_TR');
+    return Observable.of((appendLanguage ? this.parser.currentLang : '') + route + '_TR');
   }
 }
 
@@ -71,31 +71,31 @@ describe('LocalizeRouterPipe', () => {
   });
 
   it('should translate a route', () => {
-    localize.loader.currentLang = 'en';
+    localize.parser.currentLang = 'en';
 
     expect(localizePipe.transform('route')).toEqual('route_TR');
   });
 
   it('should prepend language if root route', () => {
-    localize.loader.currentLang = 'en';
+    localize.parser.currentLang = 'en';
 
     expect(localizePipe.transform('/route')).toEqual('en/route_TR');
   });
 
   it('should translate a multi segment route', () => {
-    localize.loader.currentLang = 'en';
+    localize.parser.currentLang = 'en';
 
     expect(localizePipe.transform('path/to/my/route')).toEqual('path/to/my/route_TR');
   });
 
   it('should translate a complex segment route', () => {
-    localize.loader.currentLang = 'en';
+    localize.parser.currentLang = 'en';
 
     expect(localizePipe.transform(['/path', 4, 'my', 5])).toEqual(['en/path_TR', 4, 'my_TR', 5]);
   });
 
   it('should translate a complex segment route if it changed', () => {
-    localize.loader.currentLang = 'en';
+    localize.parser.currentLang = 'en';
     spyOn(ref, 'markForCheck').and.callThrough();
 
     localizePipe.transform(['/path', null, 'my', 5]);
@@ -106,7 +106,7 @@ describe('LocalizeRouterPipe', () => {
   });
 
   it('should not translate a complex segment route if it`s not changed', () => {
-    localize.loader.currentLang = 'en';
+    localize.parser.currentLang = 'en';
     spyOn(ref, 'markForCheck').and.callThrough();
 
     localizePipe.transform(['/path', 4, 'my', 5]);
@@ -117,7 +117,7 @@ describe('LocalizeRouterPipe', () => {
   });
 
   it('should call markForChanges when it translates a string', () => {
-    localize.loader.currentLang = 'en';
+    localize.parser.currentLang = 'en';
     spyOn(ref, 'markForCheck').and.callThrough();
 
     localizePipe.transform('route');
@@ -125,7 +125,7 @@ describe('LocalizeRouterPipe', () => {
   });
 
   it('should not call markForChanges when query is not string', () => {
-    localize.loader.currentLang = 'en';
+    localize.parser.currentLang = 'en';
     spyOn(ref, 'markForCheck').and.callThrough();
 
     localizePipe.transform(null);
@@ -133,7 +133,7 @@ describe('LocalizeRouterPipe', () => {
   });
 
   it('should not call markForChanges when query is empty string', () => {
-    localize.loader.currentLang = 'en';
+    localize.parser.currentLang = 'en';
     spyOn(ref, 'markForCheck').and.callThrough();
 
     localizePipe.transform('');
@@ -141,7 +141,7 @@ describe('LocalizeRouterPipe', () => {
   });
 
   it('should not call markForChanges when no language selected', () => {
-    localize.loader.currentLang = null;
+    localize.parser.currentLang = null;
     spyOn(ref, 'markForCheck').and.callThrough();
 
     localizePipe.transform('route');
@@ -149,7 +149,7 @@ describe('LocalizeRouterPipe', () => {
   });
 
   it('should not call markForChanges if same route already translated', () => {
-    localize.loader.currentLang = 'en';
+    localize.parser.currentLang = 'en';
     spyOn(ref, 'markForCheck').and.callThrough();
     localizePipe.transform('route');
     localizePipe.transform('route');
@@ -158,7 +158,7 @@ describe('LocalizeRouterPipe', () => {
 
   it('should subscribe to service`s routerEvents', () => {
     let query = 'MY_TEXT';
-    localize.loader.currentLang = 'en';
+    localize.parser.currentLang = 'en';
     spyOn(localizePipe, 'transform').and.callThrough();
     spyOn(ref, 'markForCheck').and.callThrough();
 
@@ -166,7 +166,7 @@ describe('LocalizeRouterPipe', () => {
     ref.markForCheck.calls.reset();
     (<any>localizePipe.transform)['calls'].reset();
 
-    localize.loader.currentLang = 'de';
+    localize.parser.currentLang = 'de';
     localize.routerEvents.next('de');
     expect(localizePipe.transform).toHaveBeenCalled();
     expect(ref.markForCheck).toHaveBeenCalled();

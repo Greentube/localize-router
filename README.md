@@ -16,7 +16,7 @@ Based on an extension of [ng2-translate](https://github.com/ocombe/ng2-translate
     - [Service](#service)
 - [API](#api)
     - [LocalizeRouterService](#localizerouterservice)
-    - [LocalizeLoader](#localizeloader)
+    - [LocalizeParser](#localizeparser)
 - [License](#license)
 
 ## Installation
@@ -61,13 +61,13 @@ export class AppModule {
 }
 ```
 
-Static file's default path is `assets/locales.json`. You can override the path by calling LocalizeStaticLoader on you own:
+Static file's default path is `assets/locales.json`. You can override the path by calling `StaticParserLoader` on you own:
 ```ts
 ...
 LocalizeRouterModule.forRoot(routes, {
-    provide: LocalizeLoader,
+    provide: LocalizeParser,
     useFactory: (translate, http) => 
-        new LocalizeStaticLoader(translate, http, 'your/path/to/config.json'),
+        new StaticParserLoader(translate, http, 'your/path/to/config.json'),
     deps: [TranslateService, Http]
 }), 
 ... 
@@ -95,9 +95,9 @@ With manual initialization you need to provide information directly:
 ```ts
 ...
 LocalizeRouterModule.forRoot(routes, {
-    provide: LocalizeLoader,
+    provide: LocalizeParser,
     useFactory: (translate, http) => 
-        new LocalizeManualLoader(translate, ['en','de',...], 'YOUR_PREFIX'),
+        new ManualParserLoader(translate, ['en','de',...], 'YOUR_PREFIX'),
     deps: [TranslateService, Http]
 }), 
 ... 
@@ -123,7 +123,7 @@ Make sure you therefore place most common language (e.g. 'en') as a first string
 #### ng2-translate integration
 
 `LocalizeRouter` depends on `ng2-translate` and automatically initializes it with selected locales.
-Following code is run on `LocalizeLoader` init:
+Following code is run on `LocalizeParser` init:
 ```ts
 this.translate.setDefaultLang(languageOfBrowser || firstLanguageFromConfig);
 // ...
@@ -170,9 +170,9 @@ localizeService.routerEvents.subscribe((language: string) => {
     // do something with language
 });
 ```
-- `loader`: Used instance of LocalizeLoader
+- `parser`: Used instance of LocalizeParser
 ```ts
-let selectedLanguage = localizeService.loader.currentLang;
+let selectedLanguage = localizeService.parser.currentLang;
 ```
 #### Methods:
 - `translateRoute(path: string, prependLanguage?: boolean): Observable<string>`: Translates given path. If `prependLanguage` is true or `path` starts with backslash and `prependLanguage` not set then path is prepended with currently set language. 
@@ -192,7 +192,7 @@ For german language and route defined as `:lang/users/:user_name/profile`
 ```
 yoursite.com/en/users/Miroslav%20Jonas/profile -> yoursite.com/de/benutzer/Miroslav%20Jonas/profil
 ```
-### LocalizeLoader
+### LocalizeParser
 #### Properties:
 - `locales`: Array of used language codes
 - `currentLang`: Currently selected language
