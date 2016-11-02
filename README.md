@@ -1,7 +1,8 @@
 # localize-router
 > An implementation of routes localization for Angular 2.
 
-Based on an extension of [ng2-translate](https://github.com/ocombe/ng2-translate).
+Based on and extension of [ng2-translate](https://github.com/ocombe/ng2-translate).
+Demo project can be found [here](https://github.com/meeroslav/localize-router-example).
 
 # Table of contents: 
 - [Installation](#installation)
