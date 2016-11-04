@@ -1,5 +1,5 @@
 {
-  "name": "localize-router",
+  "name": "@greentube/localize-router",
   "version": "0.2.0",
   "description": "An implementation of routes localization for Angular 2",
   "scripts": {
@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/meeroslav/localize-router.git"
+    "url": "https://github.com/Greentube/localize-router.git"
   },
   "keywords": [
     "angular",
@@ -23,12 +23,12 @@
   "author": "Miroslav Jonas",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/meeroslav/localize-router/issues"
+    "url": "https://github.com/Greentube/localize-router/issues"
   },
   "main": "bundles/localize-router.js",
   "module": "localize-router.js",
   "typings": "./localize-router.d.ts",
-  "homepage": "https://github.com/meeroslav/localize-router",
+  "homepage": "https://github.com/Greentube/localize-router",
   "peerDependencies": {
     "@angular/core": "^2.0.0",
     "@angular/http": "^2.0.0",
