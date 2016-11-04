@@ -22,9 +22,8 @@ Demo project can be found [here](https://github.com/meeroslav/localize-router-ex
 
 ## Installation
 
-* soon
 ```
-npm install --save-dev localize-router
+npm install --save-dev @greentube/localize-router
 ```
 
 ## Usage
