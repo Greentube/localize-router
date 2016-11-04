@@ -6,7 +6,8 @@
     "test": "tsc && karma start",
     "test-watch": "tsc && concurrently \"tsc -w\" \"karma start karma.conf.js\"",
     "commit": "npm run prepublish && npm test && git-cz",
-    "prepublish": "ngc && node make.js"
+    "prepublish": "ngc && node make.js",
+    "semantic-release": "semantic-release pre && npm publish && semantic-release post"
   },
   "repository": {
     "type": "git",
