@@ -48,6 +48,7 @@
     "@angular/router": "3.1.0",
     "@types/jasmine": "2.5.35",
     "@types/node": "6.0.45",
+    "@types/es6-promise": "0.0.32",
     "awesome-typescript-loader": "2.2.4",
     "codelyzer": "1.0.0-beta.1",
     "commitizen": "2.8.6",
@@ -82,8 +83,5 @@
     "commitizen": {
       "path": "./node_modules/cz-conventional-changelog"
     }
-  },
-  "dependencies": {
-    "@types/es6-promise": "0.0.32"
   }
 }

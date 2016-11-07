@@ -1,4 +1,6 @@
-# localize-router
+# localize-router 
+[![Build Status](https://travis-ci.org/Greentube/localize-router.svg?branch=master)](https://travis-ci.org/Greentube/localize-router) 
+[![npm version](https://img.shields.io/npm/v/localize-router.svg)](https://www.npmjs.com/package/localize-router)
 > An implementation of routes localization for Angular 2.
 
 Based on and extension of [ng2-translate](https://github.com/ocombe/ng2-translate).
