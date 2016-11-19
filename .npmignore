@@ -1,27 +1,28 @@
 #################
 ## Misc
 #################
-**/.DS_Store
 nbproject
 manifest.mf
 build.xml
+
+#################
+## Project
+#################
+
 node_modules/*
 npm-debug.log
 *.ts
 !*.d.ts
 tests
-examples
-.github
 coverage
+config
+karma.conf.js
+make.js
+tsconfig.json
+tslint.json
 !*.metadata.json
 !bundles/*.js
-
-#################
-## JetBrains
-#################
-.idea
-.project
-.settings
+.*
 
 ############
 ## Windows
