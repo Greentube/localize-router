@@ -78,9 +78,9 @@ LocalizeRouterModule.forRoot(routes, {
 
 #### JSON config file
 JSON config file has following structure:
-```json
+```
 {
-    "locales": [...],
+    "locales": ["en", "de", ...],
     "prefix": "..."
 }
 ```
