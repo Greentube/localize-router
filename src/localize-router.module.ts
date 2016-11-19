@@ -1,12 +1,11 @@
-import {NgModule, ModuleWithProviders, APP_INITIALIZER} from '@angular/core';
-import {HttpModule, Http} from '@angular/http';
+import { NgModule, ModuleWithProviders, APP_INITIALIZER } from '@angular/core';
+import { HttpModule, Http } from '@angular/http';
 import {
-  LocalizeRouterService, LocalizeParser, StaticParserLoader,
-  ManualParserLoader
+  LocalizeRouterService, LocalizeParser, StaticParserLoader
 } from './localize-router.service';
-import {RouterModule, Routes} from '@angular/router';
-import {LocalizeRouterPipe} from './localize-router.pipe';
-import {TranslateModule, TranslateService} from 'ng2-translate';
+import { RouterModule, Routes } from '@angular/router';
+import { LocalizeRouterPipe } from './localize-router.pipe';
+import { TranslateModule, TranslateService } from 'ng2-translate';
 
 /**
  * Helper function for loading external parser

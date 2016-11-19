@@ -1,12 +1,15 @@
-import {Injectable, Inject, ApplicationRef} from '@angular/core';
-import {Http, Response} from '@angular/http';
-import {Routes, Router, Route, NavigationStart, ActivatedRouteSnapshot, RouterStateSnapshot} from '@angular/router';
-import {TranslateService} from 'ng2-translate';
-import {Observable} from 'rxjs/Observable';
-import {Observer} from 'rxjs/Observer';
-import {Subject} from "rxjs/Subject";
+import { Injectable, Inject, ApplicationRef } from '@angular/core';
+import { Http, Response } from '@angular/http';
+import {
+  Routes, Router, Route, NavigationStart,
+  ActivatedRouteSnapshot, RouterStateSnapshot
+} from '@angular/router';
+import { recognize } from "@angular/router/src/recognize";
+import { TranslateService } from 'ng2-translate';
+import { Observable } from 'rxjs/Observable';
+import { Observer } from 'rxjs/Observer';
+import { Subject } from "rxjs/Subject";
 import 'rxjs/add/observable/forkJoin';
-import {recognize} from "@angular/router/src/recognize";
 
 interface ILocalizeRouteConfig {
   locales: Array<string>;
@@ -236,11 +239,13 @@ export class LocalizeRouterService {
     if (lang !== this.parser.currentLang) {
       let currentTree = this.router.parseUrl(location.pathname);
 
-      recognize(this.appRef.componentTypes[0], this.parser.routes, currentTree, location.pathname).subscribe((s: RouterStateSnapshot) => {
-        this.parser.translateRoutes(lang).then(() => {
-          this.router.navigateByUrl(this.traverseRouteSnapshot(s.root));
-        });
-      });
+      recognize(this.appRef.componentTypes[0], this.parser.routes, currentTree, location.pathname).subscribe(
+        (s: RouterStateSnapshot) => {
+          this.parser.translateRoutes(lang).then(() => {
+            this.router.navigateByUrl(this.traverseRouteSnapshot(s.root));
+          });
+        }
+      );
     }
   }
 
