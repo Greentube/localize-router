@@ -65,7 +65,7 @@ export abstract class LocalizeParser {
   /**
    * Translate routes to selected language
    * @param language
-   * @returns {Promise<T>}
+   * @returns {Promise<any>}
    */
   public translateRoutes(language: string): Promise<any> {
     this.translate.use(language);
@@ -236,10 +236,9 @@ export class LocalizeRouterService {
     if (lang !== this.parser.currentLang) {
       let currentTree = this.router.parseUrl(location.pathname);
 
-      recognize(this.appRef.componentTypes[0], this.parser.routes, currentTree, location.pathname).subscribe((s: RouterStateSnapshot) =>{
+      recognize(this.appRef.componentTypes[0], this.parser.routes, currentTree, location.pathname).subscribe((s: RouterStateSnapshot) => {
         this.parser.translateRoutes(lang).then(() => {
-          let newUrl = this.traverseRouteSnapshot(s.root);
-          history.pushState(null, '', newUrl);
+          this.router.navigateByUrl(this.traverseRouteSnapshot(s.root));
         });
       });
     }
@@ -251,7 +250,7 @@ export class LocalizeRouterService {
    * @returns {string}
    */
   private traverseRouteSnapshot(snapshot: ActivatedRouteSnapshot): string {
-    if (snapshot.firstChild) {
+    if (snapshot.firstChild && snapshot.firstChild.routeConfig && snapshot.firstChild.routeConfig.path) {
       return this.parseSegmentValue(snapshot) + '/' + this.traverseRouteSnapshot(snapshot.firstChild);
     }
     return this.parseSegmentValue(snapshot);
