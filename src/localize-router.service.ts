@@ -45,23 +45,34 @@ export abstract class LocalizeParser {
    * @returns {Promise<any>}
    */
   protected init(routes: Routes): Promise<any> {
-    this.originalRouteNames = JSON.parse(JSON.stringify(routes));
+    let selectedLanguage: string;
 
-    if (!this.locales.length) {
-      return Promise.resolve();
+    if (this.routes) {
+      // add new routes
+      selectedLanguage = this.currentLang;
+      // append new routes
+      this.originalRouteNames.splice(0, 0, ...JSON.parse(JSON.stringify(routes)));
+      this.routes[1].children.splice(0, 0, ...routes);
+    } else {
+      // init first routes
+      this.routes = routes;
+      this.originalRouteNames = JSON.parse(JSON.stringify(routes));
+
+      if (!this.locales.length) {
+        return Promise.resolve();
+      }
+      /** detect current language */
+      let locationLang = this.getLocationLang();
+      let browserLang = this._getBrowserLang();
+      selectedLanguage = locationLang || browserLang || this.locales[ 0 ];
+      this.translate.setDefaultLang(browserLang || this.locales[ 0 ]);
+
+      /** mutable operation on routes */
+      let children = this.routes.splice(0, this.routes.length,
+        { path: '', redirectTo: this.translate.getDefaultLang(), pathMatch: 'full' });
+      this.routes.push({ children: children });
     }
-    /** detect current language */
-    let locationLang = this.getLocationLang();
-    let browserLang = this._getBrowserLang();
-    let selectedLanguage = locationLang || browserLang || this.locales[0];
-    this.translate.setDefaultLang(browserLang || this.locales[0]);
-
-    /** mutable operation on routes */
-    let children = this.routes.splice(0, this.routes.length,
-      {path: '', redirectTo: this.translate.getDefaultLang(), pathMatch: 'full'});
-    this.routes.push({path: selectedLanguage, children: children });
     /** translate routes */
-
     return this.translateRoutes(selectedLanguage);
   }
 
@@ -164,6 +175,12 @@ export abstract class LocalizeParser {
  */
 export class ManualParserLoader extends LocalizeParser {
 
+  /**
+   * CTOR
+   * @param translate
+   * @param locales
+   * @param prefix
+   */
   constructor(
     @Inject(TranslateService) translate: TranslateService,
     locales: Array<string> = ['en'],
@@ -174,11 +191,13 @@ export class ManualParserLoader extends LocalizeParser {
     this.prefix = prefix;
   }
 
+  /**
+   * Initialize or append routes
+   * @param routes
+   */
   load(routes: Routes): Promise<any> {
     return new Promise((resolve: any) => {
-      this.routes = routes;
-
-      this.init(this.routes).then(resolve);
+      this.init(routes).then(resolve);
     });
   }
 }
@@ -187,25 +206,41 @@ export class ManualParserLoader extends LocalizeParser {
  * Load configuration from server
  */
 export class StaticParserLoader extends LocalizeParser {
+  private _dataLoaded: boolean;
 
+  /**
+   * CTOR
+   * @param translate
+   * @param http
+   * @param path
+   */
   constructor(
     @Inject(TranslateService) translate: TranslateService,
     @Inject(Http) private http: Http,
     private path: string = 'assets/locales.json'
   ) {
     super(translate);
+    this._dataLoaded = false;
   }
 
+  /**
+   * Initialize or append routes
+   * @param routes
+   */
   load(routes: Routes): Promise<any> {
     return new Promise((resolve: any) => {
-      this.http.get(`${this.path}`)
-        .map((res: Response) => res.json())
-        .subscribe((data: ILocalizeRouteConfig) => {
-          this.locales = data.locales;
-          this.prefix = data.prefix;
-          this.routes = routes;
-          this.init(this.routes).then(resolve);
-        });
+      if (this._dataLoaded) {
+        this.init(routes).then(resolve);
+      } else {
+        this.http.get(`${this.path}`)
+          .map((res: Response) => res.json())
+          .subscribe((data: ILocalizeRouteConfig) => {
+            this._dataLoaded = true;
+            this.locales = data.locales;
+            this.prefix = data.prefix;
+            this.init(routes).then(resolve);
+          });
+      }
     });
   }
 }

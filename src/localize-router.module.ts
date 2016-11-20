@@ -32,13 +32,11 @@ export function initializeLocalizeRouterFactory(routes: Routes) {
   exports: [HttpModule, TranslateModule, LocalizeRouterPipe]
 })
 export class LocalizeRouterModule {
+
   static forRoot(
     routes: Routes,
-    localizeLoader: any = {
-      provide: LocalizeParser,
-      useFactory: localizeLoaderFactory,
-      deps: [TranslateService, Http]
-  }): ModuleWithProviders {
+    localizeLoader: any = { provide: LocalizeParser, useFactory: localizeLoaderFactory, deps: [TranslateService, Http] }
+  ): ModuleWithProviders {
     let localizeInitiator: any = {
       provide: APP_INITIALIZER,
       useFactory: initializeLocalizeRouterFactory(routes),
@@ -49,6 +47,20 @@ export class LocalizeRouterModule {
     return {
       ngModule: LocalizeRouterModule,
       providers: [ localizeLoader, localizeInitiator, LocalizeRouterService ]
+    };
+  }
+
+  static forChild(routes: Routes): ModuleWithProviders {
+    let localizeLoader: any = {
+      provide: APP_INITIALIZER,
+      useFactory: initializeLocalizeRouterFactory(routes),
+      deps: [LocalizeParser],
+      multi: true
+    };
+
+    return {
+      ngModule: LocalizeRouterModule,
+      providers: [ localizeLoader ]
     };
   }
 }
