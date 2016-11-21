@@ -1,6 +1,6 @@
 {
   "name": "localize-router",
-  "version": "0.2.4",
+  "version": "0.3.0",
   "description": "An implementation of routes localization for Angular 2",
   "scripts": {
     "test": "tsc && karma start",
