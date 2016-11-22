@@ -76,6 +76,19 @@ LocalizeRouterModule.forRoot(routes, {
     
 ```
 
+If you are using child modules or routes you need to initialize them with `forChild` command:
+```ts
+@NgModule({
+  imports: [
+    TranslateModule,
+    LocalizeRouterModule.forChild(routes),
+    RouterModule.forChild(routes)
+  ],
+  declarations: [ChildComponent]
+})
+export class ChildModule { }
+```
+
 #### JSON config file
 JSON config file has following structure:
 ```
