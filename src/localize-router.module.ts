@@ -1,4 +1,4 @@
-import { NgModule, ModuleWithProviders, APP_INITIALIZER } from '@angular/core';
+import { NgModule, ModuleWithProviders, APP_INITIALIZER, Provider } from '@angular/core';
 import { HttpModule, Http } from '@angular/http';
 import {
   LocalizeRouterService, LocalizeParser, StaticParserLoader
@@ -37,7 +37,7 @@ export class LocalizeRouterModule {
     routes: Routes,
     localizeLoader: any = { provide: LocalizeParser, useFactory: localizeLoaderFactory, deps: [TranslateService, Http] }
   ): ModuleWithProviders {
-    let localizeInitiator: any = {
+    let localizeInitiator: Provider = {
       provide: APP_INITIALIZER,
       useFactory: initializeLocalizeRouterFactory(routes),
       deps: [LocalizeParser],
@@ -51,7 +51,7 @@ export class LocalizeRouterModule {
   }
 
   static forChild(routes: Routes): ModuleWithProviders {
-    let localizeLoader: any = {
+    let localizeLoader: Provider = {
       provide: APP_INITIALIZER,
       useFactory: initializeLocalizeRouterFactory(routes),
       deps: [LocalizeParser],
