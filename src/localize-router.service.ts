@@ -187,11 +187,7 @@ export class ManualParserLoader extends LocalizeParser {
    * @param locales
    * @param prefix
    */
-  constructor(
-    @Inject(TranslateService) translate: TranslateService,
-    locales: Array<string> = ['en'],
-    prefix: string = 'ROUTES.'
-  ) {
+  constructor(translate: TranslateService, locales: Array<string> = ['en'], prefix: string = 'ROUTES.') {
     super(translate);
     this.locales = locales;
     this.prefix = prefix;
@@ -220,11 +216,7 @@ export class StaticParserLoader extends LocalizeParser {
    * @param http
    * @param path
    */
-  constructor(
-    @Inject(TranslateService) translate: TranslateService,
-    @Inject(Http) private http: Http,
-    private path: string = 'assets/locales.json'
-  ) {
+  constructor(translate: TranslateService, private http: Http, private path: string = 'assets/locales.json') {
     super(translate);
     this._dataLoaded = false;
   }

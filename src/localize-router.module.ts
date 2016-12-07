@@ -7,6 +7,9 @@ import { RouterModule, Routes } from '@angular/router';
 import { LocalizeRouterPipe } from './localize-router.pipe';
 import { TranslateModule, TranslateService } from 'ng2-translate';
 
+export * from './localize-router.pipe';
+export * from './localize-router.service';
+
 /**
  * Helper function for loading external parser
  * @param translate
@@ -14,7 +17,7 @@ import { TranslateModule, TranslateService } from 'ng2-translate';
  * @returns {StaticParserLoader}
  */
 export function localizeLoaderFactory(translate: TranslateService, http: Http) {
-  return new StaticParserLoader(translate, http, 'assets/locales.json');
+  return new StaticParserLoader(translate, http);
 }
 
 @NgModule({
@@ -26,17 +29,22 @@ export class LocalizeRouterModule {
 
   static forRoot(
     routes: Routes,
-    localizeLoader: Provider = { provide: LocalizeParser, useFactory: localizeLoaderFactory, deps: [TranslateService, Http] }
+    localizeLoader: Provider = {
+      provide: LocalizeParser,
+      useFactory: localizeLoaderFactory,
+      deps: [TranslateService, Http]
+    }
   ): ModuleWithProviders {
     return {
       ngModule: LocalizeRouterModule,
       providers: [
-        localizeLoader, {
+        localizeLoader,
+        LocalizeRouterService,
+        {
           provide: RAW_ROUTUES,
           multi: true,
           useValue: routes
         },
-        LocalizeRouterService,
         {
           provide: APP_INITIALIZER,
           useFactory: parserInitializer,

@@ -17,6 +17,7 @@ Demo project can be found [here](https://github.com/meeroslav/localize-router-ex
         - [ng2-translate integration](#ng2-translate-integration)
     - [Pipe](#pipe)
     - [Service](#service)
+    - [AOT](#aot)
 - [API](#api)
     - [LocalizeRouterService](#localizerouterservice)
     - [LocalizeParser](#localizeparser)
@@ -175,6 +176,54 @@ class MyComponent {
     }
 }
 ```
+
+### AOT
+
+Currently NG compiler has issues with static loader factory in `localize-router.module` so in order to have a fully functional Ahead-Of-Time compilation `localizeLoaderFactory` has to be included in the `app.module`.
+Working example can be found [here](https://github.com/meeroslav/universal-localize-example). 
+
+app.module.ts
+```ts
+
+export function createTranslateLoader(http: Http) {
+  return new TranslateStaticLoader(http, '/assets/locales', '.json');
+}
+
+export function localizeLoaderFactory(translate: TranslateService, http: Http) {
+  return new StaticParserLoader(translate, http);
+}
+
+const routes: Routes = [
+  { path: '', redirectTo: 'home', pathMatch: 'full' }
+];
+
+@NgModule({
+  declarations: [
+    AppComponent
+  ],
+  imports: [
+    BrowserModule,
+    HttpModule,
+    TranslateModule.forRoot({
+      provide: TranslateLoader,
+      useFactory: createTranslateLoader,
+      deps: [Http]
+    }),
+    RouterModule.forRoot(routes),
+    LocalizeRouterModule.forRoot(routes, {
+      provide: LocalizeParser,
+      useFactory: localizeLoaderFactory,
+      deps: [TranslateService, Http]
+    })
+  ],
+  exports: [RouterModule],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+
+```
+
+
 
 ## API
 ### LocalizeRouterService
