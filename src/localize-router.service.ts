@@ -1,9 +1,6 @@
-import { Injectable, Inject, ApplicationRef } from '@angular/core';
+import { Injectable, Inject, ApplicationRef, OpaqueToken } from '@angular/core';
 import { Http, Response } from '@angular/http';
-import {
-  Routes, Router, Route, NavigationStart,
-  ActivatedRouteSnapshot, RouterStateSnapshot
-} from '@angular/router';
+import { Routes, Router, Route, NavigationStart, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { recognize } from "@angular/router/src/recognize";
 import { TranslateService } from 'ng2-translate';
 import { Observable } from 'rxjs/Observable';
@@ -11,10 +8,19 @@ import { Observer } from 'rxjs/Observer';
 import { Subject } from "rxjs/Subject";
 import 'rxjs/add/observable/forkJoin';
 
+/**
+ * Config interface
+ */
 interface ILocalizeRouteConfig {
   locales: Array<string>;
   prefix: string;
 }
+
+/**
+ * Static provider for keeping track of routes
+ * @type {OpaqueToken}
+ */
+export const RAW_ROUTUES = new OpaqueToken('RAW_ROUTUES');
 
 /**
  * Abstract class for parsing localization
@@ -348,4 +354,25 @@ export class LocalizeRouterService {
       }
     };
   }
+}
+
+/**
+ * Pre-loading helper functions
+ * Necessary evil for AOT
+ * @param parser
+ * @param routes
+ * @returns {any}
+ */
+export function parserInitializer(parser: LocalizeParser, routes: any) {
+  loadRoutes.prototype.parser = parser;
+  loadRoutes.prototype.routes = routes.reduce(concatArrays);
+  return loadRoutes;
+}
+
+export function concatArrays(a: Array<any>, b: Array<any>): Array<any> {
+  return a.concat(b);
+}
+
+export function loadRoutes() {
+  return loadRoutes.prototype.parser.load(loadRoutes.prototype.routes);
 }

@@ -1,7 +1,7 @@
 import { NgModule, ModuleWithProviders, APP_INITIALIZER, Provider } from '@angular/core';
 import { HttpModule, Http } from '@angular/http';
 import {
-  LocalizeRouterService, LocalizeParser, StaticParserLoader
+  LocalizeRouterService, LocalizeParser, StaticParserLoader, RAW_ROUTUES, parserInitializer
 } from './localize-router.service';
 import { RouterModule, Routes } from '@angular/router';
 import { LocalizeRouterPipe } from './localize-router.pipe';
@@ -17,15 +17,6 @@ export function localizeLoaderFactory(translate: TranslateService, http: Http) {
   return new StaticParserLoader(translate, http, 'assets/locales.json');
 }
 
-/**
- * Helper function for localize router initialization
- * @param routes
- * @returns {(parser:LocalizeParser)=>()=>Promise<any>}
- */
-export function initializeLocalizeRouterFactory(routes: Routes) {
-  return (loader: LocalizeParser) => () => loader.load(routes);
-}
-
 @NgModule({
   imports: [HttpModule, RouterModule, TranslateModule],
   declarations: [LocalizeRouterPipe],
@@ -35,32 +26,35 @@ export class LocalizeRouterModule {
 
   static forRoot(
     routes: Routes,
-    localizeLoader: any = { provide: LocalizeParser, useFactory: localizeLoaderFactory, deps: [TranslateService, Http] }
+    localizeLoader: Provider = { provide: LocalizeParser, useFactory: localizeLoaderFactory, deps: [TranslateService, Http] }
   ): ModuleWithProviders {
-    let localizeInitiator: Provider = {
-      provide: APP_INITIALIZER,
-      useFactory: initializeLocalizeRouterFactory(routes),
-      deps: [LocalizeParser],
-      multi: true
-    };
-
     return {
       ngModule: LocalizeRouterModule,
-      providers: [ localizeLoader, localizeInitiator, LocalizeRouterService ]
+      providers: [
+        localizeLoader, {
+          provide: RAW_ROUTUES,
+          multi: true,
+          useValue: routes
+        },
+        LocalizeRouterService,
+        {
+          provide: APP_INITIALIZER,
+          useFactory: parserInitializer,
+          deps: [LocalizeParser, RAW_ROUTUES],
+          multi: true
+        }
+      ]
     };
   }
 
   static forChild(routes: Routes): ModuleWithProviders {
-    let localizeLoader: Provider = {
-      provide: APP_INITIALIZER,
-      useFactory: initializeLocalizeRouterFactory(routes),
-      deps: [LocalizeParser],
-      multi: true
-    };
-
     return {
       ngModule: LocalizeRouterModule,
-      providers: [ localizeLoader ]
+      providers: [{
+        provide: RAW_ROUTUES,
+        multi: true,
+        useValue: routes
+      }]
     };
   }
 }

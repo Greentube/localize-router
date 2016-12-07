@@ -34,7 +34,7 @@ class FakeRouter extends Router {
 class FakeApplicationRef {
   componentTypes: any[];
 
-  constructor(){ this.componentTypes = [DummyComponent]; }
+  constructor() { this.componentTypes = [DummyComponent]; }
 }
 
 class DummyComponent {}
