@@ -19,11 +19,12 @@ coverage
 /compiled
 
 #################
-## JetBrains
+## IDEs
 #################
 .idea
 .project
 .settings
+.vscode
 
 ############
 ## Windows

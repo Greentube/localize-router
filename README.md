@@ -1,12 +1,12 @@
-# localize-router 
-[![Build Status](https://travis-ci.org/Greentube/localize-router.svg?branch=master)](https://travis-ci.org/Greentube/localize-router) 
+# localize-router
+[![Build Status](https://travis-ci.org/Greentube/localize-router.svg?branch=master)](https://travis-ci.org/Greentube/localize-router)
 [![npm version](https://img.shields.io/npm/v/localize-router.svg)](https://www.npmjs.com/package/localize-router)
 > An implementation of routes localization for Angular 2.
 
 Based on and extension of [ng2-translate](https://github.com/ocombe/ng2-translate).
 Demo project can be found [here](https://github.com/meeroslav/localize-router-example).
 
-# Table of contents: 
+# Table of contents:
 - [Installation](#installation)
 - [Usage](#usage)
     - [Initialize module](#initialize-module)
@@ -69,12 +69,12 @@ Static file's default path is `assets/locales.json`. You can override the path b
 ...
 LocalizeRouterModule.forRoot(routes, {
     provide: LocalizeParser,
-    useFactory: (translate, http) => 
+    useFactory: (translate, http) =>
         new StaticParserLoader(translate, http, 'your/path/to/config.json'),
     deps: [TranslateService, Http]
-}), 
-... 
-    
+}),
+...
+
 ```
 
 If you are using child modules or routes you need to initialize them with `forChild` command:
@@ -112,18 +112,18 @@ With manual initialization you need to provide information directly:
 ...
 LocalizeRouterModule.forRoot(routes, {
     provide: LocalizeParser,
-    useFactory: (translate, http) => 
+    useFactory: (translate, http) =>
         new ManualParserLoader(translate, ['en','de',...], 'YOUR_PREFIX'),
     deps: [TranslateService, Http]
-}), 
-... 
-    
+}),
+...
+
 ```
 
 ### How it works
 
 `Localize router` intercepts Router initialization and translates each `path` and `redirectTo` path of Routes.
-The translation process is done with [ng2-translate](https://github.com/ocombe/ng2-translate). In order to separate router translations from normal application translations we use `prefix`. Default value for prefix is `ROUTES.`. 
+The translation process is done with [ng2-translate](https://github.com/ocombe/ng2-translate). In order to separate router translations from normal application translations we use `prefix`. Default value for prefix is `ROUTES.`.
 ```
 'home' -> 'ROUTES.home'
 ```
@@ -164,14 +164,16 @@ Example for german language and link to 'about':
 
 ### Service
 
-Routes can be manually translated using `LocalizeRouterService`:
+Routes can be manually translated using `LocalizeRouterService`. This is important if you want to use `router.navigate` for dynamical routes.
+
 ```ts
 class MyComponent {
     constructor(private localize: LocalizeRouterService) { }
-    
+
     myMethod() {
         this.localize.translateRoute('about/me').subscribe((path: string) {
-            // do something with path
+            // do something with translated path
+            // e.g. this.router.navigate([path]);
         });
     }
 }
@@ -180,7 +182,7 @@ class MyComponent {
 ### AOT
 
 Currently NG compiler has issues with static loader factory in `localize-router.module` so in order to have a fully functional Ahead-Of-Time compilation `localizeLoaderFactory` has to be included in the `app.module`.
-Working example can be found [here](https://github.com/meeroslav/universal-localize-example). 
+Working example can be found [here](https://github.com/meeroslav/universal-localize-example).
 
 app.module.ts
 ```ts
@@ -239,7 +241,7 @@ localizeService.routerEvents.subscribe((language: string) => {
 let selectedLanguage = localizeService.parser.currentLang;
 ```
 #### Methods:
-- `translateRoute(path: string, prependLanguage?: boolean): Observable<string>`: Translates given path. If `prependLanguage` is true or `path` starts with backslash and `prependLanguage` not set then path is prepended with currently set language. 
+- `translateRoute(path: string, prependLanguage?: boolean): Observable<string>`: Translates given path. If `prependLanguage` is true or `path` starts with backslash and `prependLanguage` not set then path is prepended with currently set language.
 ```ts
 localizeService.translateRoute('', true).subscribe((res: string) => {
     // res equals e.g. '/en'
@@ -249,7 +251,7 @@ localizeService.translateRoute('', false).subscribe((res: string) => {
 });
 localizeService.translateRoute('/').subscribe((res: string) => {
     // res equals e.g. '/en'
-});    
+});
 ```
 - `changeLanguage(lang: string)`: Translates current url to given language and changes the application's language
 For german language and route defined as `:lang/users/:user_name/profile`
