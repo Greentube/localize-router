@@ -26,7 +26,7 @@ Demo project can be found [here](https://github.com/meeroslav/localize-router-ex
 ## Installation
 
 ```
-npm install --save-dev localize-router
+npm install --save localize-router
 ```
 
 ## Usage
