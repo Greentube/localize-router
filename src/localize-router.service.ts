@@ -149,7 +149,9 @@ export abstract class LocalizeParser {
    * @private
    */
   private _getBrowserLang(): string {
-    if (navigator) {
+    if (typeof this.translate.getBrowserLang === 'function') {
+      return this.translate.getBrowserLang();
+    } else if (navigator) {
       let lang = navigator.language.split( '-' )[ 0 ];
       if (this.locales.indexOf(lang) !== -1) {
         return lang;
