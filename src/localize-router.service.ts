@@ -22,6 +22,8 @@ interface ILocalizeRouteConfig {
  */
 export const RAW_ROUTUES = new OpaqueToken('RAW_ROUTUES');
 
+const LOCALIZE_LOCAL_STORAGE = 'LOCALIZE_LOCAL_STORAGE';
+
 /**
  * Abstract class for parsing localization
  */
@@ -69,9 +71,9 @@ export abstract class LocalizeParser {
       }
       /** detect current language */
       let locationLang = this.getLocationLang();
-      let browserLang = this._getBrowserLang();
-      selectedLanguage = locationLang || browserLang || this.locales[ 0 ];
-      this.translate.setDefaultLang(browserLang || this.locales[ 0 ]);
+      let defaultLanguage = this._cachedLang || this._getBrowserLang() || this.locales[ 0 ];
+      selectedLanguage = locationLang || defaultLanguage;
+      this.translate.setDefaultLang(defaultLanguage);
 
       /** mutable operation on routes */
       let children = this.routes.splice(0, this.routes.length,
@@ -87,9 +89,10 @@ export abstract class LocalizeParser {
    * @param language
    * @returns {Promise<any>}
    */
-  public translateRoutes(language: string): Promise<any> {
+  translateRoutes(language: string): Promise<any> {
     this.translate.use(language);
     this.currentLang = language;
+    this._cachedLang = language;
 
     this.routes[1].path = language;
     return this._translateRouteTree(this.routes[1].children, this.originalRouteNames);
@@ -133,7 +136,7 @@ export abstract class LocalizeParser {
    * @param path
    * @returns {Observable<string>}
    */
-  public translateRoute(path: string): Observable<string> {
+  translateRoute(path: string): Observable<string> {
     let pathSegments = path.split('/');
 
     /** collect observables  */
@@ -155,18 +158,6 @@ export abstract class LocalizeParser {
     });
   }
 
-  /**
-   * Get user's language set in the browser
-   * @returns {any}
-   * @private
-   */
-  private _getBrowserLang(): string {
-    let browserLang = this.translate.getBrowserLang();
-    if (browserLang && this.locales.indexOf(browserLang) !== -1) {
-      return browserLang;
-    }
-    return null;
-  }
 
   /**
    * Get language from url
@@ -181,6 +172,46 @@ export abstract class LocalizeParser {
     }
     if (pathSlices.length && this.locales.indexOf(pathSlices[0]) !== -1) {
       return pathSlices[0];
+    }
+    return null;
+  }
+
+  /**
+   * Get user's language set in the browser
+   * @returns {any}
+   * @private
+   */
+  private _getBrowserLang(): string {
+    return this._returnIfInLocales(this.translate.getBrowserLang());
+  }
+
+  /**
+   * Get language from local storage
+   * @returns {string}
+   * @private
+   */
+  private get _cachedLang(): string {
+    if(typeof window === 'undefined' || typeof window.localStorage === 'undefined') {
+      return undefined;
+    }
+    return this._returnIfInLocales(window.localStorage.getItem(LOCALIZE_LOCAL_STORAGE));
+  }
+
+  /**
+   * Save language to local storage
+   * @param value
+   * @private
+   */
+  private set _cachedLang(value: string) {
+    if(typeof window === 'undefined' || typeof window.localStorage === 'undefined') {
+      return;
+    }
+    window.localStorage.setItem(LOCALIZE_LOCAL_STORAGE, value);
+  }
+
+  private _returnIfInLocales(value: string): string {
+    if (value && this.locales.indexOf(value) !== -1) {
+      return value;
     }
     return null;
   }

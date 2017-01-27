@@ -251,6 +251,7 @@ describe('LocalizeParser', () => {
       ]}
     ];
     locales = ['en', 'de', 'fr'];
+    localStorage.removeItem('LOCALIZE_LOCAL_STORAGE');
     injector = getTestBed();
     translate = injector.get(TranslateService);
     loader = new ManualParserLoader(translate);
@@ -322,6 +323,21 @@ describe('LocalizeParser', () => {
     expect(routes[1]).toEqual({path: 'de', children: []});
     expect(loader.currentLang).toEqual('de');
     expect(translate.currentLang).toEqual('de');
+  }));
+  it('should set language from localStorage', fakeAsync(() => {
+    loader = new ManualParserLoader(translate, locales, prefix);
+    spyOn(loader, 'translateRoutes').and.callThrough();
+
+    (<any>translate)['browserLang'] = 'de';
+    localStorage.setItem('LOCALIZE_LOCAL_STORAGE', 'fr');
+
+    routes = [];
+    loader.load(routes);
+    tick();
+    expect(routes[0]).toEqual({path: '', redirectTo: 'fr', pathMatch: 'full'});
+    expect(routes[1]).toEqual({path: 'fr', children: []});
+    expect(loader.currentLang).toEqual('fr');
+    expect(translate.currentLang).toEqual('fr');
   }));
 
   it('should pick first language from locales if navigator language not recognized', fakeAsync(() => {
