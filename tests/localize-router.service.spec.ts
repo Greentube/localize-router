@@ -7,10 +7,13 @@ import {getTestBed, TestBed, fakeAsync, tick} from "@angular/core/testing";
 import {Routes, Router, Event, NavigationStart, NavigationEnd} from "@angular/router";
 import {Observable, Subject} from "rxjs";
 import {TranslateService} from "ng2-translate";
+import { CommonModule } from '@angular/common';
 
 class FakeTranslateService {
   defLang: string;
   currentLang: string;
+
+  browserLang: string = '';
 
   content: any = {
     'PREFIX.home': 'home_TR',
@@ -21,14 +24,18 @@ class FakeTranslateService {
   getDefaultLang() { return this.defLang; }
   use(lang: string) { this.currentLang = lang; }
   get(input: string) { return Observable.of(this.content[input] || input); }
+
+  getBrowserLang() { return this.browserLang; }
 }
 
-class FakeRouter extends Router {
+class FakeRouter {
   routes: Routes;
   fakeRouterEvents: Subject<Event> = new Subject<Event>();
 
   resetConfig(routes: Routes) { this.routes = routes; }
   get events(): Observable<Event> { return this.fakeRouterEvents; }
+
+  parseUrl() { return ''; }
 }
 
 class FakeApplicationRef {
@@ -53,7 +60,7 @@ describe('LocalizeRouterService', () => {
     routes = [{ path: '', component: DummyComponent }];
 
     TestBed.configureTestingModule({
-      imports: [HttpModule, LocalizeRouterModule.forRoot(routes)],
+      imports: [HttpModule, CommonModule, LocalizeRouterModule.forRoot(routes)],
       providers: [
         {provide: XHRBackend, useClass: MockBackend},
         {provide: Router, useClass: FakeRouter},
@@ -90,7 +97,7 @@ describe('LocalizeRouterService', () => {
   });
 
   it('should reset route config on load', () => {
-    expect((router as FakeRouter).routes).toEqual(void 0);
+    expect((<any>router)['routes']).toEqual(void 0);
     parser.routes = routes;
     spyOn(router, 'resetConfig').and.callThrough();
 
@@ -151,7 +158,7 @@ describe('LocalizeRouterService', () => {
     parser.locales = ['de', 'en'];
     spyOn(parser, 'translateRoutes').and.stub();
 
-    (router as FakeRouter).fakeRouterEvents.next(new NavigationStart(1, '/en/new/path'));
+    (<any>router).fakeRouterEvents.next(new NavigationStart(1, '/en/new/path'));
     expect(parser.translateRoutes).toHaveBeenCalledWith('en');
   });
 
@@ -161,7 +168,7 @@ describe('LocalizeRouterService', () => {
     parser.locales = ['de', 'en'];
     spyOn(parser, 'translateRoutes').and.stub();
 
-    (router as FakeRouter).fakeRouterEvents.next(new NavigationStart(1, '/bla/new/path'));
+    (<any>router).fakeRouterEvents.next(new NavigationStart(1, '/bla/new/path'));
     expect(parser.translateRoutes).not.toHaveBeenCalled();
   });
 
@@ -171,7 +178,7 @@ describe('LocalizeRouterService', () => {
     parser.locales = ['de', 'en'];
     spyOn(parser, 'translateRoutes').and.stub();
 
-    (router as FakeRouter).fakeRouterEvents.next(new NavigationStart(1, '/de/new/path'));
+    (<any>router).fakeRouterEvents.next(new NavigationStart(1, '/de/new/path'));
     expect(parser.translateRoutes).not.toHaveBeenCalled();
   });
 
@@ -181,7 +188,7 @@ describe('LocalizeRouterService', () => {
     parser.locales = ['de', 'en'];
     spyOn(parser, 'translateRoutes').and.stub();
 
-    (router as FakeRouter).fakeRouterEvents.next(new NavigationEnd(1, '/en/new/path', '/en/new/path'));
+    (<any>router).fakeRouterEvents.next(new NavigationEnd(1, '/en/new/path', '/en/new/path'));
     expect(parser.translateRoutes).not.toHaveBeenCalled();
   });
 
@@ -306,7 +313,7 @@ describe('LocalizeParser', () => {
     loader = new ManualParserLoader(translate, locales, prefix);
     spyOn(loader, 'translateRoutes').and.callThrough();
 
-    (<any>navigator)['__defineGetter__']('language', function () { return 'de-AT'; });
+    (<any>translate)['browserLang'] = 'de';
 
     routes = [];
     loader.load(routes);
@@ -321,7 +328,7 @@ describe('LocalizeParser', () => {
     loader = new ManualParserLoader(translate, locales, prefix);
     spyOn(loader, 'translateRoutes').and.callThrough();
 
-    (<any>navigator)['__defineGetter__']('language', function () { return 'sr-sp'; });
+    (<any>translate)['browserLang'] = 'sr';
 
     routes = [];
     loader.load(routes);
@@ -334,7 +341,8 @@ describe('LocalizeParser', () => {
   it('should translate path', fakeAsync(() => {
     loader = new ManualParserLoader(translate, locales, prefix);
     spyOn(loader, 'translateRoutes').and.callThrough();
-    (<any>navigator)['__defineGetter__']('language', function () { return 'sr-sp'; });
+
+    (<any>translate)['browserLang'] = 'sr';
 
     routes = [{path: 'home', component: DummyComponent }];
     loader.load(routes);
@@ -345,7 +353,7 @@ describe('LocalizeParser', () => {
   it('should not translate path if translation not found', fakeAsync(() => {
     loader = new ManualParserLoader(translate, locales, prefix);
     spyOn(loader, 'translateRoutes').and.callThrough();
-    (<any>navigator)['__defineGetter__']('language', function () { return 'sr-sp'; });
+    (<any>translate)['browserLang'] = 'sr';
 
     routes = [{path: 'abc', component: DummyComponent }];
     loader.load(routes);
@@ -356,7 +364,7 @@ describe('LocalizeParser', () => {
   it('should translate redirectTo', fakeAsync(() => {
     loader = new ManualParserLoader(translate, locales, prefix);
     spyOn(loader, 'translateRoutes').and.callThrough();
-    (<any>navigator)['__defineGetter__']('language', function () { return 'sr-sp'; });
+    (<any>translate)['browserLang'] = 'sr';
 
     routes = [{redirectTo: 'home' }];
     loader.load(routes);
@@ -367,7 +375,7 @@ describe('LocalizeParser', () => {
   it('should translate complex path segments', fakeAsync(() => {
     loader = new ManualParserLoader(translate, locales, prefix);
     spyOn(loader, 'translateRoutes').and.callThrough();
-    (<any>navigator)['__defineGetter__']('language', function () { return 'sr-sp'; });
+    (<any>translate)['browserLang'] = 'sr';
 
     routes = [{path: '/home/about', component: DummyComponent }];
     loader.load(routes);
@@ -378,7 +386,7 @@ describe('LocalizeParser', () => {
   it('should translate children', fakeAsync(() => {
     loader = new ManualParserLoader(translate, locales, prefix);
     spyOn(loader, 'translateRoutes').and.callThrough();
-    (<any>navigator)['__defineGetter__']('language', function () { return 'sr-sp'; });
+    (<any>translate)['browserLang'] = 'sr';
 
     routes = [
       {path: 'home', children: [

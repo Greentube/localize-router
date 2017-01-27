@@ -10,11 +10,9 @@
     "sourceMap": false,
     "declaration": true,
     "moduleResolution": "node",
-    "typeRoots": [
-      "./node_modules/@types",
-      "./node_modules"
-    ],
+    "noUnusedLocals": true,
     "types": [
+      "hammerjs",
       "jasmine",
       "node"
     ],
@@ -34,7 +32,6 @@
   ],
   "angularCompilerOptions": {
     "strictMetadataEmit": true,
-    "skipTemplateCodegen": true,
-    "genDir": "compiled"
+    "skipTemplateCodegen": true
   }
 }

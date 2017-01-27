@@ -1,4 +1,4 @@
-import { Injectable, Inject, ApplicationRef, OpaqueToken } from '@angular/core';
+import { Injectable, ApplicationRef, OpaqueToken } from '@angular/core';
 import { Http, Response } from '@angular/http';
 import { Routes, Router, Route, NavigationStart, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { recognize } from "@angular/router/src/recognize";
@@ -95,6 +95,13 @@ export abstract class LocalizeParser {
     return this._translateRouteTree(this.routes[1].children, this.originalRouteNames);
   }
 
+  /**
+   * Translate the route node and recursively call for all it's children
+   * @param routes
+   * @param originals
+   * @returns {Promise<any>}
+   * @private
+   */
   private _translateRouteTree(routes: Routes, originals: Routes): Promise<any> {
     let promises: Promise<any>[] = [];
     routes.forEach((route: Route, index: number) => {
@@ -121,6 +128,11 @@ export abstract class LocalizeParser {
     return observable.toPromise();
   }
 
+  /**
+   * Translate route and return observable
+   * @param path
+   * @returns {Observable<string>}
+   */
   public translateRoute(path: string): Observable<string> {
     let pathSegments = path.split('/');
 
@@ -149,11 +161,9 @@ export abstract class LocalizeParser {
    * @private
    */
   private _getBrowserLang(): string {
-    if (navigator) {
-      let lang = navigator.language.split( '-' )[ 0 ];
-      if (this.locales.indexOf(lang) !== -1) {
-        return lang;
-      }
+    let browserLang = this.translate.getBrowserLang();
+    if (browserLang && this.locales.indexOf(browserLang) !== -1) {
+      return browserLang;
     }
     return null;
   }
