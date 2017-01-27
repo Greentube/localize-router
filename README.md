@@ -141,9 +141,9 @@ Make sure you therefore place most common language (e.g. 'en') as a first string
 `LocalizeRouter` depends on `ng2-translate` and automatically initializes it with selected locales.
 Following code is run on `LocalizeParser` init:
 ```ts
-this.translate.setDefaultLang(languageOfBrowser || firstLanguageFromConfig);
+this.translate.setDefaultLang(cachedLanguage || languageOfBrowser || firstLanguageFromConfig);
 // ...
-this.translate.use(languageFromUrl || languageOfBrowser || firstLanguageFromConfig);
+this.translate.use(languageFromUrl || cachedLanguage || languageOfBrowser || firstLanguageFromConfig);
 ```
 
 Both `languageOfBrowser` and `languageFromUrl` are cross-checked with locales from config.
