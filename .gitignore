@@ -12,7 +12,8 @@ npm-debug.log
 !karma.conf.js
 *.map
 *.d.ts
-!make.js
+!copy.js
+!webpack.config.js
 !examples/**/*.js
 coverage
 *.metadata.json
@@ -43,3 +44,5 @@ Desktop.ini
 # Mac crap
 .DS_Store
 
+bundles/
+node_modules/
