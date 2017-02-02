@@ -1,9 +1,9 @@
-import {Injector} from "@angular/core";
+import {Injector} from '@angular/core';
 import {LocalizeParser, ManualParserLoader} from '../src/localize-router.parser';
-import {getTestBed, TestBed, fakeAsync, tick} from "@angular/core/testing";
-import {Routes} from "@angular/router";
-import {Observable} from "rxjs";
-import {TranslateService} from "ng2-translate";
+import {getTestBed, TestBed, fakeAsync, tick} from '@angular/core/testing';
+import {Routes} from '@angular/router';
+import {Observable} from 'rxjs/Observable';
+import {TranslateService} from 'ng2-translate';
 
 class FakeTranslateService {
   defLang: string;

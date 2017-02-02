@@ -1,13 +1,14 @@
-import {Injector, ApplicationRef} from "@angular/core";
-import {XHRBackend, HttpModule} from "@angular/http";
-import {MockBackend, MockConnection} from "@angular/http/testing";
+import {Injector, ApplicationRef} from '@angular/core';
+import {XHRBackend, HttpModule} from '@angular/http';
+import {MockBackend, MockConnection} from '@angular/http/testing';
 import {LocalizeRouterService} from '../src/localize-router.service';
 import {LocalizeParser} from '../src/localize-router.parser';
 import {LocalizeRouterModule} from '../src/localize-router.module';
-import {getTestBed, TestBed, fakeAsync, tick} from "@angular/core/testing";
-import {Routes, Router, Event, NavigationStart, NavigationEnd} from "@angular/router";
-import {Observable, Subject} from "rxjs";
-import {TranslateService} from "ng2-translate";
+import {getTestBed, TestBed, fakeAsync, tick} from '@angular/core/testing';
+import {Routes, Router, Event, NavigationStart, NavigationEnd} from '@angular/router';
+import {Observable} from 'rxjs/Observable';
+import {Subject} from 'rxjs/Subject';
+import {TranslateService} from 'ng2-translate';
 import { CommonModule } from '@angular/common';
 
 class FakeTranslateService {

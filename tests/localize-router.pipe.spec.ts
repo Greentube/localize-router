@@ -1,10 +1,11 @@
 import {LocalizeRouterPipe} from '../src/localize-router.pipe';
-import {LocalizeRouterService} from "./../localize-router";
-import {XHRBackend} from "@angular/http";
-import {Injector, ChangeDetectorRef} from "@angular/core";
-import {getTestBed, TestBed} from "@angular/core/testing";
-import {MockConnection, MockBackend} from "@angular/http/testing";
-import {Observable, Subject} from "rxjs";
+import {LocalizeRouterService} from '../src/localize-router.service';
+import {XHRBackend} from '@angular/http';
+import {Injector, ChangeDetectorRef} from '@angular/core';
+import {getTestBed, TestBed} from '@angular/core/testing';
+import {MockConnection, MockBackend} from '@angular/http/testing';
+import {Observable} from 'rxjs/Observable';
+import {Subject} from 'rxjs/Subject';
 
 class FakeChangeDetectorRef extends ChangeDetectorRef {
   markForCheck(): void {  }

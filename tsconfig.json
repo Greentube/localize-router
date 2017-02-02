@@ -16,7 +16,7 @@
     "lib": ["es2015", "dom"]
   },
   "files": [
-    "localize-router.ts",
+    "index.ts",
     "./src/localize-router.pipe.ts",
     "./src/localize-router.service.ts",
     "./src/localize-router.parser.ts",
