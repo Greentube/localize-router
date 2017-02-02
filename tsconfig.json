@@ -5,9 +5,6 @@
     "target": "es5",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "inlineSourceMap": true,
-    "inlineSources": true,
-    "sourceMap": false,
     "declaration": true,
     "moduleResolution": "node",
     "noUnusedLocals": true,
@@ -16,7 +13,7 @@
       "jasmine",
       "node"
     ],
-    "lib": ["es6", "es2015", "dom"]
+    "lib": ["es2015", "dom"]
   },
   "files": [
     "localize-router.ts",
@@ -24,9 +21,9 @@
     "./src/localize-router.service.ts",
     "./src/localize-router.parser.ts",
     "./src/localize-router.module.ts",
-    "tests/localize-router.service.spec.ts",
-    "tests/localize-router.parser.spec.ts",
-    "tests/localize-router.pipe.spec.ts"
+    "./tests/localize-router.service.spec.ts",
+    "./tests/localize-router.parser.spec.ts",
+    "./tests/localize-router.pipe.spec.ts"
   ],
   "exclude": [
     "node_modules",

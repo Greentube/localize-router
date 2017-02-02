@@ -21,14 +21,20 @@ module.exports = function (config) {
     // Webpack Config at ./webpack.test.js
     webpack: testWebpackConfig,
 
-    reporters: ['mocha', 'coverage', 'progress'],
+    reporters: ['mocha', 'coverage', 'remap-coverage'],
 
     coverageReporter: {
-      dir: 'coverage/',
-      reporters: [
-        {type: 'json'},
-        {type: 'html'}
-      ]
+      type: 'in-memory'
+    },
+
+    remapCoverageReporter: {
+      'text-summary': null,
+      json: './coverage/coverage.json',
+      html: './coverage/html'
+    },
+
+    mochaReporter: {
+      ignoreSkipped: true
     },
 
     // Webpack please don't spam the console when running in karma!

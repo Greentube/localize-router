@@ -8,6 +8,7 @@ import { TranslateModule, TranslateService } from 'ng2-translate';
 
 export * from './localize-router.pipe';
 export * from './localize-router.service';
+export * from './localize-router.parser';
 
 /**
  * Helper function for loading external parser

@@ -30,8 +30,8 @@ var testing = require('@angular/core/testing');
 var browser = require('@angular/platform-browser-dynamic/testing');
 
 testing.TestBed.initTestEnvironment(
-    browser.BrowserDynamicTestingModule,
-    browser.platformBrowserDynamicTesting()
+  browser.BrowserDynamicTestingModule,
+  browser.platformBrowserDynamicTesting()
 );
 
 /*
@@ -51,7 +51,7 @@ var testContext = require.context('../tests', true, /\.spec\.ts/);
  * loop and require those spec files here
  */
 function requireAll(requireContext) {
-    return requireContext.keys().map(requireContext);
+  return requireContext.keys().map(requireContext);
 }
 
 // requires and returns all modules that match
