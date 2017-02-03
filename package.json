@@ -1,6 +1,6 @@
 {
   "name": "localize-router",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "An implementation of routes localization for Angular 2",
   "scripts": {
     "test": "karma start",
@@ -26,9 +26,9 @@
   "bugs": {
     "url": "https://github.com/Greentube/localize-router/issues"
   },
-  "main": "bundles/localize-router.js",
-  "module": "localize-router.js",
-  "typings": "./localize-router.d.ts",
+  "main": "bundles/localize-router.umd.js",
+  "module": "index.js",
+  "typings": "index.d.ts",
   "homepage": "https://github.com/Greentube/localize-router",
   "peerDependencies": {
     "@angular/core": "^2.0.0",
