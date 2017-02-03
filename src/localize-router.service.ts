@@ -1,6 +1,5 @@
-import { Injectable, ApplicationRef, OpaqueToken } from '@angular/core';
-import { Router, NavigationStart, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
-import { recognize } from '@angular/router/src/recognize';
+import { Injectable, OpaqueToken } from '@angular/core';
+import { Router, NavigationStart, ActivatedRouteSnapshot } from '@angular/router';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 import 'rxjs/add/observable/forkJoin';
@@ -15,7 +14,6 @@ export const RAW_ROUTUES = new OpaqueToken('RAW_ROUTUES');
 
 /**
  * Localization service
- *
  * modifyRoutes
  */
 @Injectable()
@@ -26,9 +24,8 @@ export class LocalizeRouterService {
    * CTOR
    * @param parser
    * @param router
-   * @param appRef
    */
-  constructor(public parser: LocalizeParser, private router: Router, private appRef: ApplicationRef) {
+  constructor(public parser: LocalizeParser, private router: Router) {
     this.router.resetConfig(this.parser.routes);
     this.router.events.subscribe(this._routeChanged());
     this.routerEvents = new Subject<string>();
@@ -40,15 +37,11 @@ export class LocalizeRouterService {
    */
   changeLanguage(lang: string) {
     if (lang !== this.parser.currentLang) {
-      let currentTree = this.router.parseUrl(location.pathname);
+      let rootSnapshot: ActivatedRouteSnapshot = this.router.routerState.snapshot.root;
 
-      recognize(this.appRef.componentTypes[0], this.parser.routes, currentTree, location.pathname).subscribe(
-        (s: RouterStateSnapshot) => {
-          this.parser.translateRoutes(lang).then(() => {
-            this.router.navigateByUrl(this.traverseRouteSnapshot(s.root));
-          });
-        }
-      );
+      this.parser.translateRoutes(lang).then(() => {
+        this.router.navigateByUrl(this.traverseRouteSnapshot(rootSnapshot));
+      });
     }
   }
 
