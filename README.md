@@ -13,6 +13,7 @@ Demo project can be found [here](https://github.com/meeroslav/localize-router-ex
         - [Static initialization](#static-initialization)
         - [JSON config file](#json-config-file)
         - [Manual initialization](#manual-initialization)
+        - [Server side initialization](#server-side-initialization)
     - [How it works](#how-it-works)
         - [ng2-translate integration](#ng2-translate-integration)
     - [Pipe](#pipe)
@@ -66,14 +67,12 @@ export class AppModule {
 
 Static file's default path is `assets/locales.json`. You can override the path by calling `StaticParserLoader` on you own:
 ```ts
-...
 LocalizeRouterModule.forRoot(routes, {
     provide: LocalizeParser,
-    useFactory: (translate, http) =>
-        new StaticParserLoader(translate, http, 'your/path/to/config.json'),
-    deps: [TranslateService, Http]
-}),
-...
+    useFactory: (translate, location, http) =>
+        new StaticParserLoader(translate, location, http, 'your/path/to/config.json'),
+    deps: [TranslateService, Location, Http]
+})
 
 ```
 
@@ -109,16 +108,72 @@ interface ILocalizeRouteConfig {
 #### Manual initialization
 With manual initialization you need to provide information directly:
 ```ts
-...
 LocalizeRouterModule.forRoot(routes, {
     provide: LocalizeParser,
-    useFactory: (translate, http) =>
-        new ManualParserLoader(translate, ['en','de',...], 'YOUR_PREFIX'),
-    deps: [TranslateService, Http]
-}),
-...
+    useFactory: (translate, location) =>
+        new ManualParserLoader(translate, location, ['en','de',...], 'YOUR_PREFIX'),
+    deps: [TranslateService, Location]
+})
 
 ```
+
+#### Server side initialization
+In order to use server side initialization in isomorphic/universal projects you need to create loader similar to this:
+```ts
+export class LocalizeUniversalLoader extends LocalizeParser {
+  /**
+   * Gets config from the server
+   * @param routes
+   */
+  public load(routes: Routes): Promise<any> {
+    return new Promise((resolve: any) => {
+      let data: any = JSON.parse(fs.readFileSync(`assets/locales.json`, 'utf8'));
+      this.locales = data.locales;
+      this.prefix = data.prefix;
+      this.init(routes).then(resolve);
+    });
+  }
+}
+
+export function localizeLoaderFactory(translate: TranslateService, location: Location) {
+  return new LocalizeUniversalLoader(translate, location);
+}
+
+```
+
+Don't forget to create similar loader for `ng2-translate` as well:
+```ts
+export class TranslateUniversalLoader implements TranslateLoader {
+  /**
+   * Gets the translations from the server
+   * @param lang
+   * @returns {any}
+   */
+  public getTranslation(lang: string): Observable<any> {
+    return Observable.create(observer => {
+      observer.next(JSON.parse(fs.readFileSync(`src/assets/locales/${lang}.json`, 'utf8')));
+      observer.complete();
+    });
+  }
+}
+export function translateLoaderFactory() {
+  return new TranslateUniversalLoader();
+}
+```
+
+Since node server expects to know which routes are allowed you can feed it like this:
+```ts
+let fs = require('fs');
+let data: any = JSON.parse(fs.readFileSync(`src/assets/locales.json`, 'utf8'));
+
+app.get('/', ngApp);
+data.locales.forEach(route => {
+  app.get(`/${route}`, ngApp);
+  app.get(`/${route}/*`, ngApp);
+});
+```
+
+Working example can be found [here](https://github.com/meeroslav/universal-localize-example).
 
 ### How it works
 
@@ -181,51 +236,14 @@ class MyComponent {
 
 ### AOT
 
-Currently NG compiler has issues with static loader factory in `localize-router.module` so in order to have a fully functional Ahead-Of-Time compilation `localizeLoaderFactory` has to be included in the `app.module`.
-Working example can be found [here](https://github.com/meeroslav/universal-localize-example).
+In order to use Ahead-Of-Time compilation any custom loaders must be exported as functions.
+This is the implementation currently in the solution:
 
-app.module.ts
 ```ts
-
-export function createTranslateLoader(http: Http) {
-  return new TranslateStaticLoader(http, '/assets/locales', '.json');
+export function localizeLoaderFactory(translate: TranslateService, location: Location, http: Http) {
+  return new StaticParserLoader(translate, location, http);
 }
-
-export function localizeLoaderFactory(translate: TranslateService, http: Http) {
-  return new StaticParserLoader(translate, http);
-}
-
-const routes: Routes = [
-  { path: '', redirectTo: 'home', pathMatch: 'full' }
-];
-
-@NgModule({
-  declarations: [
-    AppComponent
-  ],
-  imports: [
-    BrowserModule,
-    HttpModule,
-    TranslateModule.forRoot({
-      provide: TranslateLoader,
-      useFactory: createTranslateLoader,
-      deps: [Http]
-    }),
-    RouterModule.forRoot(routes),
-    LocalizeRouterModule.forRoot(routes, {
-      provide: LocalizeParser,
-      useFactory: localizeLoaderFactory,
-      deps: [TranslateService, Http]
-    })
-  ],
-  exports: [RouterModule],
-  bootstrap: [AppComponent]
-})
-export class AppModule { }
-
 ```
-
-
 
 ## API
 ### LocalizeRouterService

@@ -4,6 +4,7 @@ import {getTestBed, TestBed, fakeAsync, tick} from '@angular/core/testing';
 import {Routes} from '@angular/router';
 import {Observable} from 'rxjs/Observable';
 import {TranslateService} from 'ng2-translate';
+import {Location} from '@angular/common';
 
 class FakeTranslateService {
   defLang: string;
@@ -24,14 +25,20 @@ class FakeTranslateService {
   getBrowserLang() { return this.browserLang; }
 }
 
+class FakeLocation {
+  path():string {
+    return "";
+  }
+}
+
 class DummyComponent {}
 
 describe('LocalizeParser', () => {
   let injector: Injector;
   let loader: ManualParserLoader;
   let translate: TranslateService;
+  let location: Location;
 
-  let fakeLocation = { pathname: '' };
   let routes: Routes;
   let locales: string[];
   let prefix = 'PREFIX.';
@@ -40,7 +47,7 @@ describe('LocalizeParser', () => {
     TestBed.configureTestingModule({
       providers: [
         {provide: TranslateService, useClass: FakeTranslateService},
-        {provide: location, useValue: fakeLocation}
+        {provide: location, useClass: FakeLocation}
       ]
     });
     routes = [
@@ -54,7 +61,8 @@ describe('LocalizeParser', () => {
     localStorage.removeItem('LOCALIZE_LOCAL_STORAGE');
     injector = getTestBed();
     translate = injector.get(TranslateService);
-    loader = new ManualParserLoader(translate);
+    location = injector.get(Location);
+    loader = new ManualParserLoader(translate, location);
   });
 
   afterEach(() => {
@@ -74,26 +82,26 @@ describe('LocalizeParser', () => {
   });
 
   it('should set locales on init', () => {
-    loader = new ManualParserLoader(translate, locales, prefix);
+    loader = new ManualParserLoader(translate, location, locales, prefix);
     expect(loader.locales).toEqual(locales);
   });
 
   it('should extract language from url on getLocationLang', () => {
-    loader = new ManualParserLoader(translate, locales, prefix);
+    loader = new ManualParserLoader(translate, location, locales, prefix);
 
     expect(loader.getLocationLang('/en/some/path/after')).toEqual('en');
     expect(loader.getLocationLang('de/some/path/after')).toEqual('de');
   });
 
   it('should return null on getLocationLang if lang not found', () => {
-    loader = new ManualParserLoader(translate, locales, prefix);
+    loader = new ManualParserLoader(translate, location, locales, prefix);
 
     expect(loader.getLocationLang('/se/some/path/after')).toEqual(null);
     expect(loader.getLocationLang('rs/some/path/after')).toEqual(null);
   });
 
   it('should call translateRoutes on init if locales passed', fakeAsync(() => {
-    loader = new ManualParserLoader(translate, locales, prefix);
+    loader = new ManualParserLoader(translate, location, locales, prefix);
     spyOn(loader, 'translateRoutes').and.callThrough();
 
     loader.load([]);
@@ -102,7 +110,7 @@ describe('LocalizeParser', () => {
   }));
 
   it('should not call translateRoutes on init if no locales', fakeAsync(() => {
-    loader = new ManualParserLoader(translate, [], prefix);
+    loader = new ManualParserLoader(translate, location, [], prefix);
     spyOn(loader, 'translateRoutes').and.callThrough();
 
     loader.load(routes);
@@ -111,7 +119,7 @@ describe('LocalizeParser', () => {
   }));
 
   it('should set language from navigator params', fakeAsync(() => {
-    loader = new ManualParserLoader(translate, locales, prefix);
+    loader = new ManualParserLoader(translate, location, locales, prefix);
     spyOn(loader, 'translateRoutes').and.callThrough();
 
     (<any>translate)['browserLang'] = 'de';
@@ -125,7 +133,7 @@ describe('LocalizeParser', () => {
     expect(translate.currentLang).toEqual('de');
   }));
   it('should set language from localStorage', fakeAsync(() => {
-    loader = new ManualParserLoader(translate, locales, prefix);
+    loader = new ManualParserLoader(translate, location, locales, prefix);
     spyOn(loader, 'translateRoutes').and.callThrough();
 
     (<any>translate)['browserLang'] = 'de';
@@ -141,7 +149,7 @@ describe('LocalizeParser', () => {
   }));
 
   it('should pick first language from locales if navigator language not recognized', fakeAsync(() => {
-    loader = new ManualParserLoader(translate, locales, prefix);
+    loader = new ManualParserLoader(translate, location, locales, prefix);
     spyOn(loader, 'translateRoutes').and.callThrough();
 
     (<any>translate)['browserLang'] = 'sr';
@@ -155,7 +163,7 @@ describe('LocalizeParser', () => {
   }));
 
   it('should translate path', fakeAsync(() => {
-    loader = new ManualParserLoader(translate, locales, prefix);
+    loader = new ManualParserLoader(translate, location, locales, prefix);
     spyOn(loader, 'translateRoutes').and.callThrough();
 
     (<any>translate)['browserLang'] = 'sr';
@@ -167,7 +175,7 @@ describe('LocalizeParser', () => {
   }));
 
   it('should not translate path if translation not found', fakeAsync(() => {
-    loader = new ManualParserLoader(translate, locales, prefix);
+    loader = new ManualParserLoader(translate, location, locales, prefix);
     spyOn(loader, 'translateRoutes').and.callThrough();
     (<any>translate)['browserLang'] = 'sr';
 
@@ -178,7 +186,7 @@ describe('LocalizeParser', () => {
   }));
 
   it('should translate redirectTo', fakeAsync(() => {
-    loader = new ManualParserLoader(translate, locales, prefix);
+    loader = new ManualParserLoader(translate, location, locales, prefix);
     spyOn(loader, 'translateRoutes').and.callThrough();
     (<any>translate)['browserLang'] = 'sr';
 
@@ -189,7 +197,7 @@ describe('LocalizeParser', () => {
   }));
 
   it('should translate complex path segments', fakeAsync(() => {
-    loader = new ManualParserLoader(translate, locales, prefix);
+    loader = new ManualParserLoader(translate, location, locales, prefix);
     spyOn(loader, 'translateRoutes').and.callThrough();
     (<any>translate)['browserLang'] = 'sr';
 
@@ -200,7 +208,7 @@ describe('LocalizeParser', () => {
   }));
 
   it('should translate children', fakeAsync(() => {
-    loader = new ManualParserLoader(translate, locales, prefix);
+    loader = new ManualParserLoader(translate, location, locales, prefix);
     spyOn(loader, 'translateRoutes').and.callThrough();
     (<any>translate)['browserLang'] = 'sr';
 

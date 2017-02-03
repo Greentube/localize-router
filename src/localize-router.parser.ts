@@ -3,6 +3,7 @@ import { Routes, Route } from '@angular/router';
 import { TranslateService } from 'ng2-translate';
 import { Observable } from 'rxjs/Observable';
 import { Observer } from 'rxjs/Observer';
+import { Location } from '@angular/common';
 import 'rxjs/add/observable/forkJoin';
 
 const LOCALIZE_LOCAL_STORAGE = 'LOCALIZE_LOCAL_STORAGE';
@@ -29,8 +30,9 @@ export abstract class LocalizeParser {
   /**
    * Loader constructor
    * @param translate
+   * @param location
    */
-  constructor(private translate: TranslateService) {}
+  constructor(private translate: TranslateService, private location: Location) {}
 
   /**
    * Load routes and fetch necessary data
@@ -156,7 +158,7 @@ export abstract class LocalizeParser {
    * @private
    */
   getLocationLang(url?: string): string {
-    let pathSlices = (url || location.pathname).split('/');
+    let pathSlices = (url || this.location.path()).split('/');
 
     if (pathSlices.length > 1 && this.locales.indexOf(pathSlices[1]) !== -1) {
       return pathSlices[1];
@@ -219,8 +221,8 @@ export class ManualParserLoader extends LocalizeParser {
    * @param locales
    * @param prefix
    */
-  constructor(translate: TranslateService, locales: Array<string> = ['en'], prefix: string = 'ROUTES.') {
-    super(translate);
+  constructor(translate: TranslateService, location: Location, locales: Array<string> = ['en'], prefix: string = 'ROUTES.') {
+    super(translate, location);
     this.locales = locales;
     this.prefix = prefix;
   }
@@ -245,11 +247,12 @@ export class StaticParserLoader extends LocalizeParser {
   /**
    * CTOR
    * @param translate
+   * @param location
    * @param http
    * @param path
    */
-  constructor(translate: TranslateService, private http: Http, private path: string = 'assets/locales.json') {
-    super(translate);
+  constructor(translate: TranslateService, location: Location, private http: Http, private path: string = 'assets/locales.json') {
+    super(translate, location);
     this._dataLoaded = false;
   }
 

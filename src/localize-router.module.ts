@@ -5,6 +5,7 @@ import { LocalizeParser, StaticParserLoader } from './localize-router.parser';
 import { RouterModule, Routes } from '@angular/router';
 import { LocalizeRouterPipe } from './localize-router.pipe';
 import { TranslateModule, TranslateService } from 'ng2-translate';
+import { Location, CommonModule } from '@angular/common';
 
 export * from './localize-router.pipe';
 export * from './localize-router.service';
@@ -13,17 +14,18 @@ export * from './localize-router.parser';
 /**
  * Helper function for loading external parser
  * @param translate
+ * @param location
  * @param http
  * @returns {StaticParserLoader}
  */
-export function localizeLoaderFactory(translate: TranslateService, http: Http) {
-  return new StaticParserLoader(translate, http);
+export function localizeLoaderFactory(translate: TranslateService, location: Location, http: Http) {
+  return new StaticParserLoader(translate, location, http);
 }
 
 @NgModule({
-  imports: [HttpModule, RouterModule, TranslateModule],
+  imports: [HttpModule, CommonModule, RouterModule, TranslateModule],
   declarations: [LocalizeRouterPipe],
-  exports: [HttpModule, TranslateModule, LocalizeRouterPipe]
+  exports: [LocalizeRouterPipe]
 })
 export class LocalizeRouterModule {
 
@@ -32,7 +34,7 @@ export class LocalizeRouterModule {
     localizeLoader: Provider = {
       provide: LocalizeParser,
       useFactory: localizeLoaderFactory,
-      deps: [TranslateService, Http]
+      deps: [TranslateService, Location, Http]
     }
   ): ModuleWithProviders {
     return {
