@@ -188,8 +188,14 @@ Upon every route change `Localize router` kicks in to check if there was a chang
 http://yourpath/home -> http://yourpath/en/home
 ```
 
-If no language is provided in the url path, application uses default path - language set in the browser or first locale in the config.
+If no language is provided in the url path, application uses: 
+* cached language in LocalStorage (browser only) or
+* current language of the browser (browser only) or 
+* first locale in the config
+
 Make sure you therefore place most common language (e.g. 'en') as a first string in the array of locales.
+
+> Note that `localize-router` does not redirect routes like `my/route` to translated ones e.g. `en/my/route`. All routes are prepended by currently selected language so route without language is unknown to Router.
 
 #### ng2-translate integration
 
