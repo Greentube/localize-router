@@ -1,4 +1,4 @@
-import {Injector, ApplicationRef} from '@angular/core';
+import {Injector} from '@angular/core';
 import {XHRBackend, HttpModule} from '@angular/http';
 import {MockBackend, MockConnection} from '@angular/http/testing';
 import {LocalizeRouterService} from '../src/localize-router.service';
@@ -9,7 +9,7 @@ import {Routes, Router, Event, NavigationStart, NavigationEnd} from '@angular/ro
 import {Observable} from 'rxjs/Observable';
 import {Subject} from 'rxjs/Subject';
 import {TranslateService} from 'ng2-translate';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 
 class FakeTranslateService {
   defLang: string;
@@ -40,10 +40,10 @@ class FakeRouter {
   parseUrl() { return ''; }
 }
 
-class FakeApplicationRef {
-  componentTypes: any[];
-
-  constructor() { this.componentTypes = [DummyComponent]; }
+class FakeLocation {
+  path():string {
+    return "";
+  }
 }
 
 class DummyComponent {}
@@ -66,7 +66,7 @@ describe('LocalizeRouterService', () => {
         {provide: XHRBackend, useClass: MockBackend},
         {provide: Router, useClass: FakeRouter},
         {provide: TranslateService, useClass: FakeTranslateService},
-        {provide: ApplicationRef, useClass: FakeApplicationRef}
+        {provide: Location, useClass: FakeLocation}
       ]
     });
     injector = getTestBed();

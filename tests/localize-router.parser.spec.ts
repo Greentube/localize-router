@@ -4,7 +4,7 @@ import {getTestBed, TestBed, fakeAsync, tick} from '@angular/core/testing';
 import {Routes} from '@angular/router';
 import {Observable} from 'rxjs/Observable';
 import {TranslateService} from 'ng2-translate';
-import {Location} from '@angular/common';
+import {Location, CommonModule} from '@angular/common';
 
 class FakeTranslateService {
   defLang: string;
@@ -45,9 +45,10 @@ describe('LocalizeParser', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
+      imports: [CommonModule],
       providers: [
         {provide: TranslateService, useClass: FakeTranslateService},
-        {provide: location, useClass: FakeLocation}
+        {provide: Location, useClass: FakeLocation}
       ]
     });
     routes = [
