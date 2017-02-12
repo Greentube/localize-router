@@ -10,7 +10,7 @@ import { LocalizeParser } from './localize-router.parser';
  * Static provider for keeping track of routes
  * @type {OpaqueToken}
  */
-export const RAW_ROUTUES = new OpaqueToken('RAW_ROUTUES');
+export const RAW_ROUTES = new OpaqueToken('RAW_ROUTES');
 
 /**
  * Localization service

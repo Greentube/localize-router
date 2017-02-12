@@ -17,7 +17,7 @@ tests
 coverage
 config
 karma.conf.js
-make.js
+copy.js
 tsconfig.json
 tslint.json
 !*.metadata.json

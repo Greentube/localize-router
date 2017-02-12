@@ -1,6 +1,6 @@
 import { NgModule, ModuleWithProviders, APP_INITIALIZER, Provider } from '@angular/core';
 import { HttpModule, Http } from '@angular/http';
-import { LocalizeRouterService, RAW_ROUTUES, parserInitializer } from './localize-router.service';
+import { LocalizeRouterService, RAW_ROUTES, parserInitializer } from './localize-router.service';
 import { LocalizeParser, StaticParserLoader } from './localize-router.parser';
 import { RouterModule, Routes } from '@angular/router';
 import { LocalizeRouterPipe } from './localize-router.pipe';
@@ -43,14 +43,14 @@ export class LocalizeRouterModule {
         localizeLoader,
         LocalizeRouterService,
         {
-          provide: RAW_ROUTUES,
+          provide: RAW_ROUTES,
           multi: true,
           useValue: routes
         },
         {
           provide: APP_INITIALIZER,
           useFactory: parserInitializer,
-          deps: [LocalizeParser, RAW_ROUTUES],
+          deps: [LocalizeParser, RAW_ROUTES],
           multi: true
         }
       ]
@@ -61,7 +61,7 @@ export class LocalizeRouterModule {
     return {
       ngModule: LocalizeRouterModule,
       providers: [{
-        provide: RAW_ROUTUES,
+        provide: RAW_ROUTES,
         multi: true,
         useValue: routes
       }]
