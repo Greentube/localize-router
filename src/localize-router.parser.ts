@@ -1,4 +1,5 @@
 import { Http, Response } from '@angular/http';
+import { OpaqueToken } from '@angular/core';
 import { Routes, Route } from '@angular/router';
 import { TranslateService } from 'ng2-translate';
 import { Observable } from 'rxjs/Observable';
@@ -8,6 +9,12 @@ import 'rxjs/add/observable/forkJoin';
 import 'rxjs/add/operator/toPromise';
 
 const LOCALIZE_LOCAL_STORAGE = 'LOCALIZE_LOCAL_STORAGE';
+
+/**
+ * Static provider for keeping track of routes
+ * @type {OpaqueToken}
+ */
+export const RAW_ROUTES = new OpaqueToken('RAW_ROUTES');
 
 /**
  * Config interface
@@ -301,4 +308,26 @@ export class StaticParserLoader extends LocalizeParser {
       }
     });
   }
+}
+
+
+/**
+ * Pre-loading helper functions
+ * Necessary evil for AOT
+ * @param parser
+ * @param routes
+ * @returns {any}
+ */
+export function parserInitializer(parser: LocalizeParser, routes: any) {
+  loadRoutes.prototype.parser = parser;
+  loadRoutes.prototype.routes = routes.reduce(concatArrays);
+  return loadRoutes;
+}
+
+export function concatArrays(a: Array<any>, b: Array<any>): Array<any> {
+  return a.concat(b);
+}
+
+export function loadRoutes() {
+  return loadRoutes.prototype.parser.load(loadRoutes.prototype.routes);
 }

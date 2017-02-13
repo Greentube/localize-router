@@ -1,7 +1,7 @@
 import { NgModule, ModuleWithProviders, APP_INITIALIZER, Provider } from '@angular/core';
 import { HttpModule, Http } from '@angular/http';
-import { LocalizeRouterService, RAW_ROUTES, parserInitializer } from './localize-router.service';
-import { LocalizeParser, StaticParserLoader } from './localize-router.parser';
+import { LocalizeRouterService } from './localize-router.service';
+import { LocalizeParser, RAW_ROUTES, StaticParserLoader, parserInitializer } from './localize-router.parser';
 import { RouterModule, Routes } from '@angular/router';
 import { LocalizeRouterPipe } from './localize-router.pipe';
 import { TranslateModule, TranslateService } from 'ng2-translate';

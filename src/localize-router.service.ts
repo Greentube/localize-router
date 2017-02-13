@@ -1,16 +1,10 @@
-import { Injectable, OpaqueToken } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Router, NavigationStart, ActivatedRouteSnapshot } from '@angular/router';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 import 'rxjs/add/observable/forkJoin';
 
 import { LocalizeParser } from './localize-router.parser';
-
-/**
- * Static provider for keeping track of routes
- * @type {OpaqueToken}
- */
-export const RAW_ROUTES = new OpaqueToken('RAW_ROUTES');
 
 /**
  * Localization service
@@ -109,25 +103,4 @@ export class LocalizeRouterService {
       }
     };
   }
-}
-
-/**
- * Pre-loading helper functions
- * Necessary evil for AOT
- * @param parser
- * @param routes
- * @returns {any}
- */
-export function parserInitializer(parser: LocalizeParser, routes: any) {
-  loadRoutes.prototype.parser = parser;
-  loadRoutes.prototype.routes = routes.reduce(concatArrays);
-  return loadRoutes;
-}
-
-export function concatArrays(a: Array<any>, b: Array<any>): Array<any> {
-  return a.concat(b);
-}
-
-export function loadRoutes() {
-  return loadRoutes.prototype.parser.load(loadRoutes.prototype.routes);
 }
