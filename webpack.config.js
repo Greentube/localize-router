@@ -7,7 +7,6 @@ const webpack = require('webpack');
 const ProvidePlugin = require('webpack/lib/ProvidePlugin');
 const DefinePlugin = require('webpack/lib/DefinePlugin');
 const LoaderOptionsPlugin = require('webpack/lib/LoaderOptionsPlugin');
-const nodeExternals = require('webpack-node-externals');
 
 module.exports = {
   devtool: '#source-map',
@@ -27,9 +26,8 @@ module.exports = {
   },
 
   // require those dependencies but don't bundle them
-  // externals: [/^\@angular\//, /^rxjs\//, /^rxjs\\/, 'ng2-translate'],
+  externals: [/^\@angular\//, /^rxjs\//, 'ng2-translate'],
   target: 'node',
-  externals: [nodeExternals()],
 
   module: {
     rules: [{

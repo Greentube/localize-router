@@ -27,6 +27,7 @@ export abstract class LocalizeParser {
 
   protected prefix: string;
   private originalRouteNames: Routes;
+  private originalWildcard: Route;
 
   /**
    * Loader constructor
@@ -56,7 +57,15 @@ export abstract class LocalizeParser {
       this.originalRouteNames.splice(0, 0, ...JSON.parse(JSON.stringify(routes)));
       this.routes[1].children.splice(0, 0, ...routes);
     } else {
-      // init first routes
+      // extract potential wildcard route
+      let wildcardIndex = routes.findIndex((route: Route) => route.path === '**');
+      let wildcardRoute: Route;
+      if (wildcardIndex !== -1) {
+        wildcardRoute = routes.splice(wildcardIndex, 1)[0];
+        this.originalWildcard = JSON.parse(JSON.stringify(wildcardRoute));
+      }
+
+      // init routes
       this.routes = routes;
       this.originalRouteNames = JSON.parse(JSON.stringify(routes));
 
@@ -72,16 +81,13 @@ export abstract class LocalizeParser {
       /** mutable operation on routes */
       let children = this.routes.splice(0, this.routes.length,
         { path: '', redirectTo: this.translate.getDefaultLang(), pathMatch: 'full' });
-      /** check for the wildcard */
-      let wildcardIndex = children.findIndex((elem: Route) => elem.path === '**');
-      let wildcardRoute: Route[];
-      if (wildcardIndex !== -1) {
-        wildcardRoute = children.splice(wildcardIndex, 1);
-      }
-      /** add children and potential wildcard element */
+
+      /** append children routes... */
       this.routes.push({ children: children });
-      if (wildcardRoute && wildcardRoute.length) {
-        this.routes.push(wildcardRoute[0]);
+
+      /** ...and potential wildcard route */
+      if (wildcardRoute) {
+        this.routes.push(wildcardRoute);
       }
     }
     /** translate routes */
@@ -100,9 +106,8 @@ export abstract class LocalizeParser {
     this.routes[1].path = language;
 
     let promises: Promise<any>[] = [];
-    if (this.routes.length === 3 && this.routes[2].redirectTo) {
-      let wildcardIndex = this.originalRouteNames.findIndex((elem: Route) => elem.path === '**');
-      promises.push(this._getTranslatePromise(this.originalRouteNames[wildcardIndex], this.routes[2], 'redirectTo', true));
+    if (this.originalWildcard) {
+      promises.push(this._getTranslatePromise(this.originalWildcard, this.routes[2], 'redirectTo', true));
     }
     promises.push(this._translateRouteTree(this.routes[1].children, this.originalRouteNames));
 
@@ -237,6 +242,7 @@ export class ManualParserLoader extends LocalizeParser {
   /**
    * CTOR
    * @param translate
+   * @param location
    * @param locales
    * @param prefix
    */
