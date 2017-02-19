@@ -1,7 +1,7 @@
 import { Http, Response } from '@angular/http';
 import { OpaqueToken } from '@angular/core';
 import { Routes, Route } from '@angular/router';
-import { TranslateService } from 'ng2-translate';
+import { TranslateService } from '@ngx-translate/core';
 import { Observable } from 'rxjs/Observable';
 import { Observer } from 'rxjs/Observer';
 import { Location } from '@angular/common';
@@ -309,7 +309,6 @@ export class StaticParserLoader extends LocalizeParser {
     });
   }
 }
-
 
 /**
  * Pre-loading helper functions

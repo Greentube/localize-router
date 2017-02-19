@@ -8,7 +8,7 @@ import {getTestBed, TestBed, fakeAsync, tick} from '@angular/core/testing';
 import {Routes, Router, Event, NavigationStart, NavigationEnd} from '@angular/router';
 import {Observable} from 'rxjs/Observable';
 import {Subject} from 'rxjs/Subject';
-import {TranslateService} from 'ng2-translate';
+import {TranslateService} from '@ngx-translate/core';
 import { CommonModule, Location } from '@angular/common';
 
 class FakeTranslateService {

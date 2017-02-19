@@ -4,7 +4,7 @@ import { LocalizeRouterService } from './localize-router.service';
 import { LocalizeParser, RAW_ROUTES, StaticParserLoader, parserInitializer } from './localize-router.parser';
 import { RouterModule, Routes } from '@angular/router';
 import { LocalizeRouterPipe } from './localize-router.pipe';
-import { TranslateModule, TranslateService } from 'ng2-translate';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Location, CommonModule } from '@angular/common';
 
 export * from './localize-router.pipe';
