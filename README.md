@@ -1,9 +1,9 @@
 # localize-router
 [![Build Status](https://travis-ci.org/Greentube/localize-router.svg?branch=master)](https://travis-ci.org/Greentube/localize-router)
 [![npm version](https://img.shields.io/npm/v/localize-router.svg)](https://www.npmjs.com/package/localize-router)
-> An implementation of routes localization for Angular 2.
+> An implementation of routes localization for Angular.
 
-Based on and extension of [ng2-translate](https://github.com/ocombe/ng2-translate).
+Based on and extension of [ngx-translate](https://github.com/ngx-translate/core).
 Demo project can be found [here](https://github.com/meeroslav/localize-router-example).
 
 # Table of contents:
@@ -15,7 +15,7 @@ Demo project can be found [here](https://github.com/meeroslav/localize-router-ex
         - [Manual initialization](#manual-initialization)
         - [Server side initialization](#server-side-initialization)
     - [How it works](#how-it-works)
-        - [ng2-translate integration](#ng2-translate-integration)
+        - [ngx-translate integration](#ngx-translate-integration)
     - [Pipe](#pipe)
     - [Service](#service)
     - [AOT](#aot)
@@ -45,7 +45,7 @@ Module can be initialized either using static file or manually by passing necess
 import {BrowserModule} from "@angular/platform-browser";
 import {NgModule} from '@angular/core';
 import {HttpModule} from '@angular/http';
-import {TranslateModule} from 'ng2-translate/ng2-translate';
+import {TranslateModule} from '@ngx-translate/core';
 import {LocalizeRouterModule} from 'localize-router/localize-router';
 import {RouterModule} from '@angular/router';
 
@@ -141,7 +141,7 @@ export function localizeLoaderFactory(translate: TranslateService, location: Loc
 
 ```
 
-Don't forget to create similar loader for `ng2-translate` as well:
+Don't forget to create similar loader for `ngx-translate` as well:
 ```ts
 export class TranslateUniversalLoader implements TranslateLoader {
   /**
@@ -178,7 +178,8 @@ Working example can be found [here](https://github.com/meeroslav/universal-local
 ### How it works
 
 `Localize router` intercepts Router initialization and translates each `path` and `redirectTo` path of Routes.
-The translation process is done with [ng2-translate](https://github.com/ocombe/ng2-translate). In order to separate router translations from normal application translations we use `prefix`. Default value for prefix is `ROUTES.`.
+The translation process is done with [ngx-translate](https://github.com/ngx-translate/core). In order to separate 
+router translations from normal application translations we use `prefix`. Default value for prefix is `ROUTES.`.
 ```
 'home' -> 'ROUTES.home'
 ```
@@ -197,9 +198,9 @@ Make sure you therefore place most common language (e.g. 'en') as a first string
 
 > Note that `localize-router` does not redirect routes like `my/route` to translated ones e.g. `en/my/route`. All routes are prepended by currently selected language so route without language is unknown to Router.
 
-#### ng2-translate integration
+#### ngx-translate integration
 
-`LocalizeRouter` depends on `ng2-translate` and automatically initializes it with selected locales.
+`LocalizeRouter` depends on `ngx-translate` core service and automatically initializes it with selected locales.
 Following code is run on `LocalizeParser` init:
 ```ts
 this.translate.setDefaultLang(cachedLanguage || languageOfBrowser || firstLanguageFromConfig);

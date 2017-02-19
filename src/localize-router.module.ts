@@ -1,4 +1,4 @@
-import { NgModule, ModuleWithProviders, APP_INITIALIZER, Provider } from '@angular/core';
+import { NgModule, ModuleWithProviders, APP_INITIALIZER, Provider, OpaqueToken, Optional, SkipSelf } from '@angular/core';
 import { HttpModule, Http } from '@angular/http';
 import { LocalizeRouterService } from './localize-router.service';
 import { LocalizeParser, RAW_ROUTES, StaticParserLoader, parserInitializer } from './localize-router.parser';
@@ -10,6 +10,8 @@ import { Location, CommonModule } from '@angular/common';
 export * from './localize-router.pipe';
 export * from './localize-router.service';
 export * from './localize-router.parser';
+
+export const LOCALIZE_ROUTER_FORROOT_GUARD = new OpaqueToken('LOCALIZE_ROUTER_FORROOT_GUARD');
 
 /**
  * Helper function for loading external parser
@@ -43,6 +45,11 @@ export class LocalizeRouterModule {
         localizeLoader,
         LocalizeRouterService,
         {
+          provide: LOCALIZE_ROUTER_FORROOT_GUARD,
+          useFactory: provideForRootGuard,
+          deps: [[LocalizeRouterModule, new Optional(), new SkipSelf()]]
+        },
+        {
           provide: RAW_ROUTES,
           multi: true,
           useValue: routes
@@ -67,4 +74,12 @@ export class LocalizeRouterModule {
       }]
     };
   }
+}
+
+export function provideForRootGuard(localizeRouterModule: LocalizeRouterModule): any {
+  if (localizeRouterModule) {
+    throw new Error(
+      `LocalizeRouterModule.forRoot() called twice. Lazy loaded modules should use LocalizeRouterModule.forChild() instead.`);
+  }
+  return 'guarded';
 }
