@@ -77,22 +77,10 @@ describe('LocalizeRouterPipe', () => {
     expect(localizePipe.transform('route')).toEqual('route_TR');
   });
 
-  it('should prepend language if root route', () => {
-    localize.parser.currentLang = 'en';
-
-    expect(localizePipe.transform('/route')).toEqual('en/route_TR');
-  });
-
   it('should translate a multi segment route', () => {
     localize.parser.currentLang = 'en';
 
     expect(localizePipe.transform('path/to/my/route')).toEqual('path/to/my/route_TR');
-  });
-
-  it('should translate a complex segment route', () => {
-    localize.parser.currentLang = 'en';
-
-    expect(localizePipe.transform(['/path', 4, 'my', 5])).toEqual(['en/path_TR', 4, 'my_TR', 5]);
   });
 
   it('should translate a complex segment route if it changed', () => {

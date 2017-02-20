@@ -1,6 +1,5 @@
 import { PipeTransform, Pipe, Injectable, ChangeDetectorRef } from '@angular/core';
 import { LocalizeRouterService } from './localize-router.service';
-import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 import 'rxjs/add/observable/forkJoin';
 
@@ -50,20 +49,7 @@ export class LocalizeRouterPipe implements PipeTransform {
    * @param key
    */
   private updateValue(key: string | Array<any>) {
-    let translateBatch: Array<Observable<any>> = [];
-
-    if (typeof key === 'string') {
-      this.localize.translateRoute(key, key.indexOf('/') === 0).subscribe(this.translateCallback(key));
-    } else { // it's array
-      (key as Array<any>).forEach((segment: any, index: number) => {
-        if (typeof segment === 'string') {
-          translateBatch.push(this.localize.translateRoute(segment, index === 0 && segment.indexOf('/') === 0));
-        } else {
-          translateBatch.push(Observable.of(segment));
-        }
-      });
-      Observable.forkJoin(translateBatch).subscribe(this.translateCallback(key));
-    }
+    this.localize.translateRoute(key).subscribe(this.translateCallback(key));
   }
 
   /**

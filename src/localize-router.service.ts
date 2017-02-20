@@ -70,19 +70,24 @@ export class LocalizeRouterService {
    * Translate route to current language
    * If new language is explicitly provided then replace language part in url with new language
    * @param path
-   * @param prependLanguage
    * @returns {Observable<string>}
    */
-  translateRoute(path: string, prependLanguage?: boolean): Observable<string> {
-    let startsWithBackslash = path.length && path.indexOf('/') === 0;
-    if (prependLanguage === void 0) {
-      prependLanguage = startsWithBackslash;
-    }
-    let interpolated = prependLanguage ?
-      startsWithBackslash ? `/${this.parser.currentLang}${path}` : `/${this.parser.currentLang}/${path}` :
-      path;
+  translateRoute(path: string | Array<any>): Observable<string | Array<any>> {
+    if (typeof path === 'string') {
+      return this.parser.translateRoute(path.indexOf('/') === 0 ? `/${this.parser.currentLang}${path}` : path);
+    } else { // it's array
+      let translateBatch: Array<Observable<any>> = [];
 
-    return this.parser.translateRoute(interpolated);
+      (path as Array<any>).forEach((segment: any, index: number) => {
+        if (typeof segment === 'string') {
+          translateBatch.push(this.parser.translateRoute(index === 0 && segment.indexOf('/') === 0 ?
+            `/${this.parser.currentLang}${segment}` : segment));
+        } else {
+          translateBatch.push(Observable.of(segment));
+        }
+      });
+      Observable.forkJoin(translateBatch);
+    }
   }
 
   /**

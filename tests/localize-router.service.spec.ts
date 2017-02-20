@@ -125,31 +125,14 @@ describe('LocalizeRouterService', () => {
     expect(parser.translateRoute).toHaveBeenCalledWith('/de/my/path');
   });
 
-  it('should append language if second param is true', () => {
+  it('should translate complex route', () => {
     localizeRouterService = new LocalizeRouterService(parser, router);
     parser.currentLang = 'de';
     spyOn(parser, 'translateRoute').and.stub();
 
-    localizeRouterService.translateRoute('my/path', true);
+    localizeRouterService.translateRoute(['/my/path', 123, 'about']);
     expect(parser.translateRoute).toHaveBeenCalledWith('/de/my/path');
-  });
-
-  it('should append language if second param is true and is root route', () => {
-    localizeRouterService = new LocalizeRouterService(parser, router);
-    parser.currentLang = 'de';
-    spyOn(parser, 'translateRoute').and.stub();
-
-    localizeRouterService.translateRoute('/my/path', true);
-    expect(parser.translateRoute).toHaveBeenCalledWith('/de/my/path');
-  });
-
-  it('should not append language if second param is false', () => {
-    localizeRouterService = new LocalizeRouterService(parser, router);
-    parser.currentLang = 'de';
-    spyOn(parser, 'translateRoute').and.stub();
-
-    localizeRouterService.translateRoute('/my/path', false);
-    expect(parser.translateRoute).toHaveBeenCalledWith('/my/path');
+    expect(parser.translateRoute).toHaveBeenCalledWith('about');
   });
 
   it('should translate routes if language had changed on route event', () => {
