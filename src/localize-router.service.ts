@@ -72,11 +72,11 @@ export class LocalizeRouterService {
    * @param path
    * @returns {Observable<string>}
    */
-  translateRoute(path: string | Array<any>): Observable<string | Array<any>> {
+  translateRoute(path: string | Array<any>): Observable<string | any[]> {
     if (typeof path === 'string') {
       return this.parser.translateRoute(path.indexOf('/') === 0 ? `/${this.parser.currentLang}${path}` : path);
     } else { // it's array
-      let translateBatch: Array<Observable<any>> = [];
+      let translateBatch: Observable<any>[] = [];
 
       (path as Array<any>).forEach((segment: any, index: number) => {
         if (typeof segment === 'string') {
