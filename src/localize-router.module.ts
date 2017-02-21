@@ -1,7 +1,10 @@
-import { NgModule, ModuleWithProviders, APP_INITIALIZER, Provider, OpaqueToken, Optional, SkipSelf } from '@angular/core';
+import {
+  NgModule, ModuleWithProviders, APP_INITIALIZER, Provider, OpaqueToken, Optional, SkipSelf,
+  Injectable, Injector
+} from '@angular/core';
 import { HttpModule, Http } from '@angular/http';
 import { LocalizeRouterService } from './localize-router.service';
-import { LocalizeParser, RAW_ROUTES, StaticParserLoader, parserInitializer } from './localize-router.parser';
+import { LocalizeParser, RAW_ROUTES, StaticParserLoader } from './localize-router.parser';
 import { RouterModule, Routes } from '@angular/router';
 import { LocalizeRouterPipe } from './localize-router.pipe';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
@@ -24,6 +27,35 @@ export function localizeLoaderFactory(translate: TranslateService, location: Loc
   return new StaticParserLoader(translate, location, http);
 }
 
+@Injectable()
+export class ParserInitializer {
+  parser: LocalizeParser;
+  routes: Routes;
+
+  constructor(private injector: Injector) {}
+
+  appInitializer(): Promise<any> {
+    // TODO: Potentially add route guards here on existing routes
+
+    const res = this.parser.load(this.routes);
+    res.then(() => {
+      const localize: LocalizeRouterService = this.injector.get(LocalizeRouterService);
+      localize.init();
+    });
+
+    return res;
+  }
+
+  generateInitializer(parser: LocalizeParser, routes: Routes[]) {
+    this.parser = parser;
+    this.routes = routes.reduce((a, b) => a.concat(b));
+    return this.appInitializer;
+  }
+}
+export function getAppInitializer(p: ParserInitializer, parser: LocalizeParser, routes: Routes[]) {
+  return p.generateInitializer(parser, routes).bind(p);
+}
+
 @NgModule({
   imports: [HttpModule, CommonModule, RouterModule, TranslateModule],
   declarations: [LocalizeRouterPipe],
@@ -42,8 +74,6 @@ export class LocalizeRouterModule {
     return {
       ngModule: LocalizeRouterModule,
       providers: [
-        localizeLoader,
-        LocalizeRouterService,
         {
           provide: LOCALIZE_ROUTER_FORROOT_GUARD,
           useFactory: provideForRootGuard,
@@ -54,11 +84,15 @@ export class LocalizeRouterModule {
           multi: true,
           useValue: routes
         },
+
+        localizeLoader,
+        LocalizeRouterService,
+        ParserInitializer,
         {
           provide: APP_INITIALIZER,
-          useFactory: parserInitializer,
-          deps: [LocalizeParser, RAW_ROUTES],
-          multi: true
+          multi: true,
+          useFactory: getAppInitializer,
+          deps: [ParserInitializer, LocalizeParser, RAW_ROUTES]
         }
       ]
     };

@@ -20,9 +20,15 @@ export class LocalizeRouterService {
    * @param router
    */
   constructor(public parser: LocalizeParser, private router: Router) {
+    this.routerEvents = new Subject<string>();
+  }
+
+  /**
+   * Start up the service
+   */
+  init() {
     this.router.resetConfig(this.parser.routes);
     this.router.events.subscribe(this._routeChanged());
-    this.routerEvents = new Subject<string>();
   }
 
   /**

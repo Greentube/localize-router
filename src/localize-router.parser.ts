@@ -309,24 +309,3 @@ export class StaticParserLoader extends LocalizeParser {
     });
   }
 }
-
-/**
- * Pre-loading helper functions
- * Necessary evil for AOT
- * @param parser
- * @param routes
- * @returns {any}
- */
-export function parserInitializer(parser: LocalizeParser, routes: any) {
-  loadRoutes.prototype.parser = parser;
-  loadRoutes.prototype.routes = routes.reduce(concatArrays);
-  return loadRoutes;
-}
-
-export function concatArrays(a: Array<any>, b: Array<any>): Array<any> {
-  return a.concat(b);
-}
-
-export function loadRoutes() {
-  return loadRoutes.prototype.parser.load(loadRoutes.prototype.routes);
-}

@@ -96,12 +96,13 @@ describe('LocalizeRouterService', () => {
     expect(localizeRouterService.routerEvents).toBeDefined();
   });
 
-  it('should reset route config on load', () => {
+  it('should reset route config on init', () => {
     expect((<any>router)['routes']).toEqual(void 0);
     parser.routes = routes;
     spyOn(router, 'resetConfig').and.callThrough();
 
     localizeRouterService = new LocalizeRouterService(parser, router);
+    localizeRouterService.init();
     expect(router.resetConfig).toHaveBeenCalledWith(routes);
   });
 
@@ -137,6 +138,7 @@ describe('LocalizeRouterService', () => {
 
   it('should translate routes if language had changed on route event', () => {
     localizeRouterService = new LocalizeRouterService(parser, router);
+    localizeRouterService.init();
     parser.currentLang = 'de';
     parser.locales = ['de', 'en'];
     spyOn(parser, 'translateRoutes').and.stub();
