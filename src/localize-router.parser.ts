@@ -7,6 +7,7 @@ import { Observer } from 'rxjs/Observer';
 import { Location } from '@angular/common';
 import 'rxjs/add/observable/forkJoin';
 import 'rxjs/add/operator/toPromise';
+import 'rxjs/add/operator/share';
 
 const LOCALIZE_LOCAL_STORAGE = 'LOCALIZE_LOCAL_STORAGE';
 
@@ -98,7 +99,8 @@ export abstract class LocalizeParser {
       }
     }
     /** translate routes */
-    return this.translateRoutes(selectedLanguage);
+    const res = this.translateRoutes(selectedLanguage);
+    return res.toPromise();
   }
 
   /**
@@ -106,20 +108,20 @@ export abstract class LocalizeParser {
    * @param language
    * @returns {Promise<any>}
    */
-  translateRoutes(language: string): Promise<any> {
+  translateRoutes(language: string): Observable<any> {
     this.translate.use(language);
     this.currentLang = language;
     this._cachedLang = language;
     this.routes[1].path = language;
 
-    let promises: Promise<any>[] = [];
+    let observables$: Observable<any>[] = [];
     if (this.originalWildcard) {
-      promises.push(this._getTranslatePromise(this.originalWildcard, this.routes[2], 'redirectTo', true));
+      observables$.push(this._getTranslatePromise(this.originalWildcard, this.routes[2], 'redirectTo', true));
     }
-    promises.push(this._translateRouteTree(this.routes[1].children, this.originalRouteNames));
+    observables$.push(this._translateRouteTree(this.routes[1].children, this.originalRouteNames));
 
     // resolve all
-    return Promise.all(promises);
+    return Observable.forkJoin(observables$);
   }
 
   /**
@@ -129,30 +131,30 @@ export abstract class LocalizeParser {
    * @returns {Promise<any>}
    * @private
    */
-  private _translateRouteTree(routes: Routes, originals: Routes): Promise<any> {
-    let promises: Promise<any>[] = [];
+  private _translateRouteTree(routes: Routes, originals: Routes): Observable<any> {
+    let observables$: Observable<any>[] = [];
     routes.forEach((route: Route, index: number) => {
       let original = originals[index];
       if (route.path && route.path !== '**') {
-        promises.push(this._getTranslatePromise(original, route, 'path'));
+        observables$.push(this._getTranslatePromise(original, route, 'path'));
       }
       if (route.redirectTo) {
-        promises.push(this._getTranslatePromise(original, route, 'redirectTo'));
+        observables$.push(this._getTranslatePromise(original, route, 'redirectTo'));
       }
       if (route.children) {
-        promises.push(this._translateRouteTree(route.children, original.children));
+        observables$.push(this._translateRouteTree(route.children, original.children));
       }
     });
 
-    return Promise.all(promises);
+    return Observable.forkJoin(observables$);
   }
 
-  private _getTranslatePromise(target: Route, destination: Route, property: string, prefixLang?: boolean): Promise<any> {
+  private _getTranslatePromise(target: Route, destination: Route, property: string, prefixLang?: boolean): Observable<any> {
     let observable = this.translateRoute((<any>target)[property]);
     observable.subscribe((result: string) => {
       (<any>destination)[property] = prefixLang ? `${this.currentLang}/${result}` : result;
     });
-    return observable.toPromise();
+    return observable;
   }
 
   /**

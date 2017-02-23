@@ -35,8 +35,6 @@ export class ParserInitializer {
   constructor(private injector: Injector) {}
 
   appInitializer(): Promise<any> {
-    // TODO: Potentially add route guards here on existing routes
-
     const res = this.parser.load(this.routes);
     res.then(() => {
       const localize: LocalizeRouterService = this.injector.get(LocalizeRouterService);
@@ -84,7 +82,6 @@ export class LocalizeRouterModule {
           multi: true,
           useValue: routes
         },
-
         localizeLoader,
         LocalizeRouterService,
         ParserInitializer,

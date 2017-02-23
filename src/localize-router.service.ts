@@ -39,7 +39,7 @@ export class LocalizeRouterService {
     if (lang !== this.parser.currentLang) {
       let rootSnapshot: ActivatedRouteSnapshot = this.router.routerState.snapshot.root;
 
-      this.parser.translateRoutes(lang).then(() => {
+      this.parser.translateRoutes(lang).subscribe(() => {
         this.router.navigateByUrl(this.traverseRouteSnapshot(rootSnapshot));
       });
     }
