@@ -92,7 +92,7 @@ export class LocalizeRouterService {
           translateBatch.push(Observable.of(segment));
         }
       });
-      Observable.forkJoin(translateBatch);
+      return Observable.forkJoin(translateBatch);
     }
   }
 
