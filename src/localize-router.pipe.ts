@@ -2,6 +2,7 @@ import { PipeTransform, Pipe, Injectable, ChangeDetectorRef } from '@angular/cor
 import { LocalizeRouterService } from './localize-router.service';
 import { Subscription } from 'rxjs/Subscription';
 import 'rxjs/add/observable/forkJoin';
+import { equals } from './util';
 
 @Injectable()
 @Pipe({
@@ -34,7 +35,7 @@ export class LocalizeRouterPipe implements PipeTransform {
     if(!query || query.length === 0 || !this.localize.parser.currentLang) {
       return query;
     }
-    if(this.equals(query, this.lastKey) && this.equals(this.lastLanguage, this.localize.parser.currentLang)) {
+    if(equals(query, this.lastKey) && equals(this.lastLanguage, this.localize.parser.currentLang)) {
       return this.value;
     }
     this.lastKey = query;
@@ -63,36 +64,5 @@ export class LocalizeRouterPipe implements PipeTransform {
       this.lastKey = key;
       this._ref.markForCheck();
     };
-  }
-
-  /**
-   * Compare if two objects are same
-   * @param o1
-   * @param o2
-   * @returns {boolean}
-   */
-  private equals(o1: any, o2: any): boolean {
-    if (o1 === o2) {
-      return true;
-    }
-    if(o1 === null || o2 === null) {
-      return false;
-    }
-
-    let t1 = typeof o1,
-        t2 = typeof o2,
-        length: number,
-        index: any;
-
-    if(t1 === t2 && t1 === 'object' && Array.isArray(o1) && Array.isArray(o2) && (length = o1.length) === o2.length) {
-      for(index = 0; index < length; index++) {
-        if(!this.equals(o1[index], o2[index])) {
-          return false;
-        }
-      }
-      return true;
-    }
-
-    return false;
   }
 }
