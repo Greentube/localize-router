@@ -185,6 +185,9 @@ export abstract class LocalizeParser {
       if (route.children) {
         this._translateRouteTree(route.children);
       }
+      if (route.loadChildren && (<any>route)._loadedConfig) {
+        this._translateRouteTree((<any>route)._loadedConfig.routes);
+      }
     });
   }
 
