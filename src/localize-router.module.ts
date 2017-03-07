@@ -9,6 +9,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { LocalizeRouterPipe } from './localize-router.pipe';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Location, CommonModule } from '@angular/common';
+import { prepareRoutes } from './localize-router.parser';
 
 export * from './localize-router.pipe';
 export * from './localize-router.service';
@@ -80,7 +81,7 @@ export class LocalizeRouterModule {
         {
           provide: RAW_ROUTES,
           multi: true,
-          useValue: routes
+          useValue: prepareRoutes(routes)
         },
         localizeLoader,
         LocalizeRouterService,
@@ -101,7 +102,7 @@ export class LocalizeRouterModule {
       providers: [{
         provide: RAW_ROUTES,
         multi: true,
-        useValue: routes
+        useValue: prepareRoutes(routes)
       }]
     };
   }

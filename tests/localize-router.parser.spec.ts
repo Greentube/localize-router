@@ -5,6 +5,7 @@ import {Routes} from '@angular/router';
 import {Observable} from 'rxjs/Observable';
 import {TranslateService} from '@ngx-translate/core';
 import {Location, CommonModule} from '@angular/common';
+import { prepareRoutes } from '../src/localize-router.parser';
 
 class FakeTranslateService {
   defLang: string;
@@ -19,7 +20,10 @@ class FakeTranslateService {
 
   setDefaultLang(lang: string) { this.defLang = lang; }
   getDefaultLang() { return this.defLang; }
-  use(lang: string) { this.currentLang = lang; }
+  use(lang: string) {
+    this.currentLang = lang;
+    return Observable.of(this.content);
+  }
   get(input: string) { return Observable.of(this.content[input] || input); }
 
   getBrowserLang() { return this.browserLang; }
@@ -169,7 +173,7 @@ describe('LocalizeParser', () => {
 
     (<any>translate)['browserLang'] = 'sr';
 
-    routes = [{path: 'home', component: DummyComponent }];
+    routes = prepareRoutes([{path: 'home', component: DummyComponent }]);
     loader.load(routes);
     tick();
     expect(routes[1].children[0].path).toEqual('home_TR');
@@ -180,7 +184,7 @@ describe('LocalizeParser', () => {
     spyOn(loader, 'translateRoutes').and.callThrough();
     (<any>translate)['browserLang'] = 'sr';
 
-    routes = [{path: 'abc', component: DummyComponent }];
+    routes = prepareRoutes([{path: 'abc', component: DummyComponent }]);
     loader.load(routes);
     tick();
     expect(routes[1].children[0].path).toEqual('abc');
@@ -191,7 +195,7 @@ describe('LocalizeParser', () => {
     spyOn(loader, 'translateRoutes').and.callThrough();
     (<any>translate)['browserLang'] = 'sr';
 
-    routes = [{redirectTo: 'home' }];
+    routes = prepareRoutes([{redirectTo: 'home' }]);
     loader.load(routes);
     tick();
     expect(routes[1].children[0].redirectTo).toEqual('home_TR');
@@ -202,7 +206,7 @@ describe('LocalizeParser', () => {
     spyOn(loader, 'translateRoutes').and.callThrough();
     (<any>translate)['browserLang'] = 'sr';
 
-    routes = [{path: '/home/about', component: DummyComponent }];
+    routes = prepareRoutes([{path: '/home/about', component: DummyComponent }]);
     loader.load(routes);
     tick();
     expect(routes[1].children[0].path).toEqual('/home_TR/about_TR');
@@ -213,11 +217,11 @@ describe('LocalizeParser', () => {
     spyOn(loader, 'translateRoutes').and.callThrough();
     (<any>translate)['browserLang'] = 'sr';
 
-    routes = [
-      {path: 'home', children: [
+    routes = prepareRoutes([
+      { path: 'home', children: [
         {path: 'about', component: DummyComponent }
       ]}
-    ];
+    ]);
     loader.load(routes);
     tick();
     expect(routes[1].children[0].path).toEqual('home_TR');

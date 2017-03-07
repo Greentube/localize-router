@@ -80,19 +80,23 @@ export class LocalizeRouterService {
    */
   translateRoute(path: string | Array<any>): Observable<string | any[]> {
     if (typeof path === 'string') {
-      return this.parser.translateRoute(path.indexOf('/') === 0 ? `/${this.parser.currentLang}${path}` : path);
+      let result = this.parser.translateRoute(path);
+      return Observable.of(!path.indexOf('/') ? `/${this.parser.currentLang}${result}` : result);
     } else { // it's array
-      let translateBatch: Observable<any>[] = [];
-
+      let result: any[] = [];
       (path as Array<any>).forEach((segment: any, index: number) => {
         if (typeof segment === 'string') {
-          translateBatch.push(this.parser.translateRoute(index === 0 && segment.indexOf('/') === 0 ?
-            `/${this.parser.currentLang}${segment}` : segment));
+          let res = this.parser.translateRoute(segment);
+          if (!index && !segment.indexOf('/')) {
+            result.push(`/${this.parser.currentLang}${res}`);
+          } else {
+            result.push(res);
+          }
         } else {
-          translateBatch.push(Observable.of(segment));
+          result.push(segment);
         }
       });
-      return Observable.forkJoin(translateBatch);
+      return Observable.of(result);
     }
   }
 
@@ -107,10 +111,10 @@ export class LocalizeRouterService {
     return (event: any) => {
       let lang = self.parser.getLocationLang(event.url);
       if (event instanceof NavigationStart && lang && lang !== this.parser.currentLang) {
-        this.parser.translateRoutes(lang);
-
-        /** Fire route change event */
-        this.routerEvents.next(lang);
+        this.parser.translateRoutes(lang).subscribe(() => {
+          /** Fire route change event */
+          this.routerEvents.next(lang);
+        });
       }
     };
   }

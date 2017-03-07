@@ -109,7 +109,7 @@ describe('LocalizeRouterService', () => {
   it('should call parser translateRoute', () => {
     localizeRouterService = new LocalizeRouterService(parser, router);
     let testString = 'result/path';
-    spyOn(parser, 'translateRoute').and.returnValue(Observable.of(testString));
+    spyOn(parser, 'translateRoute').and.returnValue(testString);
 
     localizeRouterService.translateRoute('my/path').subscribe((res: string) => {
       expect(res).toEqual(testString);
@@ -120,19 +120,24 @@ describe('LocalizeRouterService', () => {
   it('should append language if root route', () => {
     localizeRouterService = new LocalizeRouterService(parser, router);
     parser.currentLang = 'de';
-    spyOn(parser, 'translateRoute').and.stub();
+    let testString = '/my/path';
+    spyOn(parser, 'translateRoute').and.returnValue(testString);
 
-    localizeRouterService.translateRoute('/my/path');
-    expect(parser.translateRoute).toHaveBeenCalledWith('/de/my/path');
+    localizeRouterService.translateRoute(testString).subscribe((res) => {
+      expect(res).toEqual('/de' + testString);
+    });
+    expect(parser.translateRoute).toHaveBeenCalledWith('/my/path');
   });
 
   it('should translate complex route', () => {
     localizeRouterService = new LocalizeRouterService(parser, router);
     parser.currentLang = 'de';
-    spyOn(parser, 'translateRoute').and.stub();
+    spyOn(parser, 'translateRoute').and.callFake((val: any) => val);
 
-    localizeRouterService.translateRoute(['/my/path', 123, 'about']);
-    expect(parser.translateRoute).toHaveBeenCalledWith('/de/my/path');
+    localizeRouterService.translateRoute(['/my/path', 123, 'about']).subscribe((res) => {
+      expect(res[0]).toEqual('/de/my/path');
+    });
+    expect(parser.translateRoute).toHaveBeenCalledWith('/my/path');
     expect(parser.translateRoute).toHaveBeenCalledWith('about');
   });
 
@@ -141,7 +146,7 @@ describe('LocalizeRouterService', () => {
     localizeRouterService.init();
     parser.currentLang = 'de';
     parser.locales = ['de', 'en'];
-    spyOn(parser, 'translateRoutes').and.stub();
+    spyOn(parser, 'translateRoutes').and.returnValue(Observable.of(void 0));
 
     (<any>router).fakeRouterEvents.next(new NavigationStart(1, '/en/new/path'));
     expect(parser.translateRoutes).toHaveBeenCalledWith('en');

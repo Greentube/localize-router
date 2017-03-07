@@ -26,16 +26,48 @@ export interface ILocalizeRouteConfig {
 }
 
 /**
+ * Copy original path/redirect segment names to route's data
+ * @param routes
+ * @returns {Routes}
+ */
+export function prepareRoutes(routes: Routes): Routes {
+
+  routes.forEach((route: Route) => {
+    route.data = route.data || {};
+
+    if (!(<any>route.data).localizeRouter) {
+      let pointer: Route = (<any>route.data).localizeRouter = {};
+
+      if (route.path && route.path !== '**') {
+        pointer.path = route.path;
+      }
+      if (route.redirectTo) {
+        pointer.redirectTo = route.redirectTo;
+      }
+      if (route.children) {
+        prepareRoutes(route.children);
+      }
+      if (route.loadChildren && (<any>route)._loadedConfig) {
+        prepareRoutes((<any>route)._loadedConfig.routes);
+      }
+    }
+  });
+
+  return routes;
+}
+
+/**
  * Abstract class for parsing localization
  */
 export abstract class LocalizeParser {
   locales: Array<string>;
   currentLang: string;
   routes: Routes;
+  defaultLang: string;
 
   protected prefix: string;
-  private originalRouteNames: Routes;
-  private originalWildcard: Route;
+
+  private translationObject: any;
 
   /**
    * Loader constructor
@@ -57,47 +89,39 @@ export abstract class LocalizeParser {
    */
   protected init(routes: Routes): Promise<any> {
     let selectedLanguage: string;
+    let wildcardRoute: Route;
 
-    if (this.routes) {
-      // add new routes
-      selectedLanguage = this.currentLang;
-      // append new routes
-      this.originalRouteNames.splice(0, 0, ...JSON.parse(JSON.stringify(routes)));
-      this.routes[1].children.splice(0, 0, ...routes);
-    } else {
-      // extract potential wildcard route
-      let wildcardIndex = routes.findIndex((route: Route) => route.path === '**');
-      let wildcardRoute: Route;
-      if (wildcardIndex !== -1) {
-        wildcardRoute = routes.splice(wildcardIndex, 1)[0];
-        this.originalWildcard = JSON.parse(JSON.stringify(wildcardRoute));
-      }
+    this.routes = routes;
 
-      // init routes
-      this.routes = routes;
-      this.originalRouteNames = JSON.parse(JSON.stringify(routes));
-
-      if (!this.locales.length) {
-        return Promise.resolve();
-      }
-      /** detect current language */
-      let locationLang = this.getLocationLang();
-      let defaultLanguage = this._cachedLang || this._getBrowserLang() || this.locales[ 0 ];
-      selectedLanguage = locationLang || defaultLanguage;
-      this.translate.setDefaultLang(defaultLanguage);
-
-      /** mutable operation on routes */
-      let children = this.routes.splice(0, this.routes.length,
-        { path: '', redirectTo: this.translate.getDefaultLang(), pathMatch: 'full' });
-
-      /** append children routes... */
-      this.routes.push({ children: children });
-
-      /** ...and potential wildcard route */
-      if (wildcardRoute) {
-        this.routes.push(wildcardRoute);
-      }
+    if (!this.locales.length) {
+      return Promise.resolve();
     }
+    /** detect current language */
+    let locationLang = this.getLocationLang();
+    this.defaultLang = this._cachedLang || this._getBrowserLang() || this.locales[ 0 ];
+    selectedLanguage = locationLang || this.defaultLang;
+    this.translate.setDefaultLang(this.defaultLang);
+
+    /** set base route */
+    const baseRoute = { path: '', redirectTo: this.defaultLang, pathMatch: 'full' };
+
+    /** extract potential wildcard route */
+    let wildcardIndex = routes.findIndex((route: Route) => route.path === '**');
+    if (wildcardIndex !== -1) {
+      wildcardRoute = routes.splice(wildcardIndex, 1)[0];
+    }
+
+    /** mutable operation on routes */
+    let children = this.routes.splice(0, this.routes.length, baseRoute);
+
+    /** append children routes... */
+    this.routes.push({ children: children });
+
+    /** ...and potential wildcard route */
+    if (wildcardRoute) {
+      this.routes.push(wildcardRoute);
+    }
+
     /** translate routes */
     const res = this.translateRoutes(selectedLanguage);
     return res.toPromise();
@@ -109,79 +133,65 @@ export abstract class LocalizeParser {
    * @returns {Promise<any>}
    */
   translateRoutes(language: string): Observable<any> {
-    this.translate.use(language);
-    this.currentLang = language;
-    this._cachedLang = language;
-    this.routes[1].path = language;
+    return new Observable<any>((observer: Observer<any>) => {
+      this.currentLang = language;
+      this._cachedLang = language;
+      if (this.routes.length > 1) {
+        this.routes[ 1 ].path = language;
+      }
 
-    let observables$: Observable<any>[] = [];
-    if (this.originalWildcard) {
-      observables$.push(this._getTranslatePromise(this.originalWildcard, this.routes[2], 'redirectTo', true));
-    }
-    observables$.push(this._translateRouteTree(this.routes[1].children, this.originalRouteNames));
+      this.translate.use(language).subscribe((translations: any) => {
+        this.translationObject = translations;
 
-    // resolve all
-    return Observable.forkJoin(observables$);
+        if (this.routes.length > 1) {
+          this._translateRouteTree(this.routes[1].children);
+        }
+        // if there is wildcard route
+        if (this.routes.length > 2 && this.routes[2].redirectTo) {
+          this._translateProperty(this.routes[2], 'redirectTo', true);
+        }
+
+        observer.next(void 0);
+        observer.complete();
+      });
+    });
   }
 
   /**
    * Translate the route node and recursively call for all it's children
    * @param routes
-   * @param originals
    * @returns {Promise<any>}
    * @private
    */
-  private _translateRouteTree(routes: Routes, originals: Routes): Observable<any> {
-    let observables$: Observable<any>[] = [];
-    routes.forEach((route: Route, index: number) => {
-      let original = originals[index];
+  private _translateRouteTree(routes: Routes): void {
+    routes.forEach((route: Route) => {
       if (route.path && route.path !== '**') {
-        observables$.push(this._getTranslatePromise(original, route, 'path'));
+        this._translateProperty(route, 'path');
       }
       if (route.redirectTo) {
-        observables$.push(this._getTranslatePromise(original, route, 'redirectTo'));
+        this._translateProperty(route, 'redirectTo', !route.redirectTo.indexOf('/'));
       }
       if (route.children) {
-        observables$.push(this._translateRouteTree(route.children, original.children));
+        this._translateRouteTree(route.children);
       }
     });
-
-    return Observable.forkJoin(observables$);
   }
 
-  private _getTranslatePromise(target: Route, destination: Route, property: string, prefixLang?: boolean): Observable<any> {
-    let observable = this.translateRoute((<any>target)[property]);
-    observable.subscribe((result: string) => {
-      (<any>destination)[property] = prefixLang ? `${this.currentLang}/${result}` : result;
-    });
-    return observable;
+  private _translateProperty(route: Route, property: string, prefixLang?: boolean): void {
+    let result = this.translateRoute((<any>route.data).localizeRouter[property]);
+    (<any>route)[property] = prefixLang ? `/${this.currentLang}${result}` : result;
   }
 
   /**
    * Translate route and return observable
    * @param path
-   * @returns {Observable<string>}
+   * @returns {string}
    */
-  translateRoute(path: string): Observable<string> {
+  translateRoute(path: string): string {
     let pathSegments = path.split('/');
 
     /** collect observables  */
-    let routeObservables: Observable<any>[] = pathSegments.map((part: string) =>
-      part.length ?
-        this.translate.get(this.prefix + part) :
-        Observable.of(part));
-
-    return new Observable<string>((observer: Observer<string>) => {
-      Observable.forkJoin(routeObservables).subscribe((translatedSegments: Array<string>) => {
-        for (let i = 0; i < translatedSegments.length; i++) {
-          if (translatedSegments[i] === this.prefix + pathSegments[i]) {
-            translatedSegments[i] = pathSegments[i];
-          }
-        }
-        observer.next(translatedSegments.join('/'));
-        observer.complete();
-      });
-    });
+    return pathSegments.map((part: string) => part.length ? this.translateText(part) : part).join('/');
   }
 
 
@@ -240,6 +250,14 @@ export abstract class LocalizeParser {
       return value;
     }
     return null;
+  }
+
+  private translateText(key: string): string {
+    if (!this.translationObject) {
+      return key;
+    }
+    let res = this.translationObject[this.prefix + key];
+    return res || key;
   }
 }
 

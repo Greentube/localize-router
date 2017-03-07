@@ -17,6 +17,7 @@ tests
 coverage
 config
 karma.conf.js
+webpack.config.js
 copy.js
 tsconfig.json
 tslint.json
