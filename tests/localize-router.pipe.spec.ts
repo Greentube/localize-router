@@ -4,7 +4,6 @@ import {XHRBackend} from '@angular/http';
 import {Injector, ChangeDetectorRef} from '@angular/core';
 import {getTestBed, TestBed} from '@angular/core/testing';
 import {MockConnection, MockBackend} from '@angular/http/testing';
-import {Observable} from 'rxjs/Observable';
 import {Subject} from 'rxjs/Subject';
 
 class FakeChangeDetectorRef extends ChangeDetectorRef {
@@ -25,8 +24,8 @@ class FakeLocalizeRouterService {
     this.parser = new DummyLocalizeParser();
   }
 
-  translateRoute(route: string, appendLanguage?: boolean): Observable<string> {
-    return Observable.of((appendLanguage ? this.parser.currentLang : '') + route + '_TR');
+  translateRoute(route: string): string {
+    return route + '_TR';
   }
 }
 

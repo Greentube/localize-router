@@ -238,10 +238,10 @@ class MyComponent {
     constructor(private localize: LocalizeRouterService) { }
 
     myMethod() {
-        this.localize.translateRoute('about/me').subscribe((path: string) {
-            // do something with translated path
-            // e.g. this.router.navigate([path]);
-        });
+        let translatedPath: any = this.localize.translateRoute('about/me');
+       
+        // do something with translated path
+        // e.g. this.router.navigate([translatedPath]);
     }
 }
 ```
@@ -271,32 +271,27 @@ localizeService.routerEvents.subscribe((language: string) => {
 let selectedLanguage = localizeService.parser.currentLang;
 ```
 #### Methods:
-- `translateRoute(path: string, prependLanguage?: boolean): Observable<string>`: Translates given path. If `prependLanguage` is true or `path` starts with backslash and `prependLanguage` not set then path is prepended with currently set language.
+- `translateRoute(path: string | any[]): string | any[]`: Translates given path. If `path` starts with backslash then path is prepended with currently set language.
 ```ts
-localizeService.translateRoute('', true).subscribe((res: string) => {
-    // res equals e.g. '/en'
-});
-localizeService.translateRoute('', false).subscribe((res: string) => {
-    // res equals ''
-});
-localizeService.translateRoute('/').subscribe((res: string) => {
-    // res equals e.g. '/en'
-});
+localizeService.translateRoute('/'); // -> e.g. '/en'
+localizeService.translateRoute('/about'); // -> '/de/uber' (e.g. for German language)
+localizeService.translateRoute('about'); // -> 'uber' (e.g. for German language)
 ```
 - `changeLanguage(lang: string)`: Translates current url to given language and changes the application's language
 For german language and route defined as `:lang/users/:user_name/profile`
 ```
-yoursite.com/en/users/Miroslav%20Jonas/profile -> yoursite.com/de/benutzer/Miroslav%20Jonas/profil
+yoursite.com/en/users/John%20Doe/profile -> yoursite.com/de/benutzer/John%20Doe/profil
 ```
 ### LocalizeParser
 #### Properties:
 - `locales`: Array of used language codes
 - `currentLang`: Currently selected language
-- `routes`: Currently used translated routes
+- `routes`: Active translated routes
 
 #### Methods:
-- `translateRoutes(language: string): Promise<any>`: Translates all the routes and sets language and current language across the application.
-- `translateRoute(path: string): Observable<string>`: Translates single path
+- `translateRoutes(language: string): Observable<any>`: Translates all the routes and sets language and current 
+language across the application.
+- `translateRoute(path: string): string`: Translates single path
 - `getLocationLang(url?: string): string`: Extracts language from current url if matching defined locales
 
 ## License

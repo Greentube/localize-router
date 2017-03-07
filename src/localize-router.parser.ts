@@ -31,7 +31,6 @@ export interface ILocalizeRouteConfig {
  * @returns {Routes}
  */
 export function prepareRoutes(routes: Routes): Routes {
-
   routes.forEach((route: Route) => {
     route.data = route.data || {};
 
@@ -127,6 +126,18 @@ export abstract class LocalizeParser {
     return res.toPromise();
   }
 
+  initChildRoutes(routes: Routes) {
+    prepareRoutes(routes);
+
+    if (!this.translationObject) {
+      // not lazy, it will be translated in main init
+      return routes;
+    }
+
+    this._translateRouteTree(routes);
+    return routes;
+  }
+
   /**
    * Translate routes to selected language
    * @param language
@@ -134,7 +145,6 @@ export abstract class LocalizeParser {
    */
   translateRoutes(language: string): Observable<any> {
     return new Observable<any>((observer: Observer<any>) => {
-      this.currentLang = language;
       this._cachedLang = language;
       if (this.routes.length > 1) {
         this.routes[ 1 ].path = language;
@@ -142,6 +152,7 @@ export abstract class LocalizeParser {
 
       this.translate.use(language).subscribe((translations: any) => {
         this.translationObject = translations;
+        this.currentLang = language;
 
         if (this.routes.length > 1) {
           this._translateRouteTree(this.routes[1].children);

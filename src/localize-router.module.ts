@@ -1,6 +1,6 @@
 import {
   NgModule, ModuleWithProviders, APP_INITIALIZER, Provider, OpaqueToken, Optional, SkipSelf,
-  Injectable, Injector
+  Injectable, Injector, Inject
 } from '@angular/core';
 import { HttpModule, Http } from '@angular/http';
 import { LocalizeRouterService } from './localize-router.service';
@@ -10,10 +10,6 @@ import { LocalizeRouterPipe } from './localize-router.pipe';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Location, CommonModule } from '@angular/common';
 import { prepareRoutes } from './localize-router.parser';
-
-export * from './localize-router.pipe';
-export * from './localize-router.service';
-export * from './localize-router.parser';
 
 export const LOCALIZE_ROUTER_FORROOT_GUARD = new OpaqueToken('LOCALIZE_ROUTER_FORROOT_GUARD');
 
@@ -62,6 +58,14 @@ export function getAppInitializer(p: ParserInitializer, parser: LocalizeParser, 
 })
 export class LocalizeRouterModule {
 
+  static Localize: LocalizeParser;
+
+  constructor(@Inject(LocalizeParser) localize: LocalizeParser) {
+    if (localize && !LocalizeRouterModule.Localize) {
+      LocalizeRouterModule.Localize = localize;
+    }
+  }
+
   static forRoot(
     routes: Routes,
     localizeLoader: Provider = {
@@ -99,11 +103,15 @@ export class LocalizeRouterModule {
   static forChild(routes: Routes): ModuleWithProviders {
     return {
       ngModule: LocalizeRouterModule,
-      providers: [{
-        provide: RAW_ROUTES,
-        multi: true,
-        useValue: prepareRoutes(routes)
-      }]
+      providers: [
+        {
+          provide: RAW_ROUTES,
+          multi: true,
+          useValue: LocalizeRouterModule.Localize ?
+            LocalizeRouterModule.Localize.initChildRoutes(routes) :
+            prepareRoutes(routes)
+        }
+      ]
     };
   }
 }

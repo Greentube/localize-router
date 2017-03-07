@@ -111,9 +111,8 @@ describe('LocalizeRouterService', () => {
     let testString = 'result/path';
     spyOn(parser, 'translateRoute').and.returnValue(testString);
 
-    localizeRouterService.translateRoute('my/path').subscribe((res: string) => {
-      expect(res).toEqual(testString);
-    });
+    let res = localizeRouterService.translateRoute('my/path');
+    expect(res).toEqual(testString);
     expect(parser.translateRoute).toHaveBeenCalledWith('my/path');
   });
 
@@ -123,9 +122,8 @@ describe('LocalizeRouterService', () => {
     let testString = '/my/path';
     spyOn(parser, 'translateRoute').and.returnValue(testString);
 
-    localizeRouterService.translateRoute(testString).subscribe((res) => {
-      expect(res).toEqual('/de' + testString);
-    });
+    let res = localizeRouterService.translateRoute(testString);
+    expect(res).toEqual('/de' + testString);
     expect(parser.translateRoute).toHaveBeenCalledWith('/my/path');
   });
 
@@ -134,9 +132,9 @@ describe('LocalizeRouterService', () => {
     parser.currentLang = 'de';
     spyOn(parser, 'translateRoute').and.callFake((val: any) => val);
 
-    localizeRouterService.translateRoute(['/my/path', 123, 'about']).subscribe((res) => {
-      expect(res[0]).toEqual('/de/my/path');
-    });
+    let res = localizeRouterService.translateRoute(['/my/path', 123, 'about']);
+    expect(res[0]).toEqual('/de/my/path');
+
     expect(parser.translateRoute).toHaveBeenCalledWith('/my/path');
     expect(parser.translateRoute).toHaveBeenCalledWith('about');
   });

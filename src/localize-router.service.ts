@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { Router, NavigationStart, ActivatedRouteSnapshot } from '@angular/router';
-import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 import 'rxjs/add/observable/forkJoin';
 
@@ -78,10 +77,12 @@ export class LocalizeRouterService {
    * @param path
    * @returns {Observable<string>}
    */
-  translateRoute(path: string | Array<any>): Observable<string | any[]> {
+  translateRoute(path: string | any[]): string | any[] {
     if (typeof path === 'string') {
       let result = this.parser.translateRoute(path);
-      return Observable.of(!path.indexOf('/') ? `/${this.parser.currentLang}${result}` : result);
+      return !path.indexOf('/') ?
+        `/${this.parser.currentLang}${result}` :
+        result;
     } else { // it's array
       let result: any[] = [];
       (path as Array<any>).forEach((segment: any, index: number) => {
@@ -96,7 +97,7 @@ export class LocalizeRouterService {
           result.push(segment);
         }
       });
-      return Observable.of(result);
+      return result;
     }
   }
 
@@ -112,7 +113,7 @@ export class LocalizeRouterService {
       let lang = self.parser.getLocationLang(event.url);
       if (event instanceof NavigationStart && lang && lang !== this.parser.currentLang) {
         this.parser.translateRoutes(lang).subscribe(() => {
-          /** Fire route change event */
+          // Fire route change event
           this.routerEvents.next(lang);
         });
       }

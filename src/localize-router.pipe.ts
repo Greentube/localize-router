@@ -10,8 +10,8 @@ import { equals } from './util';
   pure: false // required to update the value when the promise is resolved
 })
 export class LocalizeRouterPipe implements PipeTransform {
-  private value: string = '';
-  private lastKey: string | Array<any>;
+  private value: string | any[] = '';
+  private lastKey: string | any[];
   private lastLanguage: string;
   private subscription: Subscription;
 
@@ -31,7 +31,7 @@ export class LocalizeRouterPipe implements PipeTransform {
    * @param query
    * @returns {string}
    */
-  transform(query: string | Array<any>): any {
+  transform(query: string | any[]): any {
     if(!query || query.length === 0 || !this.localize.parser.currentLang) {
       return query;
     }
@@ -40,29 +40,12 @@ export class LocalizeRouterPipe implements PipeTransform {
     }
     this.lastKey = query;
     this.lastLanguage = this.localize.parser.currentLang;
-    this.updateValue(query);
+
+    /** translate key and update values */
+    this.value = this.localize.translateRoute(query);
+    this.lastKey = query;
+    this._ref.markForCheck();
 
     return this.value;
-  }
-
-  /**
-   * Translate key and update values
-   * @param key
-   */
-  private updateValue(key: string | Array<any>) {
-    this.localize.translateRoute(key).subscribe(this.translateCallback(key));
-  }
-
-  /**
-   * Callback on translateRoute subscription
-   * @param key
-   * @returns {(route:any)=>undefined}
-   */
-  private translateCallback(key: string | Array<any>): (route: any) => void {
-    return (route: any) => {
-      this.value = route;
-      this.lastKey = key;
-      this._ref.markForCheck();
-    };
   }
 }
