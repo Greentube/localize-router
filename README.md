@@ -3,11 +3,6 @@
 [![npm version](https://img.shields.io/npm/v/localize-router.svg)](https://www.npmjs.com/package/localize-router)
 > An implementation of routes localization for Angular.
 
-> IMPORTANT INFORMATION: Angular Router version 3.4.8 and 4.x.x are breaking the core functionality of 
-`localize-router`, therefore router
-version 
-is currently fixed to maximum 3.4.7
-
 Based on and extension of [ngx-translate](https://github.com/ngx-translate/core).
 Demo project can be found [here](https://github.com/meeroslav/localize-router-example).
 
