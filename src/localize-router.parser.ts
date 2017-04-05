@@ -113,7 +113,7 @@ export abstract class LocalizeParser {
     this.routes[1].path = language;
 
     let promises: Promise<any>[] = [];
-    if (this.originalWildcard) {
+    if (this.originalWildcard && this.originalWildcard.redirectTo) {
       promises.push(this._getTranslatePromise(this.originalWildcard, this.routes[2], 'redirectTo', true));
     }
     promises.push(this._translateRouteTree(this.routes[1].children, this.originalRouteNames));
