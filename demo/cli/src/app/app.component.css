@@ -4,22 +4,28 @@
   margin: 0;
   font-family: Arial, Helvetica, sans-serif;
 }
-h1 {
+header {
   background-color: #106cc8;
   border-bottom: 2px solid #1059b1;
   color: rgba(255, 255, 255, 0.87);
   padding: 16px;
-  font-size: 20px;
-  font-weight: normal;
   letter-spacing: 0.1px;
   margin: 0;
   display: block;
 }
-h1 a {
-  float: right;
-  padding: 0 8px;
+h1 {
+  font-size: 20px;
+  font-weight: normal;
+  display: inline;
 }
-h1 a.router-link-active {
+.button-bar {
+  float: right;
+}
+header a, header button {
+  float: right;
+  margin: 0 8px;
+}
+header a.router-link-active {
   color: White;
 }
 nav {
