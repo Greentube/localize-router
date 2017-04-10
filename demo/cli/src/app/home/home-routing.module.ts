@@ -1,6 +1,7 @@
 import { NgModule }             from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { HomeComponent } from './home/home.component';
+import { LocalizeRouterModule } from 'localize-router';
 
 const homeRoutes: Routes = [
   { path: 'home',  component: HomeComponent },
@@ -8,10 +9,9 @@ const homeRoutes: Routes = [
 
 @NgModule({
   imports: [
-    RouterModule.forChild(homeRoutes)
+    RouterModule.forChild(homeRoutes),
+    LocalizeRouterModule.forChild(homeRoutes)
   ],
-  exports: [
-    RouterModule
-  ]
+  exports: [ RouterModule, LocalizeRouterModule ]
 })
 export class HomeRoutingModule { }

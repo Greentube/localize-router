@@ -3,6 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { UsersComponent } from './users/users.component';
 import { UserComponent } from './user/user.component';
 import { ProfileComponent } from './profile/profile.component';
+import { LocalizeRouterModule } from 'localize-router';
 
 const usersRoutes: Routes = [
   { path: 'users',
@@ -16,10 +17,9 @@ const usersRoutes: Routes = [
 
 @NgModule({
   imports: [
-    RouterModule.forChild(usersRoutes)
+    RouterModule.forChild(usersRoutes),
+    LocalizeRouterModule.forChild(usersRoutes)
   ],
-  exports: [
-    RouterModule
-  ]
+  exports: [ RouterModule, LocalizeRouterModule ]
 })
 export class UsersRoutingModule { }

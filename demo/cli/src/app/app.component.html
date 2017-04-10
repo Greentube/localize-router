@@ -5,22 +5,13 @@
   <a [routerLink]="'/de'" [routerLinkActive]="['router-link-active']">DE</a>
 </h1>
 <nav>
-  <!--<a [routerLink]="'/home' | localize" [routerLinkActive]="['router-link-active']" [routerLinkActiveOptions]="{exact:true}">-->
-    <!--{{'HOME' | translate}}-->
-  <!--</a>-->
-  <!--<a [routerLink]="'/about' | localize" [routerLinkActive]="['router-link-active']">-->
-    <!--{{'ABOUT' | translate}}-->
-  <!--</a>-->
-  <!--<a [routerLink]="'/users' | localize" [routerLinkActive]="['router-link-active']">-->
-    <!--{{'USERS' | translate}}-->
-  <!--</a>  -->
-  <a [routerLink]="'/home'" [routerLinkActive]="['router-link-active']" [routerLinkActiveOptions]="{exact:true}">
+  <a [routerLink]="'/home' | localize" [routerLinkActive]="['router-link-active']" [routerLinkActiveOptions]="{exact:true}">
     {{'HOME' | translate}}
   </a>
-  <a [routerLink]="'/about'" [routerLinkActive]="['router-link-active']">
+  <a [routerLink]="'/about' | localize" [routerLinkActive]="['router-link-active']">
     {{'ABOUT' | translate}}
   </a>
-  <a [routerLink]="'/users'" [routerLinkActive]="['router-link-active']">
+  <a [routerLink]="'/users' | localize" [routerLinkActive]="['router-link-active']">
     {{'USERS' | translate}}
   </a>
 </nav>
