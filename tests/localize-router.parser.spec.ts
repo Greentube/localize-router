@@ -5,7 +5,6 @@ import {Routes} from '@angular/router';
 import {Observable} from 'rxjs/Observable';
 import {TranslateService} from '@ngx-translate/core';
 import {Location, CommonModule} from '@angular/common';
-import { prepareRoutes } from '../src/localize-router.parser';
 
 class FakeTranslateService {
   defLang: string;
@@ -173,7 +172,7 @@ describe('LocalizeParser', () => {
 
     (<any>translate)['browserLang'] = 'sr';
 
-    routes = prepareRoutes([{path: 'home', component: DummyComponent }]);
+    routes = [{path: 'home', component: DummyComponent }];
     loader.load(routes);
     tick();
     expect(routes[1].children[0].path).toEqual('home_TR');
@@ -184,7 +183,7 @@ describe('LocalizeParser', () => {
     spyOn(loader, 'translateRoutes').and.callThrough();
     (<any>translate)['browserLang'] = 'sr';
 
-    routes = prepareRoutes([{path: 'abc', component: DummyComponent }]);
+    routes = [{path: 'abc', component: DummyComponent }];
     loader.load(routes);
     tick();
     expect(routes[1].children[0].path).toEqual('abc');
@@ -195,7 +194,7 @@ describe('LocalizeParser', () => {
     spyOn(loader, 'translateRoutes').and.callThrough();
     (<any>translate)['browserLang'] = 'sr';
 
-    routes = prepareRoutes([{redirectTo: 'home' }]);
+    routes = [{redirectTo: 'home' }];
     loader.load(routes);
     tick();
     expect(routes[1].children[0].redirectTo).toEqual('home_TR');
@@ -206,7 +205,7 @@ describe('LocalizeParser', () => {
     spyOn(loader, 'translateRoutes').and.callThrough();
     (<any>translate)['browserLang'] = 'sr';
 
-    routes = prepareRoutes([{path: '/home/about', component: DummyComponent }]);
+    routes = [{path: '/home/about', component: DummyComponent }];
     loader.load(routes);
     tick();
     expect(routes[1].children[0].path).toEqual('/home_TR/about_TR');
@@ -217,11 +216,11 @@ describe('LocalizeParser', () => {
     spyOn(loader, 'translateRoutes').and.callThrough();
     (<any>translate)['browserLang'] = 'sr';
 
-    routes = prepareRoutes([
+    routes = [
       { path: 'home', children: [
         {path: 'about', component: DummyComponent }
       ]}
-    ]);
+    ];
     loader.load(routes);
     tick();
     expect(routes[1].children[0].path).toEqual('home_TR');

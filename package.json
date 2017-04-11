@@ -1,6 +1,6 @@
 {
   "name": "localize-router",
-  "version": "0.6.4",
+  "version": "0.7.0",
   "description": "An implementation of routes localization for Angular 2",
   "scripts": {
     "test": "karma start",
@@ -34,7 +34,7 @@
     "@angular/core": ">=2.0.0",
     "@angular/common": ">=2.0.0",
     "@angular/http": ">=2.0.0",
-    "@angular/router": ">=3.0.0 && <4.0.0",
+    "@angular/router": ">=3.0.0",
     "rxjs": "^5.0.0",
     "@ngx-translate/core": "^6.0.0"
   },

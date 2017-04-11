@@ -26,36 +26,6 @@ export interface ILocalizeRouteConfig {
 }
 
 /**
- * Copy original path/redirect segment names to route's data
- * @param routes
- * @returns {Routes}
- */
-export function prepareRoutes(routes: Routes): Routes {
-  routes.forEach((route: Route) => {
-    route.data = route.data || {};
-
-    if (!(<any>route.data).localizeRouter) {
-      let pointer: Route = (<any>route.data).localizeRouter = {};
-
-      if (route.path && route.path !== '**') {
-        pointer.path = route.path;
-      }
-      if (route.redirectTo) {
-        pointer.redirectTo = route.redirectTo;
-      }
-      if (route.children) {
-        prepareRoutes(route.children);
-      }
-      if (route.loadChildren && (<any>route)._loadedConfig) {
-        prepareRoutes((<any>route)._loadedConfig.routes);
-      }
-    }
-  });
-
-  return routes;
-}
-
-/**
  * Abstract class for parsing localization
  */
 export abstract class LocalizeParser {
@@ -127,8 +97,6 @@ export abstract class LocalizeParser {
   }
 
   initChildRoutes(routes: Routes) {
-    prepareRoutes(routes);
-
     if (!this.translationObject) {
       // not lazy, it will be translated in main init
       return routes;
@@ -191,8 +159,24 @@ export abstract class LocalizeParser {
     });
   }
 
+  /**
+   * Translate property and if first time add original to cache
+   * @param route
+   * @param property
+   * @param prefixLang
+   * @private
+   */
   private _translateProperty(route: Route, property: string, prefixLang?: boolean): void {
-    let result = this.translateRoute((<any>route.data).localizeRouter[property]);
+    // set property to data if not there yet
+    let dataPointer: any = route.data = route.data || {};
+    if (!dataPointer.localizeRouter) {
+      dataPointer.localizeRouter = {};
+    }
+    if (!dataPointer.localizeRouter[property]) {
+      dataPointer.localizeRouter[property] = (<any>route)[property];
+    }
+
+    let result = this.translateRoute(dataPointer.localizeRouter[property]);
     (<any>route)[property] = prefixLang ? `/${this.currentLang}${result}` : result;
   }
 
