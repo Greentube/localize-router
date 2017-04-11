@@ -3,7 +3,6 @@ import { RouterModule, Routes } from '@angular/router';
 import { LocalizeRouterModule } from 'localize-router';
 
 const routes: Routes = [
-  { path: '', redirectTo: '/home', pathMatch: 'full' },
   { path: 'users', loadChildren: './users/users.module#UsersModule' }
 ];
 

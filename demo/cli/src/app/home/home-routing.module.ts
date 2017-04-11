@@ -5,6 +5,7 @@ import { LocalizeRouterModule } from 'localize-router';
 
 const homeRoutes: Routes = [
   { path: 'home',  component: HomeComponent },
+  { path: '',  component: HomeComponent }
 ];
 
 @NgModule({
