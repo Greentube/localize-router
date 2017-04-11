@@ -4,9 +4,7 @@ import { LocalizeRouterModule } from 'localize-router';
 
 const routes: Routes = [
   { path: '', redirectTo: '/home', pathMatch: 'full' },
-  // { path: 'dashboard',  component: DashboardComponent },
-  // { path: 'detail/:id', component: HeroDetailComponent },
-  // { path: 'heroes',     component: HeroesComponent }
+  { path: 'users', loadChildren: './users/users.module#UsersModule' }
 ];
 
 @NgModule({

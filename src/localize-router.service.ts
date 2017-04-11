@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Router, NavigationStart, ActivatedRouteSnapshot } from '@angular/router';
 import { Subject } from 'rxjs/Subject';
+import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/forkJoin';
 
 import { LocalizeParser } from './localize-router.parser';
@@ -110,11 +111,18 @@ export class LocalizeRouterService {
     let self = this;
 
     return (event: any) => {
-      let lang = self.parser.getLocationLang(event.url);
+      let lang = this.parser.getLocationLang(event.url);
       if (event instanceof NavigationStart && lang && lang !== this.parser.currentLang) {
         this.parser.translateRoutes(lang).subscribe(() => {
           // Fire route change event
           this.routerEvents.next(lang);
+        });
+      }
+      // This value does not exist in Router before version 4
+      // so we have to find it indirectly
+      if (event.toString().match(/RouteConfigLoadEnd/)) {
+        Observable.of(event.route).toPromise().then(function (route) {
+          self.parser.initChildRoutes(route._loadedConfig.routes);
         });
       }
     };
