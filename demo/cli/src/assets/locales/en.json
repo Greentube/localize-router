@@ -2,12 +2,13 @@
   "APP_TITLE": "Some app text",
   "HOME": "Home >",
   "USERS": "Users >",
-  "ABOUT": "About >",
+  "LAZY": "Lazy >",
+  "SECOND_LEVEL": "Second level >",
   "PROFILE": "Profile >",
   "BACK": "< Back",
 
   "HOME_TEXT": "Home works",
-  "ABOUT_TEXT": "About works",
+  "LAZY_TEXT": "Lazy works",
   "USERS_TEXT": "Users works",
   "PROFILE_TEXT": "Profile page",
   "USER_TEXT": "User page",
@@ -15,5 +16,6 @@
   "ROUTES.users": "users",
   "ROUTES.profile": "profile",
   "ROUTES.home": "home",
-  "ROUTES.about": "about"
+  "ROUTES.lazy": "lazy",
+  "ROUTES.secondlevel":"secondlevel"
 }

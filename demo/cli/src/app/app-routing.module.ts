@@ -3,7 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { LocalizeRouterModule } from 'localize-router';
 
 const routes: Routes = [
-  { path: 'users', loadChildren: './users/users.module#UsersModule' }
+  { path: 'lazy', loadChildren: './+lazy/lazy.module#LazyModule' }
 ];
 
 @NgModule({
