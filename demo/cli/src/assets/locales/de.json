@@ -1,0 +1,21 @@
+{
+  "APP_TITLE": "Einige Applikationstext",
+  "HOME": "Startseite >",
+  "USERS": "Benutzer >",
+  "LAZY": "Bequem >",
+  "SECOND_LEVEL": "Zweites Niveau >",
+  "PROFILE": "Profil >",
+  "BACK": "< Zurück",
+
+  "HOME_TEXT": "Die Startseite funktioniert",
+  "LAZY_TEXT": "Die Bequem Seite funktioniert",
+  "USERS_TEXT": "Die Benutzer funktioniert",
+  "PROFILE_TEXT": "Das Profil",
+  "USER_TEXT": "Der Benutzer",
+
+  "ROUTES.users": "benutzer",
+  "ROUTES.profile": "profil",
+  "ROUTES.home": "startseite",
+  "ROUTES.lazy": "bequem",
+  "ROUTES.secondlevel":"zweitesniveau"
+}

@@ -1,27 +1,35 @@
+############
+## Project
+############
+
+bundles/
+node_modules/
+coverage/
+
+*.map
+*.d.ts
+*.metadata.json
+*.js
+# overrides for js
+!config/*
+!demo/cli/*js
+!copy.js
+!karma.conf.js
+!webpack.config.js
+
 #################
 ## Misc
 #################
-**/.DS_Store
+
 nbproject
 manifest.mf
 build.xml
-node_modules/*
 npm-debug.log
-*.js
-!config/*
-!karma.conf.js
-*.map
-*.d.ts
-!copy.js
-!webpack.config.js
-!examples/**/*.js
-coverage
-*.metadata.json
-/compiled
 
 #################
 ## IDEs
 #################
+
 .idea
 .project
 .settings
@@ -31,18 +39,12 @@ coverage
 ## Windows
 ############
 
-# Windows image file caches
 Thumbs.db
-
-# Folder config file
 Desktop.ini
 
 ############
 ## Mac
 ############
 
-# Mac crap
 .DS_Store
 
-bundles/
-node_modules/
