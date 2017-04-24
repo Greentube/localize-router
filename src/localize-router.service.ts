@@ -65,9 +65,7 @@ export class LocalizeRouterService {
   private parseSegmentValue(snapshot: ActivatedRouteSnapshot): string {
     if (snapshot.routeConfig) {
       let subPathSegments = snapshot.routeConfig.path.split('/');
-      return subPathSegments.
-      map((s: string, i: number) => s.indexOf(':') === 0 ? snapshot.url[i].path : s).
-      join('/');
+      return subPathSegments.map((s: string, i: number) => s.indexOf(':') === 0 ? snapshot.url[i].path : s).join('/');
     }
     return '';
   }
@@ -105,7 +103,7 @@ export class LocalizeRouterService {
    * @returns {(event:any)=>void}
    * @private
    */
-  private _routeChanged(): ((event: any)=>void) {
+  private _routeChanged(): ((event: any) => void) {
     let self = this;
 
     return (event: any) => {

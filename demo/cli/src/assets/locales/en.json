@@ -13,9 +13,9 @@
   "PROFILE_TEXT": "Profile page",
   "USER_TEXT": "User page",
 
-  "ROUTES.users": "users",
-  "ROUTES.profile": "profile",
-  "ROUTES.home": "home",
-  "ROUTES.lazy": "lazy",
-  "ROUTES.secondlevel":"secondlevel"
+  "users": "users",
+  "profile": "profile",
+  "home": "home",
+  "lazy": "lazy",
+  "secondlevel":"secondlevel"
 }

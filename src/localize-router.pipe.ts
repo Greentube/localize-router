@@ -20,7 +20,7 @@ export class LocalizeRouterPipe implements PipeTransform {
    * @param localize
    * @param _ref
    */
-  constructor(private localize: LocalizeRouterService, private _ref: ChangeDetectorRef ) {
+  constructor(private localize: LocalizeRouterService, private _ref: ChangeDetectorRef) {
     this.subscription = this.localize.routerEvents.subscribe(() => {
       this.transform(this.lastKey);
     });
@@ -32,10 +32,10 @@ export class LocalizeRouterPipe implements PipeTransform {
    * @returns {string | any[]}
    */
   transform(query: string | any[]): string | any[] {
-    if(!query || query.length === 0 || !this.localize.parser.currentLang) {
+    if (!query || query.length === 0 || !this.localize.parser.currentLang) {
       return query;
     }
-    if(equals(query, this.lastKey) && equals(this.lastLanguage, this.localize.parser.currentLang)) {
+    if (equals(query, this.lastKey) && equals(this.lastLanguage, this.localize.parser.currentLang)) {
       return this.value;
     }
     this.lastKey = query;

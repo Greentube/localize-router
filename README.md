@@ -94,16 +94,18 @@ JSON config file has following structure:
 ```
 {
     "locales": ["en", "de", ...],
-    "prefix": "..."
+    "prefix": "MY_PREFIX"
 }
 ```
 
 ```ts
 interface ILocalizeRouteConfig {
     locales: Array<string>;
-    prefix: string;
+    prefix?: string;
 }
 ```
+
+Prefix field is not mandatory and default value is empty string.
 
 #### Manual initialization
 With manual initialization you need to provide information directly:

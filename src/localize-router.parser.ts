@@ -22,7 +22,7 @@ export const RAW_ROUTES = new OpaqueToken('RAW_ROUTES');
  */
 export interface ILocalizeRouteConfig {
   locales: Array<string>;
-  prefix: string;
+  prefix?: string;
 }
 
 /**
@@ -274,7 +274,7 @@ export class ManualParserLoader extends LocalizeParser {
   constructor(translate: TranslateService, location: Location, locales: Array<string> = ['en'], prefix: string = 'ROUTES.') {
     super(translate, location);
     this.locales = locales;
-    this.prefix = prefix;
+    this.prefix = prefix || '';
   }
 
   /**
@@ -322,7 +322,7 @@ export class StaticParserLoader extends LocalizeParser {
           .subscribe((data: ILocalizeRouteConfig) => {
             this._dataLoaded = true;
             this.locales = data.locales;
-            this.prefix = data.prefix;
+            this.prefix = data.prefix || '';
             this.init(routes).then(resolve);
           });
       }

@@ -28,7 +28,12 @@ export class ParserInitializer {
   parser: LocalizeParser;
   routes: Routes;
 
-  constructor(private injector: Injector) {}
+  /**
+   * CTOR
+   * @param injector
+   */
+  constructor(private injector: Injector) {
+  }
 
   /**
    * @returns {Promise<any>}
@@ -48,7 +53,7 @@ export class ParserInitializer {
    * @param routes
    * @returns {()=>Promise<any>}
    */
-  generateInitializer(parser: LocalizeParser, routes: Routes[]): ()=>Promise<any> {
+  generateInitializer(parser: LocalizeParser, routes: Routes[]): () => Promise<any> {
     this.parser = parser;
     this.routes = routes.reduce((a, b) => a.concat(b));
     return this.appInitializer;
@@ -72,22 +77,12 @@ export function getAppInitializer(p: ParserInitializer, parser: LocalizeParser, 
 })
 export class LocalizeRouterModule {
 
-  // static Localize: LocalizeParser;
-  //
-  // constructor(@Inject(LocalizeParser) localize: LocalizeParser) {
-  //   if (localize && !LocalizeRouterModule.Localize) {
-  //     LocalizeRouterModule.Localize = localize;
-  //   }
-  // }
-
-  static forRoot(
-    routes: Routes,
+  static forRoot(routes: Routes,
     localizeLoader: Provider = {
       provide: LocalizeParser,
       useFactory: localizeLoaderFactory,
       deps: [TranslateService, Location, Http]
-    }
-  ): ModuleWithProviders {
+    }): ModuleWithProviders {
     return {
       ngModule: LocalizeRouterModule,
       providers: [
@@ -121,9 +116,6 @@ export class LocalizeRouterModule {
         {
           provide: RAW_ROUTES,
           multi: true,
-          // useValue: LocalizeRouterModule.Localize ?
-          //   LocalizeRouterModule.Localize.initChildRoutes(routes) :
-          //   routes
           useValue: routes
         }
       ]

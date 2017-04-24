@@ -13,9 +13,9 @@
   "PROFILE_TEXT": "Das Profil",
   "USER_TEXT": "Der Benutzer",
 
-  "ROUTES.users": "benutzer",
-  "ROUTES.profile": "profil",
-  "ROUTES.home": "startseite",
-  "ROUTES.lazy": "bequem",
-  "ROUTES.secondlevel":"zweitesniveau"
+  "users": "benutzer",
+  "profile": "profil",
+  "home": "startseite",
+  "lazy": "bequem",
+  "secondlevel":"zweitesniveau"
 }
