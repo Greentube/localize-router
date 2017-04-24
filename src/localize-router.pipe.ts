@@ -29,9 +29,9 @@ export class LocalizeRouterPipe implements PipeTransform {
   /**
    * Transform current url to localized one
    * @param query
-   * @returns {string}
+   * @returns {string | any[]}
    */
-  transform(query: string | any[]): any {
+  transform(query: string | any[]): string | any[] {
     if(!query || query.length === 0 || !this.localize.parser.currentLang) {
       return query;
     }

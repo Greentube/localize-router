@@ -48,6 +48,7 @@ export abstract class LocalizeParser {
   /**
    * Load routes and fetch necessary data
    * @param routes
+   * @returns {Promise<any>}
    */
   abstract load(routes: Routes): Promise<any>;
 
@@ -139,7 +140,6 @@ export abstract class LocalizeParser {
   /**
    * Translate the route node and recursively call for all it's children
    * @param routes
-   * @returns {Promise<any>}
    * @private
    */
   private _translateRouteTree(routes: Routes): void {
@@ -195,7 +195,7 @@ export abstract class LocalizeParser {
 
   /**
    * Get language from url
-   * @returns {any}
+   * @returns {string}
    * @private
    */
   getLocationLang(url?: string): string {
@@ -212,7 +212,7 @@ export abstract class LocalizeParser {
 
   /**
    * Get user's language set in the browser
-   * @returns {any}
+   * @returns {string}
    * @private
    */
   private _getBrowserLang(): string {
@@ -280,6 +280,7 @@ export class ManualParserLoader extends LocalizeParser {
   /**
    * Initialize or append routes
    * @param routes
+   * @returns {Promise<any>}
    */
   load(routes: Routes): Promise<any> {
     return new Promise((resolve: any) => {
@@ -309,6 +310,7 @@ export class StaticParserLoader extends LocalizeParser {
   /**
    * Initialize or append routes
    * @param routes
+   * @returns {Promise<any>}
    */
   load(routes: Routes): Promise<any> {
     return new Promise((resolve: any) => {
