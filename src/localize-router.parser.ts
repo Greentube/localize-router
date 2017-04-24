@@ -226,9 +226,14 @@ export abstract class LocalizeParser {
    */
   private get _cachedLang(): string {
     if(typeof window === 'undefined' || typeof window.localStorage === 'undefined') {
-      return undefined;
+      return void 0;
     }
-    return this._returnIfInLocales(window.localStorage.getItem(LOCALIZE_LOCAL_STORAGE));
+    try {
+      return this._returnIfInLocales(window.localStorage.getItem(LOCALIZE_LOCAL_STORAGE));
+    } catch(e) {
+      // weird Safari issue in private mode, where LocalStorage is defined but throws error on access
+      return void 0;
+    }
   }
 
   /**
@@ -240,7 +245,12 @@ export abstract class LocalizeParser {
     if(typeof window === 'undefined' || typeof window.localStorage === 'undefined') {
       return;
     }
-    window.localStorage.setItem(LOCALIZE_LOCAL_STORAGE, value);
+    try {
+      window.localStorage.setItem(LOCALIZE_LOCAL_STORAGE, value);
+    } catch(e) {
+      // weird Safari issue in private mode, where LocalStorage is defined but throws error on access
+      return;
+    }
   }
 
   private _returnIfInLocales(value: string): string {
