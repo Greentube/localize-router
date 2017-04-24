@@ -28,11 +28,3 @@ header a, header button {
 header a.router-link-active {
   color: White;
 }
-nav {
-  padding: 8px;
-  background-color: #d7d8d5;
-  border-bottom: 2px solid #c0c1be;
-}
-nav a + a {
-  margin-left: 8px;
-}

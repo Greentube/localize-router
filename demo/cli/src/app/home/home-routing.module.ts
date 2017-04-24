@@ -4,7 +4,6 @@ import { HomeComponent } from './home/home.component';
 import { LocalizeRouterModule } from 'localize-router';
 
 const homeRoutes: Routes = [
-  { path: 'home',  component: HomeComponent },
   { path: '',  component: HomeComponent }
 ];
 
