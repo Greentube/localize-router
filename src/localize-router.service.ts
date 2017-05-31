@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Router, NavigationStart, ActivatedRouteSnapshot } from '@angular/router';
+import { Router, NavigationStart, ActivatedRouteSnapshot, NavigationExtras } from '@angular/router';
 import { Subject } from 'rxjs/Subject';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/forkJoin';
@@ -34,13 +34,14 @@ export class LocalizeRouterService {
   /**
    * Change language and navigate to translated route
    * @param lang
+   * @param extras
    */
-  changeLanguage(lang: string): void {
+  changeLanguage(lang: string, extras?: NavigationExtras): void {
     if (lang !== this.parser.currentLang) {
       let rootSnapshot: ActivatedRouteSnapshot = this.router.routerState.snapshot.root;
 
       this.parser.translateRoutes(lang).subscribe(() => {
-        this.router.navigateByUrl(this.traverseRouteSnapshot(rootSnapshot));
+        this.router.navigateByUrl(this.traverseRouteSnapshot(rootSnapshot), extras);
       });
     }
   }
