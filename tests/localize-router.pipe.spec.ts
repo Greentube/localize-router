@@ -1,10 +1,10 @@
-import {LocalizeRouterPipe} from '../src/localize-router.pipe';
-import {LocalizeRouterService} from '../src/localize-router.service';
 import {XHRBackend} from '@angular/http';
 import {Injector, ChangeDetectorRef} from '@angular/core';
 import {getTestBed, TestBed} from '@angular/core/testing';
 import {MockConnection, MockBackend} from '@angular/http/testing';
 import {Subject} from 'rxjs/Subject';
+import {LocalizeRouterPipe} from '../src/localize-router.pipe';
+import {LocalizeRouterService} from '../src/localize-router.service';
 
 class FakeChangeDetectorRef extends ChangeDetectorRef {
   markForCheck(): void {  }
@@ -46,7 +46,7 @@ describe('LocalizeRouterPipe', () => {
       ]
     });
     injector = getTestBed();
-    backend = injector.get(XHRBackend);
+    backend = <any>injector.get(XHRBackend);
     localize = injector.get(LocalizeRouterService);
     // sets the connection when someone tries to access the backend with an xhr request
     backend.connections.subscribe((c: MockConnection) => connection = c);

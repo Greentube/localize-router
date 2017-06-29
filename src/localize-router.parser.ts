@@ -1,21 +1,22 @@
 import { Http, Response } from '@angular/http';
-import { OpaqueToken } from '@angular/core';
+import { InjectionToken, Inject } from '@angular/core';
+import { Location } from '@angular/common';
 import { Routes, Route } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Observable } from 'rxjs/Observable';
 import { Observer } from 'rxjs/Observer';
-import { Location } from '@angular/common';
 import 'rxjs/add/observable/forkJoin';
 import 'rxjs/add/operator/toPromise';
 import 'rxjs/add/operator/share';
 
-const LOCALIZE_LOCAL_STORAGE = 'LOCALIZE_LOCAL_STORAGE';
+export const DefaultStorageKey = 'LOCALIZE_LOCAL_STORAGE';
+export const LocalizeLocalStorageKeyToken = new InjectionToken<string>('localize-router-storage-key-token');
 
 /**
  * Static provider for keeping track of routes
- * @type {OpaqueToken}
+ * @type {InjectionToken}
  */
-export const RAW_ROUTES = new OpaqueToken('RAW_ROUTES');
+export const RAW_ROUTES = new InjectionToken('RAW_ROUTES');
 
 /**
  * Config interface
@@ -43,7 +44,11 @@ export abstract class LocalizeParser {
    * @param translate
    * @param location
    */
-  constructor(private translate: TranslateService, private location: Location) {}
+  constructor(
+    private translate: TranslateService,
+    private location: Location,
+    @Inject(LocalizeLocalStorageKeyToken) private storageKey: string
+  ) { }
 
   /**
    * Load routes and fetch necessary data
@@ -229,7 +234,7 @@ export abstract class LocalizeParser {
       return void 0;
     }
     try {
-      return this._returnIfInLocales(window.localStorage.getItem(LOCALIZE_LOCAL_STORAGE));
+      return this._returnIfInLocales(window.localStorage.getItem(this.storageKey));
     } catch(e) {
       // weird Safari issue in private mode, where LocalStorage is defined but throws error on access
       return void 0;
@@ -246,7 +251,7 @@ export abstract class LocalizeParser {
       return;
     }
     try {
-      window.localStorage.setItem(LOCALIZE_LOCAL_STORAGE, value);
+      window.localStorage.setItem(this.storageKey, value);
     } catch(e) {
       // weird Safari issue in private mode, where LocalStorage is defined but throws error on access
       return;
@@ -281,8 +286,14 @@ export class ManualParserLoader extends LocalizeParser {
    * @param locales
    * @param prefix
    */
-  constructor(translate: TranslateService, location: Location, locales: Array<string> = ['en'], prefix: string = 'ROUTES.') {
-    super(translate, location);
+  constructor(
+    translate: TranslateService,
+    location: Location,
+    storageKey: string = DefaultStorageKey,
+    locales: Array<string> = ['en'],
+    prefix: string = 'ROUTES.'
+  ) {
+    super(translate, location, storageKey);
     this.locales = locales;
     this.prefix = prefix || '';
   }
@@ -312,8 +323,14 @@ export class StaticParserLoader extends LocalizeParser {
    * @param http
    * @param path
    */
-  constructor(translate: TranslateService, location: Location, private http: Http, private path: string = 'assets/locales.json') {
-    super(translate, location);
+  constructor(
+    translate: TranslateService,
+    location: Location,
+    storageKey: string = DefaultStorageKey,
+    private http: Http,
+    private path: string = 'assets/locales.json'
+  ) {
+    super(translate, location, storageKey);
     this._dataLoaded = false;
   }
 

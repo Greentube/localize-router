@@ -1,10 +1,9 @@
-import {Injector} from '@angular/core';
-import {LocalizeParser, ManualParserLoader} from '../src/localize-router.parser';
-import {getTestBed, TestBed, fakeAsync, tick} from '@angular/core/testing';
+import {Location, CommonModule} from '@angular/common';
 import {Routes} from '@angular/router';
+import {TestBed, fakeAsync, tick} from '@angular/core/testing';
 import {Observable} from 'rxjs/Observable';
 import {TranslateService} from '@ngx-translate/core';
-import {Location, CommonModule} from '@angular/common';
+import {LocalizeParser, ManualParserLoader, LocalizeLocalStorageKeyToken} from '../src/localize-router.parser';
 
 class FakeTranslateService {
   defLang: string;
@@ -37,10 +36,10 @@ class FakeLocation {
 class DummyComponent {}
 
 describe('LocalizeParser', () => {
-  let injector: Injector;
   let loader: ManualParserLoader;
   let translate: TranslateService;
   let location: Location;
+  let storageKey: string;
 
   let routes: Routes;
   let locales: string[];
@@ -51,7 +50,8 @@ describe('LocalizeParser', () => {
       imports: [CommonModule],
       providers: [
         {provide: TranslateService, useClass: FakeTranslateService},
-        {provide: Location, useClass: FakeLocation}
+        { provide: Location, useClass: FakeLocation },
+        { provide: LocalizeLocalStorageKeyToken, useValue: 'localize-router-key'}
       ]
     });
     routes = [
@@ -62,15 +62,14 @@ describe('LocalizeParser', () => {
       ]}
     ];
     locales = ['en', 'de', 'fr'];
-    localStorage.removeItem('LOCALIZE_LOCAL_STORAGE');
-    injector = getTestBed();
-    translate = injector.get(TranslateService);
-    location = injector.get(Location);
+    storageKey = TestBed.get(LocalizeLocalStorageKeyToken);
+    localStorage.removeItem(storageKey);
+    translate = TestBed.get(TranslateService);
+    location = TestBed.get(Location);
     loader = new ManualParserLoader(translate, location);
   });
 
   afterEach(() => {
-    injector = undefined;
     translate = undefined;
     loader = undefined;
   });
@@ -86,26 +85,26 @@ describe('LocalizeParser', () => {
   });
 
   it('should set locales on init', () => {
-    loader = new ManualParserLoader(translate, location, locales, prefix);
+    loader = new ManualParserLoader(translate, location, storageKey, locales, prefix);
     expect(loader.locales).toEqual(locales);
   });
 
   it('should extract language from url on getLocationLang', () => {
-    loader = new ManualParserLoader(translate, location, locales, prefix);
+    loader = new ManualParserLoader(translate, location, storageKey, locales, prefix);
 
     expect(loader.getLocationLang('/en/some/path/after')).toEqual('en');
     expect(loader.getLocationLang('de/some/path/after')).toEqual('de');
   });
 
   it('should return null on getLocationLang if lang not found', () => {
-    loader = new ManualParserLoader(translate, location, locales, prefix);
+    loader = new ManualParserLoader(translate, location, storageKey, locales, prefix);
 
     expect(loader.getLocationLang('/se/some/path/after')).toEqual(null);
     expect(loader.getLocationLang('rs/some/path/after')).toEqual(null);
   });
 
   it('should call translateRoutes on init if locales passed', fakeAsync(() => {
-    loader = new ManualParserLoader(translate, location, locales, prefix);
+    loader = new ManualParserLoader(translate, location, storageKey, locales, prefix);
     spyOn(loader, 'translateRoutes').and.callThrough();
 
     loader.load([]);
@@ -114,7 +113,7 @@ describe('LocalizeParser', () => {
   }));
 
   it('should not call translateRoutes on init if no locales', fakeAsync(() => {
-    loader = new ManualParserLoader(translate, location, [], prefix);
+    loader = new ManualParserLoader(translate, location, storageKey, [], prefix);
     spyOn(loader, 'translateRoutes').and.callThrough();
 
     loader.load(routes);
@@ -123,7 +122,7 @@ describe('LocalizeParser', () => {
   }));
 
   it('should set language from navigator params', fakeAsync(() => {
-    loader = new ManualParserLoader(translate, location, locales, prefix);
+    loader = new ManualParserLoader(translate, location, storageKey, locales, prefix);
     spyOn(loader, 'translateRoutes').and.callThrough();
 
     (<any>translate)['browserLang'] = 'de';
@@ -137,11 +136,11 @@ describe('LocalizeParser', () => {
     expect(translate.currentLang).toEqual('de');
   }));
   it('should set language from localStorage', fakeAsync(() => {
-    loader = new ManualParserLoader(translate, location, locales, prefix);
+    loader = new ManualParserLoader(translate, location, storageKey, locales, prefix);
     spyOn(loader, 'translateRoutes').and.callThrough();
 
     (<any>translate)['browserLang'] = 'de';
-    localStorage.setItem('LOCALIZE_LOCAL_STORAGE', 'fr');
+    localStorage.setItem(storageKey, 'fr');
 
     routes = [];
     loader.load(routes);
@@ -153,7 +152,7 @@ describe('LocalizeParser', () => {
   }));
 
   it('should pick first language from locales if navigator language not recognized', fakeAsync(() => {
-    loader = new ManualParserLoader(translate, location, locales, prefix);
+    loader = new ManualParserLoader(translate, location, storageKey, locales, prefix);
     spyOn(loader, 'translateRoutes').and.callThrough();
 
     (<any>translate)['browserLang'] = 'sr';
@@ -167,7 +166,7 @@ describe('LocalizeParser', () => {
   }));
 
   it('should translate path', fakeAsync(() => {
-    loader = new ManualParserLoader(translate, location, locales, prefix);
+    loader = new ManualParserLoader(translate, location, storageKey, locales, prefix);
     spyOn(loader, 'translateRoutes').and.callThrough();
 
     (<any>translate)['browserLang'] = 'sr';
@@ -179,7 +178,7 @@ describe('LocalizeParser', () => {
   }));
 
   it('should not translate path if translation not found', fakeAsync(() => {
-    loader = new ManualParserLoader(translate, location, locales, prefix);
+    loader = new ManualParserLoader(translate, location, storageKey, locales, prefix);
     spyOn(loader, 'translateRoutes').and.callThrough();
     (<any>translate)['browserLang'] = 'sr';
 
@@ -190,7 +189,7 @@ describe('LocalizeParser', () => {
   }));
 
   it('should translate redirectTo', fakeAsync(() => {
-    loader = new ManualParserLoader(translate, location, locales, prefix);
+    loader = new ManualParserLoader(translate, location, storageKey, locales, prefix);
     spyOn(loader, 'translateRoutes').and.callThrough();
     (<any>translate)['browserLang'] = 'sr';
 
@@ -201,7 +200,7 @@ describe('LocalizeParser', () => {
   }));
 
   it('should translate complex path segments', fakeAsync(() => {
-    loader = new ManualParserLoader(translate, location, locales, prefix);
+    loader = new ManualParserLoader(translate, location, storageKey, locales, prefix);
     spyOn(loader, 'translateRoutes').and.callThrough();
     (<any>translate)['browserLang'] = 'sr';
 
@@ -212,7 +211,7 @@ describe('LocalizeParser', () => {
   }));
 
   it('should translate children', fakeAsync(() => {
-    loader = new ManualParserLoader(translate, location, locales, prefix);
+    loader = new ManualParserLoader(translate, location, storageKey, locales, prefix);
     spyOn(loader, 'translateRoutes').and.callThrough();
     (<any>translate)['browserLang'] = 'sr';
 

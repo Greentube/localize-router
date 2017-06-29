@@ -1,16 +1,16 @@
 import {
-  NgModule, ModuleWithProviders, APP_INITIALIZER, Provider, OpaqueToken, Optional, SkipSelf,
+  NgModule, ModuleWithProviders, APP_INITIALIZER, Provider, InjectionToken, Optional, SkipSelf,
   Injectable, Injector
 } from '@angular/core';
 import { HttpModule, Http } from '@angular/http';
 import { LocalizeRouterService } from './localize-router.service';
-import { LocalizeParser, RAW_ROUTES, StaticParserLoader } from './localize-router.parser';
+import { LocalizeParser, RAW_ROUTES, StaticParserLoader, DefaultStorageKey } from './localize-router.parser';
 import { RouterModule, Routes } from '@angular/router';
 import { LocalizeRouterPipe } from './localize-router.pipe';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Location, CommonModule } from '@angular/common';
 
-export const LOCALIZE_ROUTER_FORROOT_GUARD = new OpaqueToken('LOCALIZE_ROUTER_FORROOT_GUARD');
+export const LOCALIZE_ROUTER_FORROOT_GUARD = new InjectionToken('LOCALIZE_ROUTER_FORROOT_GUARD');
 
 /**
  * Helper function for loading external parser
@@ -19,8 +19,8 @@ export const LOCALIZE_ROUTER_FORROOT_GUARD = new OpaqueToken('LOCALIZE_ROUTER_FO
  * @param http
  * @returns {StaticParserLoader}
  */
-export function localizeLoaderFactory(translate: TranslateService, location: Location, http: Http) {
-  return new StaticParserLoader(translate, location, http);
+export function localizeLoaderFactory(translate: TranslateService, location: Location, storageKey: string, http: Http) {
+  return new StaticParserLoader(translate, location, storageKey, http);
 }
 
 @Injectable()
@@ -81,7 +81,7 @@ export class LocalizeRouterModule {
     localizeLoader: Provider = {
       provide: LocalizeParser,
       useFactory: localizeLoaderFactory,
-      deps: [TranslateService, Location, Http]
+      deps: [TranslateService, Location, DefaultStorageKey, Http]
     }): ModuleWithProviders {
     return {
       ngModule: LocalizeRouterModule,
