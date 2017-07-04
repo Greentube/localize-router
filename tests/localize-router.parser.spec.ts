@@ -127,6 +127,7 @@ describe('LocalizeParser', () => {
     spyOn(loader, 'translateRoutes').and.callThrough();
 
     (<any>translate)['browserLang'] = 'de';
+    localStorage.removeItem('LOCALIZE_DEFAULT_LANGUAGE');
 
     routes = [];
     loader.load(routes);
@@ -141,15 +142,15 @@ describe('LocalizeParser', () => {
     spyOn(loader, 'translateRoutes').and.callThrough();
 
     (<any>translate)['browserLang'] = 'de';
-    localStorage.setItem('LOCALIZE_LOCAL_STORAGE', 'fr');
+    localStorage.setItem('LOCALIZE_DEFAULT_LANGUAGE', 'fr');
 
     routes = [];
     loader.load(routes);
     tick();
     expect(routes[0]).toEqual({path: '', redirectTo: 'fr', pathMatch: 'full'});
     expect(routes[1]).toEqual({path: 'fr', children: []});
-    expect(loader.currentLang).toEqual('fr');
-    expect(translate.currentLang).toEqual('fr');
+    expect(loader.currentLang).toEqual('fr', 'loader currentLang should equal');
+    expect(translate.currentLang).toEqual('fr', 'translate currentLang should equal');
   }));
 
   it('should pick first language from locales if navigator language not recognized', fakeAsync(() => {
@@ -157,13 +158,14 @@ describe('LocalizeParser', () => {
     spyOn(loader, 'translateRoutes').and.callThrough();
 
     (<any>translate)['browserLang'] = 'sr';
+    localStorage.removeItem('LOCALIZE_DEFAULT_LANGUAGE');
 
     routes = [];
     loader.load(routes);
     tick();
     expect(routes[0].redirectTo).toEqual('en');
-    expect(loader.currentLang).toEqual('en');
-    expect(translate.currentLang).toEqual('en');
+    expect(loader.currentLang).toEqual('en', 'loader currentLang should equal');
+    expect(translate.currentLang).toEqual('en', 'translate currentLang should equal');
   }));
 
   it('should translate path', fakeAsync(() => {

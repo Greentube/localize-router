@@ -1,5 +1,5 @@
+import { Inject, Injectable } from '@angular/core';
 import { Http, Response } from '@angular/http';
-import { OpaqueToken } from '@angular/core';
 import { Routes, Route } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Observable } from 'rxjs/Observable';
@@ -8,19 +8,15 @@ import { Location } from '@angular/common';
 import 'rxjs/add/observable/forkJoin';
 import 'rxjs/add/operator/toPromise';
 import 'rxjs/add/operator/share';
+import { CACHE_MECHANISM, CACHE_NAME, CacheMechanism, USE_CACHED_LANG } from './localize-router.config';
 
-const LOCALIZE_LOCAL_STORAGE = 'LOCALIZE_LOCAL_STORAGE';
-
-/**
- * Static provider for keeping track of routes
- * @type {OpaqueToken}
- */
-export const RAW_ROUTES = new OpaqueToken('RAW_ROUTES');
+const LOCALIZE_CACHE_NAME = 'LOCALIZE_DEFAULT_LANGUAGE';
+const COOKIE_EXPIRY = 30; // 1 month
 
 /**
  * Config interface
  */
-export interface ILocalizeRouteConfig {
+export interface ILocalizeRouterParserConfig {
   locales: Array<string>;
   prefix?: string;
 }
@@ -28,6 +24,7 @@ export interface ILocalizeRouteConfig {
 /**
  * Abstract class for parsing localization
  */
+@Injectable()
 export abstract class LocalizeParser {
   locales: Array<string>;
   currentLang: string;
@@ -42,8 +39,15 @@ export abstract class LocalizeParser {
    * Loader constructor
    * @param translate
    * @param location
+   * @param useCachedLang
+   * @param cacheMechanism
+   * @param cacheName
    */
-  constructor(private translate: TranslateService, private location: Location) {}
+  constructor(private translate: TranslateService,
+              private location: Location,
+              @Inject(USE_CACHED_LANG) private useCachedLang: boolean = true,
+              @Inject(CACHE_MECHANISM) private cacheMechanism: CacheMechanism = CacheMechanism.LocalStorage,
+              @Inject(CACHE_NAME) private cacheName: string = LOCALIZE_CACHE_NAME) {}
 
   /**
    * Load routes and fetch necessary data
@@ -220,39 +224,92 @@ export abstract class LocalizeParser {
   }
 
   /**
-   * Get language from local storage
+   * Get language from local storage or cookie
    * @returns {string}
    * @private
    */
   private get _cachedLang(): string {
-    if(typeof window === 'undefined' || typeof window.localStorage === 'undefined') {
-      return void 0;
+    if (!this.useCachedLang) {
+      return;
     }
-    try {
-      return this._returnIfInLocales(window.localStorage.getItem(LOCALIZE_LOCAL_STORAGE));
-    } catch(e) {
-      // weird Safari issue in private mode, where LocalStorage is defined but throws error on access
-      return void 0;
+    if (this.cacheMechanism === CacheMechanism.LocalStorage) {
+      return this._cacheWithLocalStorage();
+    }
+    if (this.cacheMechanism === CacheMechanism.Cookie) {
+      return this._cacheWithCookies();
     }
   }
 
   /**
-   * Save language to local storage
+   * Save language to local storage or cookie
    * @param value
    * @private
    */
   private set _cachedLang(value: string) {
+    if (!this.useCachedLang) {
+      return;
+    }
+    if (this.cacheMechanism === CacheMechanism.LocalStorage) {
+      this._cacheWithLocalStorage(value);
+    }
+    if (this.cacheMechanism === CacheMechanism.Cookie) {
+      this._cacheWithCookies(value);
+    }
+  }
+
+  /**
+   * Cache value to local storage
+   * @param value
+   * @returns {string}
+   * @private
+   */
+  private _cacheWithLocalStorage(value?: string): string {
     if(typeof window === 'undefined' || typeof window.localStorage === 'undefined') {
       return;
     }
     try {
-      window.localStorage.setItem(LOCALIZE_LOCAL_STORAGE, value);
+      if (value) {
+        window.localStorage.setItem(this.cacheName, value);
+        return;
+      }
+      return this._returnIfInLocales(window.localStorage.getItem(this.cacheName));
     } catch(e) {
       // weird Safari issue in private mode, where LocalStorage is defined but throws error on access
       return;
     }
   }
 
+  /**
+   * Cache value via cookies
+   * @param value
+   * @private
+   */
+  private _cacheWithCookies(value?: string): string {
+    if(typeof document === 'undefined' || typeof document.cookie === 'undefined') {
+      return;
+    }
+    try {
+      const name = encodeURIComponent(this.cacheName);
+      if (value) {
+        let d: Date = new Date();
+        d.setTime(d.getTime() + COOKIE_EXPIRY * 86400000); // * days
+        document.cookie = `${name}=${encodeURIComponent(value)};expires=${d.toUTCString()}`;
+        return;
+      }
+      const regexp = new RegExp('(?:^' + name + '|;\\s*' + name + ')=(.*?)(?:;|$)', 'g');
+      const result = regexp.exec(document.cookie);
+      return decodeURIComponent(result[1]);
+    } catch(e) {
+      return; // should not happen but better safe than sorry
+    }
+  }
+
+  /**
+   * Check if value exists in locales list
+   * @param value
+   * @returns {any}
+   * @private
+   */
   private _returnIfInLocales(value: string): string {
     if (value && this.locales.indexOf(value) !== -1) {
       return value;
@@ -260,6 +317,11 @@ export abstract class LocalizeParser {
     return null;
   }
 
+  /**
+   * Get translated value
+   * @param key
+   * @returns {any}
+   */
   private translateText(key: string): string {
     if (!this.translationObject) {
       return key;
@@ -329,7 +391,7 @@ export class StaticParserLoader extends LocalizeParser {
       } else {
         this.http.get(`${this.path}`)
           .map((res: Response) => res.json())
-          .subscribe((data: ILocalizeRouteConfig) => {
+          .subscribe((data: ILocalizeRouterParserConfig) => {
             this._dataLoaded = true;
             this.locales = data.locales;
             this.prefix = data.prefix || '';

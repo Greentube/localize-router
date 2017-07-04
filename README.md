@@ -12,6 +12,7 @@ Demo project can be found [here](https://github.com/meeroslav/localize-router-ex
     - [Initialize module](#initialize-module)
         - [Static initialization](#static-initialization)
         - [JSON config file](#json-config-file)
+        - [Initialization config](#initialization-config)
         - [Manual initialization](#manual-initialization)
         - [Server side initialization](#server-side-initialization)
     - [How it works](#how-it-works)
@@ -20,6 +21,8 @@ Demo project can be found [here](https://github.com/meeroslav/localize-router-ex
     - [Service](#service)
     - [AOT](#aot)
 - [API](#api)
+    - [LocalizeRouterModule](#localizeroutermodule)
+    - [LocalizeRouterConfig](#localizerouterconfig)
     - [LocalizeRouterService](#localizerouterservice)
     - [LocalizeParser](#localizeparser)
 - [License](#license)
@@ -61,17 +64,18 @@ import {routes} from './app.routes';
     ],
     bootstrap: [AppComponent]
 })
-export class AppModule {
-}
+export class AppModule { }
 ```
 
 Static file's default path is `assets/locales.json`. You can override the path by calling `StaticParserLoader` on you own:
 ```ts
 LocalizeRouterModule.forRoot(routes, {
-    provide: LocalizeParser,
-    useFactory: (translate, location, http) =>
-        new StaticParserLoader(translate, location, http, 'your/path/to/config.json'),
-    deps: [TranslateService, Location, Http]
+    parser: {
+        provide: LocalizeParser,
+        useFactory: (translate, location, http) =>
+            new StaticParserLoader(translate, location, http, 'your/path/to/config.json'),
+        deps: [TranslateService, Location, Http]
+    }
 })
 
 ```
@@ -99,7 +103,7 @@ JSON config file has following structure:
 ```
 
 ```ts
-interface ILocalizeRouteConfig {
+interface ILocalizeRouterParserConfig {
     locales: Array<string>;
     prefix?: string;
 }
@@ -107,14 +111,20 @@ interface ILocalizeRouteConfig {
 
 Prefix field is not mandatory and default value is empty string.
 
+#### Initialization config
+Apart from providing routes which are mandatory, and parser loader you can provide additional configuration for more granular setting of `localize router`. More information at [LocalizeRouterConfig](#localizerouterconfig). 
+
+
 #### Manual initialization
 With manual initialization you need to provide information directly:
 ```ts
 LocalizeRouterModule.forRoot(routes, {
-    provide: LocalizeParser,
-    useFactory: (translate, location) =>
-        new ManualParserLoader(translate, location, ['en','de',...], 'YOUR_PREFIX'),
-    deps: [TranslateService, Location]
+    parser: {
+        provide: LocalizeParser,
+        useFactory: (translate, location) =>
+            new ManualParserLoader(translate, location, ['en','de',...], 'YOUR_PREFIX'),
+        deps: [TranslateService, Location]
+    }
 })
 
 ```
@@ -255,6 +265,16 @@ export function localizeLoaderFactory(translate: TranslateService, location: Loc
 ```
 
 ## API
+### LocalizeRouterModule
+#### Methods:
+- `forRoot(routes: Routes, config: LocalizeRouterConfig = {}): ModuleWithProviders`: Main initializer for localize router. Can provide custom configuration for more granular settings.
+- `forChild(routes: Routes): ModuleWithProviders`: Child module initializer for providing child routes.
+### LocalizeRouterConfig
+#### Properties
+- `parser`: Provider for loading of LocalizeParser. Default value is `StaticParserLoader`.
+- `useCachedLang`: boolean. Flag whether default language should be cached. Default value is `true`.
+- `cacheMechanism`: CacheMechanism.LocalStorage || CacheMechanism.Cookie. Default value is `CacheMechanism.LocalStorage`.
+- `cacheName`: string. Name of cookie/local store. Default value is `LOCALIZE_DEFAULT_LANGUAGE`.
 ### LocalizeRouterService
 #### Properties:
 - `routerEvents`: An EventEmitter to listen to language change event
