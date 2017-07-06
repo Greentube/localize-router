@@ -1,5 +1,7 @@
 import { Injector } from '@angular/core';
-import { HttpModule } from '@angular/http';
+import {
+  BaseRequestOptions, ConnectionBackend, Http, HttpModule, RequestOptions, XHRBackend
+} from '@angular/http';
 import { LocalizeRouterService } from '../src/localize-router.service';
 import { LocalizeParser } from '../src/localize-router.parser';
 import { LocalizeRouterModule } from '../src/localize-router.module';
@@ -9,6 +11,7 @@ import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 import { TranslateService } from '@ngx-translate/core';
 import { CommonModule, Location } from '@angular/common';
+import { MockBackend, MockConnection } from '@angular/http/testing';
 
 class FakeTranslateService {
   defLang: string;
@@ -21,48 +24,30 @@ class FakeTranslateService {
     'PREFIX.about': 'about_TR'
   };
 
-  setDefaultLang(lang: string) {
-    this.defLang = lang;
-  }
+  setDefaultLang = (lang: string) => { this.defLang = lang; };
 
-  getDefaultLang() {
-    return this.defLang;
-  }
+  use = (lang: string) => { this.currentLang = lang; };
 
-  use(lang: string) {
-    this.currentLang = lang;
-  }
+  get = (input: string) => Observable.of(this.content[input] || input);
 
-  get(input: string) {
-    return Observable.of(this.content[input] || input);
-  }
-
-  getBrowserLang() {
-    return this.browserLang;
-  }
+  getBrowserLang = () => this.browserLang;
 }
 
 class FakeRouter {
   routes: Routes;
   fakeRouterEvents: Subject<Event> = new Subject<Event>();
 
-  resetConfig(routes: Routes) {
-    this.routes = routes;
-  }
+  resetConfig = (routes: Routes) => {  this.routes = routes; };
 
   get events(): Observable<Event> {
     return this.fakeRouterEvents;
   }
 
-  parseUrl() {
-    return '';
-  }
+  parseUrl = () => '';
 }
 
 class FakeLocation {
-  path(): string {
-    return '';
-  }
+  path = () => '';
 }
 
 class DummyComponent {
@@ -75,6 +60,9 @@ describe('LocalizeRouterService', () => {
   let localizeRouterService: LocalizeRouterService;
   let routes: Routes;
 
+  let backend: any;
+  let connection: MockConnection;
+
   beforeEach(() => {
     routes = [{ path: '', component: DummyComponent }];
 
@@ -83,17 +71,26 @@ describe('LocalizeRouterService', () => {
       providers: [
         { provide: Router, useClass: FakeRouter },
         { provide: TranslateService, useClass: FakeTranslateService },
-        { provide: Location, useClass: FakeLocation }
+        { provide: Location, useClass: FakeLocation },
+        { provide: XHRBackend, useClass: MockBackend },
+        { provide: ConnectionBackend, useClass: MockBackend },
+        { provide: RequestOptions, useClass: BaseRequestOptions },
+        Http
       ]
     });
     injector = getTestBed();
     parser = injector.get(LocalizeParser);
     router = injector.get(Router);
+
+    backend = injector.get(XHRBackend);
+    backend.connections.subscribe((c: MockConnection) => connection = c);
   });
 
   afterEach(() => {
-    injector = undefined;
-    localizeRouterService = undefined;
+    injector = void 0;
+    localizeRouterService = void 0;
+    backend = void 0;
+    connection = void 0;
   });
 
   it('is defined', () => {
@@ -105,6 +102,9 @@ describe('LocalizeRouterService', () => {
 
   it('should initialize routerEvents', () => {
     localizeRouterService = new LocalizeRouterService(parser, router);
+
+    // mockBackendResponse(connection, '{"TEST": "This is a test", "TEST2": "This is another test"}');
+
     expect(localizeRouterService.routerEvents).toBeDefined();
   });
 
