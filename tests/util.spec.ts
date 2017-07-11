@@ -55,22 +55,24 @@ describe('util', () => {
     expect(equals({text: 123, same: 1}, {text: 123, same: 1})).toBe(true);
   });
   it('should ignore if inherited fields dont match', () => {
-    class Klass1 {
+    class Class1 {
       same: boolean;
+
+      first() { }
 
       constructor() { }
     }
-    Klass1.prototype['first'] = 'first';
-    class Klass2 {
+    class Class2 {
       same: boolean;
+
+      second() { }
 
       constructor() { }
     }
-    Klass2.prototype['second'] = 'second';
 
-    let instance1: any = new Klass1();
+    let instance1: any = new Class1();
     instance1.same = true;
-    let instance2: any = new Klass2();
+    let instance2: any = new Class2();
     instance2.same = true;
 
     expect(equals(instance1, instance2)).toBe(true);
