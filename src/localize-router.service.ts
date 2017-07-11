@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Router, NavigationStart, ActivatedRouteSnapshot } from '@angular/router';
+import { Router, NavigationStart, ActivatedRouteSnapshot, NavigationExtras } from '@angular/router';
 import { Subject } from 'rxjs/Subject';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/forkJoin';
@@ -26,7 +26,7 @@ export class LocalizeRouterService {
   /**
    * Start up the service
    */
-  init() {
+  init(): void {
     this.router.resetConfig(this.parser.routes);
     this.router.events.subscribe(this._routeChanged());
   }
@@ -34,13 +34,14 @@ export class LocalizeRouterService {
   /**
    * Change language and navigate to translated route
    * @param lang
+   * @param extras
    */
-  changeLanguage(lang: string) {
+  changeLanguage(lang: string, extras?: NavigationExtras): void {
     if (lang !== this.parser.currentLang) {
       let rootSnapshot: ActivatedRouteSnapshot = this.router.routerState.snapshot.root;
 
       this.parser.translateRoutes(lang).subscribe(() => {
-        this.router.navigateByUrl(this.traverseRouteSnapshot(rootSnapshot));
+        this.router.navigateByUrl(this.traverseRouteSnapshot(rootSnapshot), extras);
       });
     }
   }
@@ -60,14 +61,12 @@ export class LocalizeRouterService {
   /**
    * Extracts new segment value based on routeConfig and url
    * @param snapshot
-   * @returns {any}
+   * @returns {string}
    */
   private parseSegmentValue(snapshot: ActivatedRouteSnapshot): string {
     if (snapshot.routeConfig) {
       let subPathSegments = snapshot.routeConfig.path.split('/');
-      return subPathSegments.
-      map((s: string, i: number) => s.indexOf(':') === 0 ? snapshot.url[i].path : s).
-      join('/');
+      return subPathSegments.map((s: string, i: number) => s.indexOf(':') === 0 ? snapshot.url[i].path : s).join('/');
     }
     return '';
   }
@@ -76,38 +75,36 @@ export class LocalizeRouterService {
    * Translate route to current language
    * If new language is explicitly provided then replace language part in url with new language
    * @param path
-   * @returns {Observable<string>}
+   * @returns {string | any[]}
    */
   translateRoute(path: string | any[]): string | any[] {
     if (typeof path === 'string') {
       let result = this.parser.translateRoute(path);
-      return !path.indexOf('/') ?
-        `/${this.parser.currentLang}${result}` :
-        result;
-    } else { // it's array
-      let result: any[] = [];
-      (path as Array<any>).forEach((segment: any, index: number) => {
-        if (typeof segment === 'string') {
-          let res = this.parser.translateRoute(segment);
-          if (!index && !segment.indexOf('/')) {
-            result.push(`/${this.parser.currentLang}${res}`);
-          } else {
-            result.push(res);
-          }
-        } else {
-          result.push(segment);
-        }
-      });
-      return result;
+      return !path.indexOf('/') ? `/${this.parser.currentLang}${result}` : result;
     }
+    // it's an array
+    let result: any[] = [];
+    (path as Array<any>).forEach((segment: any, index: number) => {
+      if (typeof segment === 'string') {
+        let res = this.parser.translateRoute(segment);
+        if (!index && !segment.indexOf('/')) {
+          result.push(`/${this.parser.currentLang}${res}`);
+        } else {
+          result.push(res);
+        }
+      } else {
+        result.push(segment);
+      }
+    });
+    return result;
   }
 
   /**
    * Event handler to react on route change
-   * @returns {(event:any)=>undefined}
+   * @returns {(event:any)=>void}
    * @private
    */
-  private _routeChanged() {
+  private _routeChanged(): ((event: any) => void) {
     let self = this;
 
     return (event: any) => {

@@ -1,16 +1,23 @@
 import {
-  NgModule, ModuleWithProviders, APP_INITIALIZER, Provider, OpaqueToken, Optional, SkipSelf,
+  NgModule, ModuleWithProviders, APP_INITIALIZER, OpaqueToken, Optional, SkipSelf,
   Injectable, Injector
 } from '@angular/core';
 import { HttpModule, Http } from '@angular/http';
 import { LocalizeRouterService } from './localize-router.service';
-import { LocalizeParser, RAW_ROUTES, StaticParserLoader } from './localize-router.parser';
+import { LocalizeParser, StaticParserLoader } from './localize-router.parser';
 import { RouterModule, Routes } from '@angular/router';
 import { LocalizeRouterPipe } from './localize-router.pipe';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Location, CommonModule } from '@angular/common';
+import { CACHE_MECHANISM, CACHE_NAME, LocalizeRouterConfig, USE_CACHED_LANG } from './localize-router.config';
 
 export const LOCALIZE_ROUTER_FORROOT_GUARD = new OpaqueToken('LOCALIZE_ROUTER_FORROOT_GUARD');
+
+/**
+ * Static provider for keeping track of routes
+ * @type {OpaqueToken}
+ */
+export const RAW_ROUTES = new OpaqueToken('RAW_ROUTES');
 
 /**
  * Helper function for loading external parser
@@ -28,8 +35,16 @@ export class ParserInitializer {
   parser: LocalizeParser;
   routes: Routes;
 
-  constructor(private injector: Injector) {}
+  /**
+   * CTOR
+   * @param injector
+   */
+  constructor(private injector: Injector) {
+  }
 
+  /**
+   * @returns {Promise<any>}
+   */
   appInitializer(): Promise<any> {
     const res = this.parser.load(this.routes);
     res.then(() => {
@@ -40,13 +55,25 @@ export class ParserInitializer {
     return res;
   }
 
-  generateInitializer(parser: LocalizeParser, routes: Routes[]) {
+  /**
+   * @param parser
+   * @param routes
+   * @returns {()=>Promise<any>}
+   */
+  generateInitializer(parser: LocalizeParser, routes: Routes[]): () => Promise<any> {
     this.parser = parser;
     this.routes = routes.reduce((a, b) => a.concat(b));
     return this.appInitializer;
   }
 }
-export function getAppInitializer(p: ParserInitializer, parser: LocalizeParser, routes: Routes[]) {
+
+/**
+ * @param p
+ * @param parser
+ * @param routes
+ * @returns {any}
+ */
+export function getAppInitializer(p: ParserInitializer, parser: LocalizeParser, routes: Routes[]): any {
   return p.generateInitializer(parser, routes).bind(p);
 }
 
@@ -57,22 +84,7 @@ export function getAppInitializer(p: ParserInitializer, parser: LocalizeParser, 
 })
 export class LocalizeRouterModule {
 
-  // static Localize: LocalizeParser;
-  //
-  // constructor(@Inject(LocalizeParser) localize: LocalizeParser) {
-  //   if (localize && !LocalizeRouterModule.Localize) {
-  //     LocalizeRouterModule.Localize = localize;
-  //   }
-  // }
-
-  static forRoot(
-    routes: Routes,
-    localizeLoader: Provider = {
-      provide: LocalizeParser,
-      useFactory: localizeLoaderFactory,
-      deps: [TranslateService, Location, Http]
-    }
-  ): ModuleWithProviders {
+  static forRoot(routes: Routes, config: LocalizeRouterConfig = {}): ModuleWithProviders {
     return {
       ngModule: LocalizeRouterModule,
       providers: [
@@ -81,12 +93,15 @@ export class LocalizeRouterModule {
           useFactory: provideForRootGuard,
           deps: [[LocalizeRouterModule, new Optional(), new SkipSelf()]]
         },
+        config.parser || { provide: LocalizeParser, useFactory: localizeLoaderFactory, deps: [TranslateService, Location, Http]},
+        { provide: USE_CACHED_LANG, useValue: config.useCachedLang },
+        { provide: CACHE_NAME, useValue: config.cacheName },
+        { provide: CACHE_MECHANISM, useValue: config.cacheMechanism },
         {
           provide: RAW_ROUTES,
           multi: true,
           useValue: routes
         },
-        localizeLoader,
         LocalizeRouterService,
         ParserInitializer,
         {
@@ -106,9 +121,6 @@ export class LocalizeRouterModule {
         {
           provide: RAW_ROUTES,
           multi: true,
-          // useValue: LocalizeRouterModule.Localize ?
-          //   LocalizeRouterModule.Localize.initChildRoutes(routes) :
-          //   routes
           useValue: routes
         }
       ]
@@ -116,7 +128,11 @@ export class LocalizeRouterModule {
   }
 }
 
-export function provideForRootGuard(localizeRouterModule: LocalizeRouterModule): any {
+/**
+ * @param localizeRouterModule
+ * @returns {string}
+ */
+export function provideForRootGuard(localizeRouterModule: LocalizeRouterModule): string {
   if (localizeRouterModule) {
     throw new Error(
       `LocalizeRouterModule.forRoot() called twice. Lazy loaded modules should use LocalizeRouterModule.forChild() instead.`);

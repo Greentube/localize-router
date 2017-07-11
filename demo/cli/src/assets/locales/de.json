@@ -2,18 +2,20 @@
   "APP_TITLE": "Einige Applikationstext",
   "HOME": "Startseite >",
   "USERS": "Benutzer >",
-  "ABOUT": "Über >",
+  "LAZY": "Bequem >",
+  "SECOND_LEVEL": "Zweites Niveau >",
   "PROFILE": "Profil >",
   "BACK": "< Zurück",
 
   "HOME_TEXT": "Die Startseite funktioniert",
-  "ABOUT_TEXT": "Die Über Seite funktioniert",
+  "LAZY_TEXT": "Die Bequem Seite funktioniert",
   "USERS_TEXT": "Die Benutzer funktioniert",
   "PROFILE_TEXT": "Das Profil",
   "USER_TEXT": "Der Benutzer",
 
-  "ROUTES.users": "benutzer",
-  "ROUTES.profile": "profil",
-  "ROUTES.home": "startseite",
-  "ROUTES.about": "ueber"
+  "users": "benutzer",
+  "profile": "profil",
+  "home": "startseite",
+  "lazy": "bequem",
+  "secondlevel":"zweitesniveau"
 }

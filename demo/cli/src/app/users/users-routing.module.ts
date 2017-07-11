@@ -6,9 +6,11 @@ import { ProfileComponent } from './profile/profile.component';
 import { LocalizeRouterModule } from 'localize-router';
 
 const usersRoutes: Routes = [
-  { path: '', component: UsersComponent },
-  { path: ':id', component: UserComponent },
-  { path: ':id/profile', component: ProfileComponent }
+  { path: 'users', children: [
+    { path: '', component: UsersComponent },
+    { path: ':id', component: UserComponent },
+    { path: ':id/profile', component: ProfileComponent }
+  ]}
 ];
 
 @NgModule({

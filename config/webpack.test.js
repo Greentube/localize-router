@@ -59,7 +59,7 @@ module.exports = {
 
   plugins: [
     new webpack.ContextReplacementPlugin(
-      /angular(\\|\/)core(\\|\/)(esm(\\|\/)src|src)(\\|\/)linker/,
+      /angular(\\|\/)core(\\|\/)@angular/,
       helpers.root('./src')
     ),
     new LoaderOptionsPlugin({
@@ -69,7 +69,7 @@ module.exports = {
           emitErrors: false,
           failOnHint: false,
           resourcePath: 'src'
-        },
+        }
       }
     })
   ]

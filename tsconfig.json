@@ -18,6 +18,7 @@
   "files": [
     "index.ts",
     "./src/util.ts",
+    "./src/localize-router.config.ts",
     "./src/localize-router.pipe.ts",
     "./src/localize-router.service.ts",
     "./src/localize-router.parser.ts",

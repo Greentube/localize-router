@@ -9,11 +9,11 @@
   </span>
 </header>
 <nav>
-  <a [routerLink]="'/home' | localize" [routerLinkActive]="['router-link-active']" [routerLinkActiveOptions]="{exact:true}">
+  <a [routerLink]="'/' | localize" [routerLinkActive]="['router-link-active']" [routerLinkActiveOptions]="{exact:true}">
     {{'HOME' | translate}}
   </a>
-  <a [routerLink]="'/about' | localize" [routerLinkActive]="['router-link-active']">
-    {{'ABOUT' | translate}}
+  <a [routerLink]="'/lazy' | localize" [routerLinkActive]="['router-link-active']">
+    {{'LAZY' | translate}}
   </a>
   <a [routerLink]="'/users' | localize" [routerLinkActive]="['router-link-active']">
     {{'USERS' | translate}}
