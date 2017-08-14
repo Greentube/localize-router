@@ -10,6 +10,7 @@ import { LocalizeRouterPipe } from './localize-router.pipe';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Location, CommonModule } from '@angular/common';
 import {
+  ALWAYS_SET_PREFIX,
   CACHE_MECHANISM, CACHE_NAME, DEFAULT_LANG_FUNCTION, LOCALIZE_ROUTER_FORROOT_GUARD, LocalizeRouterConfig, LocalizeRouterSettings,
   RAW_ROUTES,
   USE_CACHED_LANG
@@ -91,6 +92,7 @@ export class LocalizeRouterModule {
           deps: [[LocalizeRouterModule, new Optional(), new SkipSelf()]]
         },
         { provide: USE_CACHED_LANG, useValue: config.useCachedLang },
+        { provide: ALWAYS_SET_PREFIX, useValue: config.alwaysSetPrefix },
         { provide: CACHE_NAME, useValue: config.cacheName },
         { provide: CACHE_MECHANISM, useValue: config.cacheMechanism },
         { provide: DEFAULT_LANG_FUNCTION, useValue: config.defaultLangFunction },

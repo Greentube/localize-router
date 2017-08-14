@@ -273,9 +273,10 @@ export function localizeLoaderFactory(translate: TranslateService, location: Loc
 #### Properties
 - `parser`: Provider for loading of LocalizeParser. Default value is `StaticParserLoader`.
 - `useCachedLang`: boolean. Flag whether default language should be cached. Default value is `true`.
+- `alwaysSetPrefix`: boolean. Flag whether language should always prefix the url if only one language is present. Default value is `true`.
 - `cacheMechanism`: CacheMechanism.LocalStorage || CacheMechanism.Cookie. Default value is `CacheMechanism.LocalStorage`.
 - `cacheName`: string. Name of cookie/local store. Default value is `LOCALIZE_DEFAULT_LANGUAGE`.
-- `defaultLangFunction`: (languages: string[], cachedLang?: string, browserLang?: string) => string. Override method for custom logic for picking default language, when no language is provided via url.
+- `defaultLangFunction`: (languages: string[], cachedLang?: string, browserLang?: string) => string. Override method for custom logic for picking default language, when no language is provided via url. Default value is `undefined`.
 ### LocalizeRouterService
 #### Properties:
 - `routerEvents`: An EventEmitter to listen to language change event

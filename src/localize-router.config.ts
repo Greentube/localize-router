@@ -56,6 +56,12 @@ export interface DefaultLanguageFunction {
 export const DEFAULT_LANG_FUNCTION = new OpaqueToken('DEFAULT_LANG_FUNCTION');
 
 /**
+ * Boolean to indicate whether prefix should be set for single language scenarios
+ * @type {OpaqueToken<boolean>}
+ */
+export const ALWAYS_SET_PREFIX = new OpaqueToken('ALWAYS_SET_PREFIX');
+
+/**
  * Config interface for LocalizeRouter
  */
 export interface LocalizeRouterConfig {
@@ -64,19 +70,26 @@ export interface LocalizeRouterConfig {
   cacheMechanism?: CacheMechanism;
   cacheName?: string;
   defaultLangFunction?: DefaultLanguageFunction;
-  // alwaysSetPrefix: boolean; // TODO this will be implemented later
-  //
+  alwaysSetPrefix?: boolean;
 }
 
 const LOCALIZE_CACHE_NAME = 'LOCALIZE_DEFAULT_LANGUAGE';
 
 export class LocalizeRouterSettings implements LocalizeRouterConfig {
+  /**
+   * Settings for localize router
+   * @param {boolean} useCachedLang
+   * @param {boolean} alwaysSetPrefix
+   * @param {CacheMechanism} cacheMechanism
+   * @param {string} cacheName
+   * @param {DefaultLanguageFunction} defaultLangFunction
+   */
   constructor(
     @Inject(USE_CACHED_LANG) public useCachedLang: boolean = true,
+    @Inject(ALWAYS_SET_PREFIX) public alwaysSetPrefix: boolean = true,
     @Inject(CACHE_MECHANISM) public cacheMechanism: CacheMechanism = CacheMechanism.LocalStorage,
     @Inject(CACHE_NAME) public cacheName: string = LOCALIZE_CACHE_NAME,
     @Inject(DEFAULT_LANG_FUNCTION) public defaultLangFunction: DefaultLanguageFunction = void 0
   ) {
-
   }
 }

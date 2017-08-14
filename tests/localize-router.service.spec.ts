@@ -131,6 +131,7 @@ describe('LocalizeRouterService', () => {
   it('should append language if root route', () => {
     localizeRouterService = new LocalizeRouterService(parser, router);
     parser.currentLang = 'de';
+    parser.locales = ['de', 'en'];
     let testString = '/my/path';
     spyOn(parser, 'translateRoute').and.returnValue(testString);
 
@@ -142,6 +143,7 @@ describe('LocalizeRouterService', () => {
   it('should translate complex route', () => {
     localizeRouterService = new LocalizeRouterService(parser, router);
     parser.currentLang = 'de';
+    parser.locales = ['de', 'en'];
     spyOn(parser, 'translateRoute').and.callFake((val: any) => val);
 
     let res = localizeRouterService.translateRoute(['/my/path', 123, 'about']);

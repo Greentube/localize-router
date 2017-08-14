@@ -31,7 +31,6 @@ export abstract class LocalizeParser {
   defaultLang: string;
 
   protected prefix: string;
-
   private translationObject: any;
 
   /**
@@ -78,24 +77,27 @@ export abstract class LocalizeParser {
     selectedLanguage = locationLang || this.defaultLang;
     this.translate.setDefaultLang(this.defaultLang);
 
-    /** set base route */
-    const baseRoute = { path: '', redirectTo: this.defaultLang, pathMatch: 'full' };
+    // don't add prefix if only single language and not enforced via options
+    if (this.locales.length > 1 || this.settings.alwaysSetPrefix) {
+      /** set base route */
+      const baseRoute = { path: '', redirectTo: this.defaultLang, pathMatch: 'full' };
 
-    /** extract potential wildcard route */
-    let wildcardIndex = routes.findIndex((route: Route) => route.path === '**');
-    if (wildcardIndex !== -1) {
-      wildcardRoute = routes.splice(wildcardIndex, 1)[0];
-    }
+      /** extract potential wildcard route */
+      let wildcardIndex = routes.findIndex((route: Route) => route.path === '**');
+      if (wildcardIndex !== -1) {
+        wildcardRoute = routes.splice(wildcardIndex, 1)[0];
+      }
 
-    /** mutable operation on routes */
-    let children = this.routes.splice(0, this.routes.length, baseRoute);
+      /** mutable operation on routes */
+      let children = this.routes.splice(0, this.routes.length, baseRoute);
 
-    /** append children routes... */
-    this.routes.push({ children: children });
+      /** append children routes... */
+      this.routes.push({ children: children });
 
-    /** ...and potential wildcard route */
-    if (wildcardRoute) {
-      this.routes.push(wildcardRoute);
+      /** ...and potential wildcard route */
+      if (wildcardRoute) {
+        this.routes.push(wildcardRoute);
+      }
     }
 
     /** translate routes */
@@ -121,7 +123,7 @@ export abstract class LocalizeParser {
   translateRoutes(language: string): Observable<any> {
     return new Observable<any>((observer: Observer<any>) => {
       this._cachedLang = language;
-      if (this.routes.length > 1) {
+      if (this.routes.length > 1 && (this.locales.length > 1 || this.settings.alwaysSetPrefix)) {
         this.routes[1].path = language;
       }
 
@@ -129,12 +131,17 @@ export abstract class LocalizeParser {
         this.translationObject = translations;
         this.currentLang = language;
 
-        if (this.routes.length > 1) {
-          this._translateRouteTree(this.routes[1].children);
-        }
-        // if there is wildcard route
-        if (this.routes.length > 2 && this.routes[2].redirectTo) {
-          this._translateProperty(this.routes[2], 'redirectTo', true);
+        // if no prefixes used
+        if (this.locales.length === 1 && !this.settings.alwaysSetPrefix) {
+          this._translateRouteTree(this.routes);
+        } else {
+          if (this.routes.length > 1) {
+            this._translateRouteTree(this.routes[1].children);
+          }
+          // if there is wildcard route
+          if (this.routes.length > 2 && this.routes[2].redirectTo) {
+            this._translateProperty(this.routes[2], 'redirectTo', true);
+          }
         }
 
         observer.next(void 0);
@@ -166,7 +173,8 @@ export abstract class LocalizeParser {
   }
 
   /**
-   * Translate property and if first time add original to cache
+   * Translate property
+   * If first time translation then add original to route data object
    * @param route
    * @param property
    * @param prefixLang
@@ -174,16 +182,20 @@ export abstract class LocalizeParser {
    */
   private _translateProperty(route: Route, property: string, prefixLang?: boolean): void {
     // set property to data if not there yet
-    let dataPointer: any = route.data = route.data || {};
-    if (!dataPointer.localizeRouter) {
-      dataPointer.localizeRouter = {};
+    let routeData: any = route.data = route.data || {};
+    if (!routeData.localizeRouter) {
+      routeData.localizeRouter = {};
     }
-    if (!dataPointer.localizeRouter[property]) {
-      dataPointer.localizeRouter[property] = (<any>route)[property];
+    if (!routeData.localizeRouter[property]) {
+      routeData.localizeRouter[property] = (<any>route)[property];
     }
 
-    let result = this.translateRoute(dataPointer.localizeRouter[property]);
-    (<any>route)[property] = prefixLang ? `/${this.currentLang}${result}` : result;
+    let result = this.translateRoute(routeData.localizeRouter[property]);
+    (<any>route)[property] = prefixLang ? `/${this.urlPrefix}${result}` : result;
+  }
+
+  get urlPrefix() {
+    return this.locales.length > 1 || this.settings.alwaysSetPrefix ? this.currentLang : '';
   }
 
   /**

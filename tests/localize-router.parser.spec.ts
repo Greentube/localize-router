@@ -11,7 +11,7 @@ import {
   DEFAULT_LANG_FUNCTION,
   LocalizeRouterSettings,
   USE_CACHED_LANG,
-  CacheMechanism
+  CacheMechanism, ALWAYS_SET_PREFIX
 } from '../src/localize-router.config';
 
 class FakeTranslateService {
@@ -82,6 +82,7 @@ describe('LocalizeParser', () => {
         { provide: DEFAULT_LANG_FUNCTION, useValue: void 0 },
         { provide: CACHE_NAME, useValue: 'LOCALIZE_DEFAULT_LANGUAGE' },
         { provide: CACHE_MECHANISM, useValue: CacheMechanism.LocalStorage },
+        { provide: ALWAYS_SET_PREFIX, useValue: true },
         LocalizeRouterSettings
       ]
     });
@@ -401,6 +402,42 @@ describe('LocalizeParser', () => {
 
     expect(loader.currentLang).toEqual('fr', 'loader currentLang should equal');
     expect(translate.currentLang).toEqual('fr', 'translate currentLang should equal');
+  }));
+
+  it('should add prefix if enforced and single lang', fakeAsync(() => {
+    settings.alwaysSetPrefix = true;
+
+    loader = new ManualParserLoader(translate, location, settings, ['de'], prefix);
+
+    localStorage.setItem('LOCALIZE_DEFAULT_LANGUAGE', 'de');
+
+    routes = [{ path: 'home', component: DummyComponent }];
+    loader.load(routes);
+    tick();
+
+    expect(routes[0]).toEqual({ path: '', redirectTo: 'de', pathMatch: 'full' });
+    expect(routes[1]).toEqual({
+      path: 'de',
+      children: [{ path: 'home_de', component: DummyComponent, data: { localizeRouter: { path: 'home' }} }]
+    });
+    expect(loader.currentLang).toEqual('de', 'loader currentLang should equal');
+    expect(translate.currentLang).toEqual('de', 'translate currentLang should equal');
+  }));
+
+  it('should not add prefix if not enforced and single lang', fakeAsync(() => {
+    settings.alwaysSetPrefix = false;
+
+    loader = new ManualParserLoader(translate, location, settings, ['de'], prefix);
+
+    localStorage.setItem('LOCALIZE_DEFAULT_LANGUAGE', 'de');
+
+    routes = [{ path: 'home', component: DummyComponent }];
+    loader.load(routes);
+    tick();
+
+    expect(routes[0]).toEqual({ path: 'home_de', component: DummyComponent, data: { localizeRouter: { path: 'home' }} });
+    expect(loader.currentLang).toEqual('de', 'loader currentLang should equal');
+    expect(translate.currentLang).toEqual('de', 'translate currentLang should equal');
   }));
 
 });
