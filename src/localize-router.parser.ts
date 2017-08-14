@@ -216,8 +216,11 @@ export abstract class LocalizeParser {
    * @private
    */
   getLocationLang(url?: string): string {
-    let pathSlices = (url || this.location.path()).split('/');
-
+    let queryParamSplit = (url || this.location.path()).split('?');
+    let pathSlices: string[] = [];
+    if (queryParamSplit.length > 0) {
+      pathSlices = queryParamSplit[0].split('/');
+    }
     if (pathSlices.length > 1 && this.locales.indexOf(pathSlices[1]) !== -1) {
       return pathSlices[1];
     }
