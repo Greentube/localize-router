@@ -72,9 +72,9 @@ Static file's default path is `assets/locales.json`. You can override the path b
 LocalizeRouterModule.forRoot(routes, {
     parser: {
         provide: LocalizeParser,
-        useFactory: (translate, location, http) =>
-            new StaticParserLoader(translate, location, http, 'your/path/to/config.json'),
-        deps: [TranslateService, Location, Http]
+        useFactory: (translate, location, settings, http) =>
+            new StaticParserLoader(translate, location, settings, http, 'your/path/to/config.json'),
+        deps: [TranslateService, Location, LocalizeRouterSettings, Http]
     }
 })
 
@@ -121,9 +121,9 @@ With manual initialization you need to provide information directly:
 LocalizeRouterModule.forRoot(routes, {
     parser: {
         provide: LocalizeParser,
-        useFactory: (translate, location) =>
-            new ManualParserLoader(translate, location, ['en','de',...], 'YOUR_PREFIX'),
-        deps: [TranslateService, Location]
+        useFactory: (translate, location, settigns) =>
+            new ManualParserLoader(translate, location, settings, ['en','de',...], 'YOUR_PREFIX'),
+        deps: [TranslateService, Location, LocalizeRouterSettings]
     }
 })
 
@@ -147,8 +147,8 @@ export class LocalizeUniversalLoader extends LocalizeParser {
   }
 }
 
-export function localizeLoaderFactory(translate: TranslateService, location: Location) {
-  return new LocalizeUniversalLoader(translate, location);
+export function localizeLoaderFactory(translate: TranslateService, location: Location, settings: LocalizeRouterSettings) {
+  return new LocalizeUniversalLoader(translate, location, settings);
 }
 
 ```
@@ -275,6 +275,7 @@ export function localizeLoaderFactory(translate: TranslateService, location: Loc
 - `useCachedLang`: boolean. Flag whether default language should be cached. Default value is `true`.
 - `cacheMechanism`: CacheMechanism.LocalStorage || CacheMechanism.Cookie. Default value is `CacheMechanism.LocalStorage`.
 - `cacheName`: string. Name of cookie/local store. Default value is `LOCALIZE_DEFAULT_LANGUAGE`.
+- `defaultLangFunction`: (languages: string[], cachedLang?: string, browserLang?: string) => string. Override method for custom logic for picking default language, when no language is provided via url.
 ### LocalizeRouterService
 #### Properties:
 - `routerEvents`: An EventEmitter to listen to language change event

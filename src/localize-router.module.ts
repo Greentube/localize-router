@@ -1,5 +1,5 @@
 import {
-  NgModule, ModuleWithProviders, APP_INITIALIZER, OpaqueToken, Optional, SkipSelf,
+  NgModule, ModuleWithProviders, APP_INITIALIZER, Optional, SkipSelf,
   Injectable, Injector
 } from '@angular/core';
 import { HttpModule, Http } from '@angular/http';
@@ -9,25 +9,22 @@ import { RouterModule, Routes } from '@angular/router';
 import { LocalizeRouterPipe } from './localize-router.pipe';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Location, CommonModule } from '@angular/common';
-import { CACHE_MECHANISM, CACHE_NAME, LocalizeRouterConfig, USE_CACHED_LANG } from './localize-router.config';
-
-export const LOCALIZE_ROUTER_FORROOT_GUARD = new OpaqueToken('LOCALIZE_ROUTER_FORROOT_GUARD');
-
-/**
- * Static provider for keeping track of routes
- * @type {OpaqueToken}
- */
-export const RAW_ROUTES = new OpaqueToken('RAW_ROUTES');
+import {
+  CACHE_MECHANISM, CACHE_NAME, DEFAULT_LANG_FUNCTION, LOCALIZE_ROUTER_FORROOT_GUARD, LocalizeRouterConfig, LocalizeRouterSettings,
+  RAW_ROUTES,
+  USE_CACHED_LANG
+} from './localize-router.config';
 
 /**
  * Helper function for loading external parser
  * @param translate
  * @param location
+ * @param settings
  * @param http
  * @returns {StaticParserLoader}
  */
-export function localizeLoaderFactory(translate: TranslateService, location: Location, http: Http) {
-  return new StaticParserLoader(translate, location, http);
+export function localizeLoaderFactory(translate: TranslateService, location: Location, settings: LocalizeRouterSettings, http: Http) {
+  return new StaticParserLoader(translate, location, settings, http);
 }
 
 @Injectable()
@@ -93,10 +90,16 @@ export class LocalizeRouterModule {
           useFactory: provideForRootGuard,
           deps: [[LocalizeRouterModule, new Optional(), new SkipSelf()]]
         },
-        config.parser || { provide: LocalizeParser, useFactory: localizeLoaderFactory, deps: [TranslateService, Location, Http]},
         { provide: USE_CACHED_LANG, useValue: config.useCachedLang },
         { provide: CACHE_NAME, useValue: config.cacheName },
         { provide: CACHE_MECHANISM, useValue: config.cacheMechanism },
+        { provide: DEFAULT_LANG_FUNCTION, useValue: config.defaultLangFunction },
+        LocalizeRouterSettings,
+        config.parser || {
+          provide: LocalizeParser,
+          useFactory: localizeLoaderFactory,
+          deps: [TranslateService, Location, LocalizeRouterSettings, Http]
+        },
         {
           provide: RAW_ROUTES,
           multi: true,

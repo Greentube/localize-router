@@ -10,7 +10,7 @@ const homeRoutes: Routes = [
 @NgModule({
   imports: [
     RouterModule.forChild(homeRoutes),
-    LocalizeRouterModule.forChild(homeRoutes)
+    LocalizeRouterModule.forChild(<any> homeRoutes)
   ],
   exports: [ RouterModule, LocalizeRouterModule ]
 })
