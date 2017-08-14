@@ -129,6 +129,14 @@ describe('LocalizeParser', () => {
 
     expect(loader.getLocationLang('/en/some/path/after')).toEqual('en');
     expect(loader.getLocationLang('de/some/path/after')).toEqual('de');
+    expect(loader.getLocationLang('en')).toEqual('en');
+    expect(loader.getLocationLang('en/')).toEqual('en');
+    expect(loader.getLocationLang('/en')).toEqual('en');
+    expect(loader.getLocationLang('/en/')).toEqual('en');
+    expect(loader.getLocationLang('en?q=str')).toEqual('en');
+    expect(loader.getLocationLang('en/?q=str')).toEqual('en');
+    expect(loader.getLocationLang('/en?q=str')).toEqual('en');
+    expect(loader.getLocationLang('/en/q=str')).toEqual('en');
   });
 
   it('should return null on getLocationLang if lang not found', () => {
@@ -136,6 +144,18 @@ describe('LocalizeParser', () => {
 
     expect(loader.getLocationLang('/se/some/path/after')).toEqual(null);
     expect(loader.getLocationLang('rs/some/path/after')).toEqual(null);
+    expect(loader.getLocationLang('')).toEqual(null);
+    expect(loader.getLocationLang('/')).toEqual(null);
+    expect(loader.getLocationLang('rs')).toEqual(null);
+    expect(loader.getLocationLang('rs/')).toEqual(null);
+    expect(loader.getLocationLang('/rs')).toEqual(null);
+    expect(loader.getLocationLang('/rs/')).toEqual(null);
+    expect(loader.getLocationLang('?q=str')).toEqual(null);
+    expect(loader.getLocationLang('/?q=str')).toEqual(null);
+    expect(loader.getLocationLang('rs?q=str')).toEqual(null);
+    expect(loader.getLocationLang('rs/?q=str')).toEqual(null);
+    expect(loader.getLocationLang('/rs?q=str')).toEqual(null);
+    expect(loader.getLocationLang('/rs/q=str')).toEqual(null);
   });
 
   it('should call translateRoutes on init if locales passed', fakeAsync(() => {
