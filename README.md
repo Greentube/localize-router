@@ -4,7 +4,9 @@
 > An implementation of routes localization for Angular.
 
 Based on and extension of [ngx-translate](https://github.com/ngx-translate/core).
-Demo project can be found [here](https://github.com/meeroslav/localize-router-example).
+Demo project can be found [here](https://github.com/meeroslav/localize-router-example) or under sub folder `demo/cli`.
+
+> This documentation is for version 1.x.x. If you are migrating from the older version follow [migration guide](https://github.com/Greentube/localize-router/blob/master/MIGRATION_GUIDE.md) to upgrade to latest version.
 
 # Table of contents:
 - [Installation](#installation)
