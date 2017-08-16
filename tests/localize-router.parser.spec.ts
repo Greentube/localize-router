@@ -184,11 +184,11 @@ describe('LocalizeParser', () => {
     (<any>translate)['browserLang'] = 'de';
     localStorage.removeItem('LOCALIZE_DEFAULT_LANGUAGE');
 
-    routes = [];
+    routes = [{ path: 'home' }];
     loader.load(routes);
     tick();
     expect(routes[0]).toEqual({ path: '', redirectTo: 'de', pathMatch: 'full' });
-    expect(routes[1]).toEqual({ path: 'de', children: [] });
+    expect(routes[1]).toEqual({ path: 'de', children: [{ path: 'home_de', data: { localizeRouter: { path: 'home' }} }] });
     expect(loader.currentLang).toEqual('de');
     expect(translate.currentLang).toEqual('de');
   }));
@@ -200,11 +200,11 @@ describe('LocalizeParser', () => {
     (<any>translate)['browserLang'] = 'de';
     localStorage.setItem('LOCALIZE_DEFAULT_LANGUAGE', 'fr');
 
-    routes = [];
+    routes = [{ path: 'home' }];
     loader.load(routes);
     tick();
     expect(routes[0]).toEqual({ path: '', redirectTo: 'fr', pathMatch: 'full' });
-    expect(routes[1]).toEqual({ path: 'fr', children: [] });
+    expect(routes[1]).toEqual({ path: 'fr', children: [{ path: 'home_fr', data: { localizeRouter: { path: 'home' }} }] });
     expect(loader.currentLang).toEqual('fr', 'loader currentLang should equal');
     expect(translate.currentLang).toEqual('fr', 'translate currentLang should equal');
   }));
@@ -384,12 +384,12 @@ describe('LocalizeParser', () => {
     (<any>translate)['browserLang'] = 'de';
     localStorage.setItem('LOCALIZE_DEFAULT_LANGUAGE', 'fr');
 
-    routes = [];
+    routes = [{ path: 'home' }];
     loader.load(routes);
     tick();
 
     expect(routes[0]).toEqual({ path: '', redirectTo: 'de', pathMatch: 'full' });
-    expect(routes[1]).toEqual({ path: 'de', children: [] });
+    expect(routes[1]).toEqual({ path: 'de', children: [{ path: 'home_de', data: { localizeRouter: { path: 'home' }} }] });
     expect(loader.currentLang).toEqual('de', 'loader currentLang should equal');
     expect(translate.currentLang).toEqual('de', 'translate currentLang should equal');
   }));
@@ -458,6 +458,20 @@ describe('LocalizeParser', () => {
     expect(routes[0]).toEqual({ path: 'home_de', component: DummyComponent, data: { localizeRouter: { path: 'home' }} });
     expect(loader.currentLang).toEqual('de', 'loader currentLang should equal');
     expect(translate.currentLang).toEqual('de', 'translate currentLang should equal');
+  }));
+  it('should exclude certain routes', fakeAsync(() => {
+    settings.useCachedLang = false;
+    loader = new ManualParserLoader(translate, location, settings, locales, prefix);
+    (<any>translate)['browserLang'] = 'de';
+
+    routes = [{ path: 'home' }, { path: 'about', data: { skipRouteLocalization: true } }];
+    loader.load(routes);
+    tick();
+
+    expect(routes.length).toEqual(3);
+    expect(routes[0]).toEqual({ path: '', redirectTo: 'de', pathMatch: 'full' });
+    expect(routes[1]).toEqual({ path: 'about', data: { skipRouteLocalization: true } });
+    expect(routes[2]).toEqual({ path: 'de', children: [{ path: 'home_de', data: { localizeRouter: { path: 'home' }} }] });
   }));
 
 });

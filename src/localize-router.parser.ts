@@ -31,7 +31,10 @@ export abstract class LocalizeParser {
   defaultLang: string;
 
   protected prefix: string;
-  private translationObject: any;
+
+  private _translationObject: any;
+  private _wildcardRoute: Route;
+  private _languageRoute: Route;
 
   /**
    * Loader constructor
@@ -58,7 +61,6 @@ export abstract class LocalizeParser {
    */
   protected init(routes: Routes): Promise<any> {
     let selectedLanguage: string;
-    let wildcardRoute: Route;
 
     this.routes = routes;
 
@@ -85,18 +87,30 @@ export abstract class LocalizeParser {
       /** extract potential wildcard route */
       let wildcardIndex = routes.findIndex((route: Route) => route.path === '**');
       if (wildcardIndex !== -1) {
-        wildcardRoute = routes.splice(wildcardIndex, 1)[0];
+        this._wildcardRoute = routes.splice(wildcardIndex, 1)[0];
       }
 
       /** mutable operation on routes */
       let children = this.routes.splice(0, this.routes.length, baseRoute);
 
+      /** exclude certain routes */
+      for (let i = children.length - 1; i >= 0; i--) {
+        if (children[i].data && children[i].data.skipRouteLocalization) {
+          // add directly to routes
+          this.routes.push(children[i]);
+          children.splice(i, 1);
+        }
+      }
+
       /** append children routes... */
-      this.routes.push({ children: children });
+      if (children && children.length) {
+        this._languageRoute = { children: children };
+        this.routes.push(this._languageRoute);
+      }
 
       /** ...and potential wildcard route */
-      if (wildcardRoute) {
-        this.routes.push(wildcardRoute);
+      if (this._wildcardRoute) {
+        this.routes.push(this._wildcardRoute);
       }
     }
 
@@ -106,7 +120,7 @@ export abstract class LocalizeParser {
   }
 
   initChildRoutes(routes: Routes) {
-    if (!this.translationObject) {
+    if (!this._translationObject) {
       // not lazy, it will be translated in main init
       return routes;
     }
@@ -123,24 +137,24 @@ export abstract class LocalizeParser {
   translateRoutes(language: string): Observable<any> {
     return new Observable<any>((observer: Observer<any>) => {
       this._cachedLang = language;
-      if (this.routes.length > 1 && (this.locales.length > 1 || this.settings.alwaysSetPrefix)) {
-        this.routes[1].path = language;
+      if (this._languageRoute && (this.locales.length > 1 || this.settings.alwaysSetPrefix)) {
+        this._languageRoute.path = language;
       }
 
       this.translate.use(language).subscribe((translations: any) => {
-        this.translationObject = translations;
+        this._translationObject = translations;
         this.currentLang = language;
 
         // if no prefixes used
         if (this.locales.length === 1 && !this.settings.alwaysSetPrefix) {
           this._translateRouteTree(this.routes);
         } else {
-          if (this.routes.length > 1) {
-            this._translateRouteTree(this.routes[1].children);
+          if (this._languageRoute) {
+            this._translateRouteTree(this._languageRoute.children);
           }
           // if there is wildcard route
-          if (this.routes.length > 2 && this.routes[2].redirectTo) {
-            this._translateProperty(this.routes[2], 'redirectTo', true);
+          if (this._wildcardRoute && this._wildcardRoute.redirectTo) {
+            this._translateProperty(this._wildcardRoute, 'redirectTo', true);
           }
         }
 
@@ -339,10 +353,10 @@ export abstract class LocalizeParser {
    * @returns {any}
    */
   private translateText(key: string): string {
-    if (!this.translationObject) {
+    if (!this._translationObject) {
       return key;
     }
-    let res = this.translationObject[this.prefix + key];
+    let res = this._translationObject[this.prefix + key];
     return res || key;
   }
 }

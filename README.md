@@ -18,6 +18,7 @@ Demo project can be found [here](https://github.com/meeroslav/localize-router-ex
         - [Manual initialization](#manual-initialization)
         - [Server side initialization](#server-side-initialization)
     - [How it works](#how-it-works)
+        - [excluding-routes](#excluding-routes)
         - [ngx-translate integration](#ngx-translate-integration)
     - [Pipe](#pipe)
     - [Service](#service)
@@ -211,6 +212,19 @@ If no language is provided in the url path, application uses:
 Make sure you therefore place most common language (e.g. 'en') as a first string in the array of locales.
 
 > Note that `localize-router` does not redirect routes like `my/route` to translated ones e.g. `en/my/route`. All routes are prepended by currently selected language so route without language is unknown to Router.
+
+#### Excluding routes
+
+Sometimes you might have a need to have certain routes excluded from the localization process e.g. login page, registration page etc. This is possible by setting flag `skipRouteLocalization` on route's data object.
+
+```typescript
+let routes = [
+  // this route gets localized
+  { path: 'home', component: HomeComponent },
+  // this route will not be localized
+  { path: 'login', component: LoginComponent, data: { skipRouteLocalization: true } }
+];
+```
 
 #### ngx-translate integration
 
