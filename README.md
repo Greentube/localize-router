@@ -226,6 +226,9 @@ let routes = [
 ];
 ```
 
+Note that this flag should only be set on root routes. By excluding root route, all its sub routes are automatically excluded.
+Setting this flag on sub route has no effect as parent route would already have or have not language prefix.
+
 #### ngx-translate integration
 
 `LocalizeRouter` depends on `ngx-translate` core service and automatically initializes it with selected locales.
