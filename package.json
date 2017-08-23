@@ -1,13 +1,13 @@
 {
   "name": "localize-router",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-alpha.2",
   "description": "An implementation of routes localization for Angular 2",
   "scripts": {
     "test": "karma start",
     "test-watch": "karma start --singleRun=false --autoWatch=true",
     "commit": "npm run prepublish && npm test",
     "prepublish": "ngc && npm run build",
-    "build": "webpack && node copy.js"
+    "build": "webpack"
   },
   "repository": {
     "type": "git",

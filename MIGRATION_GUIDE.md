@@ -17,37 +17,53 @@ In some cases your local `node_modules` might get in broken state in which case 
 
 3. The module initialization `forRoot` method has changed a bit. Instead of loader, it expects an object of parameters. 
 
-    ```typescript
+    ```ts
+    import { Http } from '@angular/http';
+    import { TranslateService } from '@ngx-translate/core';
+    import { Location } from '@angular/common';
+    import { LocalizeRouterModule, LocalizeParser, StaticParserLoader } from 'localize-router';
+
     LocalizeRouterModule.forRoot(routes, {
       provide: LocalizeParser, 
       useFactory: (translate, location, http) => 
-          new StaticParserLoader(translate, location, http, 'your/path/to/config.json'), 
+        new StaticParserLoader(translate, location, http, 'your/path/to/config.json'), 
       deps: [TranslateService, Location, Http]
     })
     ```
 
     Is now:
 
-    ```typescript
+    ```ts
+    import { Http } from '@angular/http';
+    import { TranslateService } from '@ngx-translate/core';
+    import { Location } from '@angular/common';
+    import { LocalizeRouterModule, LocalizeParser, StaticParserLoader, LocalizeRouterSettings } from 'localize-router';
+
     LocalizeRouterModule.forRoot(routes, {
       parser: { 
-          provide: LocalizeParser, 
-          useFactory: (translate, location, settings, http) => 
-              new StaticParserLoader(translate, location, settings, http, 'your/path/to/config.json'), 
-          deps: [TranslateService, Location, LocalizeRouterSettings, Http] 
+        provide: LocalizeParser, 
+        useFactory: (translate, location, settings, http) => 
+          new StaticParserLoader(translate, location, settings, http, 'your/path/to/config.json'), 
+        deps: [TranslateService, Location, LocalizeRouterSettings, Http] 
       }
     })
     ```
 
     You can now also provide additional settings regarding url prefixes and default language cache mechanisms:
 
-    ```typescript
-    LocalizeRouterModule.forRoot({
-        useCachedLang: { provide: USE_CACHED_LANG, useValue: booleanValue },
-        alwaysSetPrefix: { provide: ALWAYS_SET_PREFIX, useValue: booleanValue },
-        cacheName: { provide: CACHE_NAME, useValue: stringValue },
-        cacheMechanism: { provide: CACHE_MECHANISM, useValue: typeOfCacheMechanism },
-        defaultLangFunction: { provide: DEFAULT_LANG_FUNCTION, useValue: typeOfDefaultLanguageFunction },
+    ```ts
+    LocalizeRouterModule.forRoot(routes, {
+      parser: { 
+        provide: LocalizeParser, 
+        useFactory: (translate, location, settings, http) => 
+          new StaticParserLoader(translate, location, settings, http, 'your/path/to/config.json'), 
+        deps: [TranslateService, Location, LocalizeRouterSettings, Http] 
+      },
+      useCachedLang: { provide: USE_CACHED_LANG, useValue: booleanValue },
+      alwaysSetPrefix: { provide: ALWAYS_SET_PREFIX, useValue: booleanValue },
+      cacheName: { provide: CACHE_NAME, useValue: stringValue },
+      cacheMechanism: { provide: CACHE_MECHANISM, useValue: typeOfCacheMechanism },
+      defaultLangFunction: { provide: DEFAULT_LANG_FUNCTION, useValue: typeOfDefaultLanguageFunction },
     })
     ```
 
