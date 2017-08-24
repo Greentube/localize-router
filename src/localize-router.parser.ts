@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { Http, Response } from '@angular/http';
 import { Routes, Route } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Observable } from 'rxjs/Observable';
@@ -11,14 +10,6 @@ import 'rxjs/add/operator/share';
 import { CacheMechanism, LocalizeRouterSettings } from './localize-router.config';
 
 const COOKIE_EXPIRY = 30; // 1 month
-
-/**
- * Config interface
- */
-export interface ILocalizeRouterParserConfig {
-  locales: Array<string>;
-  prefix?: string;
-}
 
 /**
  * Abstract class for parsing localization
@@ -64,7 +55,7 @@ export abstract class LocalizeParser {
 
     this.routes = routes;
 
-    if (!this.locales.length) {
+    if (!this.locales || !this.locales.length) {
       return Promise.resolve();
     }
     /** detect current language */
@@ -396,44 +387,10 @@ export class ManualParserLoader extends LocalizeParser {
   }
 }
 
-/**
- * Load configuration from server
- */
-export class StaticParserLoader extends LocalizeParser {
-  private _dataLoaded: boolean;
-
-  /**
-   * CTOR
-   * @param translate
-   * @param location
-   * @param settings
-   * @param http
-   * @param path
-   */
-  constructor(translate: TranslateService, location: Location, settings: LocalizeRouterSettings, private http: Http, private path: string = 'assets/locales.json') {
-    super(translate, location, settings);
-    this._dataLoaded = false;
-  }
-
-  /**
-   * Initialize or append routes
-   * @param routes
-   * @returns {Promise<any>}
-   */
+export class DummyLocalizeParser extends LocalizeParser {
   load(routes: Routes): Promise<any> {
     return new Promise((resolve: any) => {
-      if (this._dataLoaded) {
-        this.init(routes).then(resolve);
-      } else {
-        this.http.get(`${this.path}`)
-          .map((res: Response) => res.json())
-          .subscribe((data: ILocalizeRouterParserConfig) => {
-            this._dataLoaded = true;
-            this.locales = data.locales;
-            this.prefix = data.prefix || '';
-            this.init(routes).then(resolve);
-          });
-      }
+      this.init(routes).then(resolve);
     });
   }
 }

@@ -12,8 +12,7 @@ Demo project can be found [here](https://github.com/meeroslav/localize-router-ex
 - [Installation](#installation)
 - [Usage](#usage)
     - [Initialize module](#initialize-module)
-        - [Static initialization](#static-initialization)
-        - [JSON config file](#json-config-file)
+        - [Http loader](#http-loader)
         - [Initialization config](#initialization-config)
         - [Manual initialization](#manual-initialization)
         - [Server side initialization](#server-side-initialization)
@@ -46,42 +45,42 @@ In order to use `localize-router` you must initialize it with following informat
 ### Initialize module
 Module can be initialized either using static file or manually by passing necessary values.
 
-#### Static initialization
+#### Http loader
+
+In order to use Http loader for config files, you must include `localize-router-http-loader` package and use its `LocalizeRouterHttpLoader`. 
+
 ```ts
 import {BrowserModule} from "@angular/platform-browser";
 import {NgModule} from '@angular/core';
 import {HttpModule} from '@angular/http';
 import {TranslateModule} from '@ngx-translate/core';
-import {LocalizeRouterModule} from 'localize-router/localize-router';
+import {LocalizeRouterModule} from 'localize-router';
+import {LocalizeRouterHttpLoader} from 'localize-router-http-loader';
 import {RouterModule} from '@angular/router';
 
 import {routes} from './app.routes';
 
 @NgModule({
-    imports: [
-        BrowserModule,
-        HttpModule,
-        TranslateModule.forRoot(),
-        LocalizeRouterModule.forRoot(routes),
-        RouterModule.forRoot(routes)
-    ],
-    bootstrap: [AppComponent]
+  imports: [
+    BrowserModule,
+    HttpModule,
+    TranslateModule.forRoot(),
+    LocalizeRouterModule.forRoot(routes, {
+      parser: {
+        provide: LocalizeParser,
+        useFactory: (translate, location, settings, http) =>
+            new LocalizeRouterHttpLoader(translate, location, settings, http),
+        deps: [TranslateService, Location, LocalizeRouterSettings, Http]
+      }
+    }),
+    RouterModule.forRoot(routes)
+  ],
+  bootstrap: [AppComponent]
 })
 export class AppModule { }
 ```
 
-Static file's default path is `assets/locales.json`. You can override the path by calling `StaticParserLoader` on you own:
-```ts
-LocalizeRouterModule.forRoot(routes, {
-    parser: {
-        provide: LocalizeParser,
-        useFactory: (translate, location, settings, http) =>
-            new StaticParserLoader(translate, location, settings, http, 'your/path/to/config.json'),
-        deps: [TranslateService, Location, LocalizeRouterSettings, Http]
-    }
-})
-
-```
+More details are available on [localize-router-http-loader](https://github.com/Greentube/localize-router-http-loader).
 
 If you are using child modules or routes you need to initialize them with `forChild` command:
 ```ts
@@ -96,41 +95,22 @@ If you are using child modules or routes you need to initialize them with `forCh
 export class ChildModule { }
 ```
 
-#### JSON config file
-JSON config file has following structure:
-```
-{
-    "locales": ["en", "de", ...],
-    "prefix": "MY_PREFIX"
-}
-```
-
-```ts
-interface ILocalizeRouterParserConfig {
-    locales: Array<string>;
-    prefix?: string;
-}
-```
-
-Prefix field is not mandatory and default value is empty string.
-
 #### Initialization config
 Apart from providing routes which are mandatory, and parser loader you can provide additional configuration for more granular setting of `localize router`. More information at [LocalizeRouterConfig](#localizerouterconfig). 
 
 
 #### Manual initialization
-With manual initialization you need to provide information directly:
-```ts
-LocalizeRouterModule.forRoot(routes, {
-    parser: {
-        provide: LocalizeParser,
-        useFactory: (translate, location, settigns) =>
-            new ManualParserLoader(translate, location, settings, ['en','de',...], 'YOUR_PREFIX'),
-        deps: [TranslateService, Location, LocalizeRouterSettings]
-    }
-})
-
-```
+   With manual initialization you need to provide information directly:
+   ```ts
+   LocalizeRouterModule.forRoot(routes, {
+       parser: {
+           provide: LocalizeParser,
+           useFactory: (translate, location, settigns) =>
+               new ManualParserLoader(translate, location, settings, ['en','de',...], 'YOUR_PREFIX'),
+           deps: [TranslateService, Location, LocalizeRouterSettings]
+       }
+   })
+   ```
 
 #### Server side initialization
 In order to use server side initialization in isomorphic/universal projects you need to create loader similar to this:
@@ -153,7 +133,6 @@ export class LocalizeUniversalLoader extends LocalizeParser {
 export function localizeLoaderFactory(translate: TranslateService, location: Location, settings: LocalizeRouterSettings) {
   return new LocalizeUniversalLoader(translate, location, settings);
 }
-
 ```
 
 Don't forget to create similar loader for `ngx-translate` as well:
@@ -217,7 +196,7 @@ Make sure you therefore place most common language (e.g. 'en') as a first string
 
 Sometimes you might have a need to have certain routes excluded from the localization process e.g. login page, registration page etc. This is possible by setting flag `skipRouteLocalization` on route's data object.
 
-```typescript
+```ts
 let routes = [
   // this route gets localized
   { path: 'home', component: HomeComponent },
