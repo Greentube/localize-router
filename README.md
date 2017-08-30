@@ -105,7 +105,7 @@ Apart from providing routes which are mandatory, and parser loader you can provi
    LocalizeRouterModule.forRoot(routes, {
        parser: {
            provide: LocalizeParser,
-           useFactory: (translate, location, settigns) =>
+           useFactory: (translate, location, settings) =>
                new ManualParserLoader(translate, location, settings, ['en','de',...], 'YOUR_PREFIX'),
            deps: [TranslateService, Location, LocalizeRouterSettings]
        }

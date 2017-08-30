@@ -86,7 +86,7 @@ export class LocalizeRouterService {
     let result: any[] = [];
     (path as Array<any>).forEach((segment: any, index: number) => {
       if (typeof segment === 'string') {
-        let res = this.parser.translateRoute(segment);
+        const res = this.parser.translateRoute(segment);
         if (!index && !segment.indexOf('/')) {
           result.push(`/${this.parser.urlPrefix}${res}`);
         } else {

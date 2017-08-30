@@ -490,4 +490,30 @@ describe('LocalizeParser', () => {
     expect(routes[2]).toEqual({ path: 'about', data: { skipRouteLocalization: true } });
   }));
 
+  it('should translate route', fakeAsync(() => {
+    loader = new ManualParserLoader(translate, location, settings, locales, prefix);
+    spyOn(loader, 'translateRoutes').and.callThrough();
+    localStorage.setItem('LOCALIZE_DEFAULT_LANGUAGE', 'en');
+
+    routes = [{ path: 'home', component: DummyComponent }];
+    loader.load(routes);
+    tick();
+
+    expect(routes[0].children[0].path).toEqual('home_en');
+    expect(loader.translateRoute('home/whatever')).toEqual('home_en/whatever');
+  }));
+  it('should keep query params while translate route', fakeAsync(() => {
+    loader = new ManualParserLoader(translate, location, settings, locales, prefix);
+    spyOn(loader, 'translateRoutes').and.callThrough();
+    localStorage.setItem('LOCALIZE_DEFAULT_LANGUAGE', 'en');
+
+    routes = [{ path: 'home', component: DummyComponent }];
+    loader.load(routes);
+    tick();
+
+    expect(routes[0].children[0].path).toEqual('home_en');
+    expect(loader.translateRoute('home/whatever?test=123')).toEqual('home_en/whatever?test=123');
+    expect(loader.translateRoute('home?test=123')).toEqual('home_en?test=123');
+    expect(() => loader.translateRoute('home?test=123?test=123')).toThrow();
+  }));
 });

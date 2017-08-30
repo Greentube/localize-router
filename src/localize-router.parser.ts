@@ -213,10 +213,17 @@ export abstract class LocalizeParser {
    * @returns {string}
    */
   translateRoute(path: string): string {
-    let pathSegments = path.split('/');
+    let queryParts = path.split('?');
+    if (queryParts.length > 2) {
+      throw 'There should be only one query parameter block in the URL';
+    }
+    let pathSegments = queryParts[0].split('/');
 
     /** collect observables  */
-    return pathSegments.map((part: string) => part.length ? this.translateText(part) : part).join('/');
+    return pathSegments
+      .map((part: string) => part.length ? this.translateText(part) : part)
+      .join('/') +
+      (queryParts.length > 1 ? `?${queryParts[1]}` : '');
   }
 
   /**
