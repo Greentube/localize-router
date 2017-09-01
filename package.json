@@ -1,7 +1,7 @@
 {
   "name": "localize-router",
   "version": "1.0.0-rc.0",
-  "description": "An implementation of routes localization for Angular 2",
+  "description": "An implementation of routes localization for Angular",
   "scripts": {
     "test": "karma start",
     "test-watch": "karma start --singleRun=false --autoWatch=true",
