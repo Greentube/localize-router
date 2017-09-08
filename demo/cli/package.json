@@ -24,7 +24,7 @@
     "@ngx-translate/http-loader": "^1.0.2",
     "core-js": "^2.4.1",
     "localize-router": "1.0.0-rc.0",
-    "localize-router-http-loader": "1.0.0",
+    "localize-router-http-loader": "1.0.1",
     "rxjs": "^5.1.0",
     "zone.js": "^0.8.4"
   },
