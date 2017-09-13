@@ -273,7 +273,6 @@ export function localizeLoaderFactory(translate: TranslateService, location: Loc
 - `useCachedLang`: boolean. Flag whether default language should be cached. Default value is `true`.
 - `alwaysSetPrefix`: boolean. Flag whether language should always prefix the url. Default value is `true`.  
   When value is `false`, prefix will not be used for for default language (this includes the situation when there is only one language).
-- `prefixDefaultLanguage`: boolean. Flag whether default language should be prefixed or not. In order to maintain constant default language, specifying`defaultLangFunction` is recommended. Default value is `true`.
 - `cacheMechanism`: CacheMechanism.LocalStorage || CacheMechanism.Cookie. Default value is `CacheMechanism.LocalStorage`.
 - `cacheName`: string. Name of cookie/local store. Default value is `LOCALIZE_DEFAULT_LANGUAGE`.
 - `defaultLangFunction`: (languages: string[], cachedLang?: string, browserLang?: string) => string. Override method for custom logic for picking default language, when no language is provided via url. Default value is `undefined`.
