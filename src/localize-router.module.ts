@@ -1,27 +1,19 @@
 import {
-  NgModule, ModuleWithProviders, APP_INITIALIZER, Provider, InjectionToken, Optional, SkipSelf,
+  NgModule, ModuleWithProviders, APP_INITIALIZER, Optional, SkipSelf,
   Injectable, Injector
 } from '@angular/core';
-import { HttpModule, Http } from '@angular/http';
 import { LocalizeRouterService } from './localize-router.service';
-import { LocalizeParser, RAW_ROUTES, StaticParserLoader, DefaultStorageKey } from './localize-router.parser';
+import { DummyLocalizeParser, LocalizeParser } from './localize-router.parser';
 import { RouterModule, Routes } from '@angular/router';
 import { LocalizeRouterPipe } from './localize-router.pipe';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { Location, CommonModule } from '@angular/common';
-
-export const LOCALIZE_ROUTER_FORROOT_GUARD = new InjectionToken('LOCALIZE_ROUTER_FORROOT_GUARD');
-
-/**
- * Helper function for loading external parser
- * @param translate
- * @param location
- * @param http
- * @returns {StaticParserLoader}
- */
-export function localizeLoaderFactory(translate: TranslateService, location: Location, storageKey: string, http: Http) {
-  return new StaticParserLoader(translate, location, storageKey, http);
-}
+import { TranslateModule } from '@ngx-translate/core';
+import { CommonModule } from '@angular/common';
+import {
+  ALWAYS_SET_PREFIX,
+  CACHE_MECHANISM, CACHE_NAME, DEFAULT_LANG_FUNCTION, LOCALIZE_ROUTER_FORROOT_GUARD, LocalizeRouterConfig, LocalizeRouterSettings,
+  RAW_ROUTES,
+  USE_CACHED_LANG
+} from './localize-router.config';
 
 @Injectable()
 export class ParserInitializer {
@@ -71,18 +63,13 @@ export function getAppInitializer(p: ParserInitializer, parser: LocalizeParser, 
 }
 
 @NgModule({
-  imports: [HttpModule, CommonModule, RouterModule, TranslateModule],
+  imports: [CommonModule, RouterModule, TranslateModule],
   declarations: [LocalizeRouterPipe],
   exports: [LocalizeRouterPipe]
 })
 export class LocalizeRouterModule {
 
-  static forRoot(routes: Routes,
-    localizeLoader: Provider = {
-      provide: LocalizeParser,
-      useFactory: localizeLoaderFactory,
-      deps: [TranslateService, Location, DefaultStorageKey, Http]
-    }): ModuleWithProviders {
+  static forRoot(routes: Routes, config: LocalizeRouterConfig = {}): ModuleWithProviders {
     return {
       ngModule: LocalizeRouterModule,
       providers: [
@@ -91,12 +78,18 @@ export class LocalizeRouterModule {
           useFactory: provideForRootGuard,
           deps: [[LocalizeRouterModule, new Optional(), new SkipSelf()]]
         },
+        { provide: USE_CACHED_LANG, useValue: config.useCachedLang },
+        { provide: ALWAYS_SET_PREFIX, useValue: config.alwaysSetPrefix },
+        { provide: CACHE_NAME, useValue: config.cacheName },
+        { provide: CACHE_MECHANISM, useValue: config.cacheMechanism },
+        { provide: DEFAULT_LANG_FUNCTION, useValue: config.defaultLangFunction },
+        LocalizeRouterSettings,
+        config.parser || { provide: LocalizeParser, useClass: DummyLocalizeParser },
         {
           provide: RAW_ROUTES,
           multi: true,
           useValue: routes
         },
-        localizeLoader,
         LocalizeRouterService,
         ParserInitializer,
         {

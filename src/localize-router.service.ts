@@ -80,15 +80,15 @@ export class LocalizeRouterService {
   translateRoute(path: string | any[]): string | any[] {
     if (typeof path === 'string') {
       let result = this.parser.translateRoute(path);
-      return !path.indexOf('/') ? `/${this.parser.currentLang}${result}` : result;
+      return !path.indexOf('/') ? `/${this.parser.urlPrefix}${result}` : result;
     }
     // it's an array
     let result: any[] = [];
     (path as Array<any>).forEach((segment: any, index: number) => {
       if (typeof segment === 'string') {
-        let res = this.parser.translateRoute(segment);
+        const res = this.parser.translateRoute(segment);
         if (!index && !segment.indexOf('/')) {
-          result.push(`/${this.parser.currentLang}${res}`);
+          result.push(`/${this.parser.urlPrefix}${res}`);
         } else {
           result.push(res);
         }

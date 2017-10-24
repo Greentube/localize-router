@@ -1,20 +1,29 @@
-import {XHRBackend} from '@angular/http';
-import {Injector, ChangeDetectorRef} from '@angular/core';
-import {getTestBed, TestBed} from '@angular/core/testing';
-import {MockConnection, MockBackend} from '@angular/http/testing';
-import {Subject} from 'rxjs/Subject';
-import {LocalizeRouterPipe} from '../src/localize-router.pipe';
-import {LocalizeRouterService} from '../src/localize-router.service';
+import { LocalizeRouterPipe } from '../src/localize-router.pipe';
+import { LocalizeRouterService } from '../src/localize-router.service';
+import { Injector, ChangeDetectorRef } from '@angular/core';
+import { getTestBed, TestBed } from '@angular/core/testing';
+import { Subject } from 'rxjs/Subject';
 
 class FakeChangeDetectorRef extends ChangeDetectorRef {
-  markForCheck(): void {  }
-  detach(): void {  }
-  detectChanges(): void {  }
-  checkNoChanges(): void {  }
-  reattach(): void {  }
+  markForCheck(): void {
+  }
+
+  detach(): void {
+  }
+
+  detectChanges(): void {
+  }
+
+  checkNoChanges(): void {
+  }
+
+  reattach(): void {
+  }
 }
 
-class DummyLocalizeParser { currentLang: string; }
+class DummyLocalizeParser {
+  currentLang: string;
+}
 
 class FakeLocalizeRouterService {
   routerEvents: Subject<string> = new Subject<string>();
@@ -31,9 +40,7 @@ class FakeLocalizeRouterService {
 
 describe('LocalizeRouterPipe', () => {
   let injector: Injector;
-  let backend: MockBackend;
   let localize: LocalizeRouterService;
-  let connection: MockConnection; // this will be set when a new connection is emitted from the backend.
   let localizePipe: LocalizeRouterPipe;
   let ref: any;
 
@@ -41,15 +48,11 @@ describe('LocalizeRouterPipe', () => {
     TestBed.configureTestingModule({
       declarations: [LocalizeRouterPipe],
       providers: [
-        {provide: XHRBackend, useClass: MockBackend},
-        {provide: LocalizeRouterService, useClass: FakeLocalizeRouterService}
+        { provide: LocalizeRouterService, useClass: FakeLocalizeRouterService }
       ]
     });
     injector = getTestBed();
-    backend = <any>injector.get(XHRBackend);
     localize = injector.get(LocalizeRouterService);
-    // sets the connection when someone tries to access the backend with an xhr request
-    backend.connections.subscribe((c: MockConnection) => connection = c);
 
     ref = new FakeChangeDetectorRef();
     localizePipe = new LocalizeRouterPipe(localize, ref);
@@ -57,9 +60,7 @@ describe('LocalizeRouterPipe', () => {
 
   afterEach(() => {
     injector = undefined;
-    backend = undefined;
     localize = undefined;
-    connection = undefined;
     localizePipe = undefined;
     ref = undefined;
   });

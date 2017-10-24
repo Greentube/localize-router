@@ -1,16 +1,16 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Http, HttpModule } from '@angular/http';
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 import { HomeModule } from './home/home.module';
-import {UsersModule} from "./users/users.module";
+import { UsersModule } from "./users/users.module";
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 
-export function HttpLoaderFactory(http: Http) {
+export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http, '/assets/locales/', '.json');
 }
 
@@ -20,13 +20,13 @@ export function HttpLoaderFactory(http: Http) {
   ],
   imports: [
     BrowserModule,
+    HttpClientModule,
     FormsModule,
-    HttpModule,
     TranslateModule.forRoot({
       loader: {
         provide: TranslateLoader,
         useFactory: HttpLoaderFactory,
-        deps: [ Http ]
+        deps: [ HttpClient ]
       }
     }),
     // feature modules
@@ -34,7 +34,6 @@ export function HttpLoaderFactory(http: Http) {
     UsersModule,
     AppRoutingModule
   ],
-  providers: [],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

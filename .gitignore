@@ -13,7 +13,6 @@ coverage/
 # overrides for js
 !config/*
 !demo/cli/*js
-!copy.js
 !karma.conf.js
 !webpack.config.js
 
@@ -47,4 +46,5 @@ Desktop.ini
 ############
 
 .DS_Store
+package-lock.json
 
