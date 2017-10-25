@@ -11,7 +11,7 @@ import { CommonModule } from '@angular/common';
 import {
   ALWAYS_SET_PREFIX,
   CACHE_MECHANISM, CACHE_NAME, DEFAULT_LANG_FUNCTION, LOCALIZE_ROUTER_FORROOT_GUARD, LocalizeRouterConfig, LocalizeRouterSettings,
-  RAW_ROUTES,
+  RAW_ROUTES, SUPPORTED_LOCALES, LOCALE_PREFIX,
   USE_CACHED_LANG
 } from './localize-router.config';
 
@@ -83,6 +83,8 @@ export class LocalizeRouterModule {
         { provide: CACHE_NAME, useValue: config.cacheName },
         { provide: CACHE_MECHANISM, useValue: config.cacheMechanism },
         { provide: DEFAULT_LANG_FUNCTION, useValue: config.defaultLangFunction },
+        { provide: SUPPORTED_LOCALES, useValue: config.supportedLocales },
+        { provide: LOCALE_PREFIX, useValue: config.localePrefix },
         LocalizeRouterSettings,
         config.parser || { provide: LocalizeParser, useClass: DummyLocalizeParser },
         {

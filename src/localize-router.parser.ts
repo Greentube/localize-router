@@ -373,13 +373,15 @@ export class ManualParserLoader extends LocalizeParser {
    * @param translate
    * @param location
    * @param settings
-   * @param locales
-   * @param prefix
    */
-  constructor(translate: TranslateService, location: Location, settings: LocalizeRouterSettings, locales: Array<string> = ['en'], prefix: string = 'ROUTES.') {
+  constructor(
+    translate: TranslateService,
+    location: Location,
+    settings: LocalizeRouterSettings,
+  ) {
     super(translate, location, settings);
-    this.locales = locales;
-    this.prefix = prefix || '';
+    this.locales = settings.supportedLocales;
+    this.prefix = settings.localePrefix || '';
   }
 
   /**
