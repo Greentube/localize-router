@@ -295,7 +295,9 @@ localizeService.translateRoute('/'); // -> e.g. '/en'
 localizeService.translateRoute('/about'); // -> '/de/uber' (e.g. for German language)
 localizeService.translateRoute('about'); // -> 'uber' (e.g. for German language)
 ```
-- `changeLanguage(lang: string)`: Translates current url to given language and changes the application's language
+- `changeLanguage(lang: string, extras?: NavigationExtras, useNavigateMethod?: boolean)`: Translates current url to given language and changes the application's language.
+`extras` will be passed down to Angular Router navigation methods.
+`userNavigateMethod` tells localize-router to use `navigate` rather than `navigateByUrl` method.  
 For german language and route defined as `:lang/users/:user_name/profile`
 ```
 yoursite.com/en/users/John%20Doe/profile -> yoursite.com/de/benutzer/John%20Doe/profil

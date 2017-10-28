@@ -35,13 +35,20 @@ export class LocalizeRouterService {
    * Change language and navigate to translated route
    * @param lang
    * @param extras
+   * @param useNavigateMethod
    */
-  changeLanguage(lang: string, extras?: NavigationExtras): void {
+  changeLanguage(lang: string, extras?: NavigationExtras, useNavigateMethod?: boolean): void {
     if (lang !== this.parser.currentLang) {
       let rootSnapshot: ActivatedRouteSnapshot = this.router.routerState.snapshot.root;
 
       this.parser.translateRoutes(lang).subscribe(() => {
-        this.router.navigateByUrl(this.traverseRouteSnapshot(rootSnapshot), extras);
+        const url = this.traverseRouteSnapshot(rootSnapshot);
+        
+        if (useNavigateMethod) {
+          this.router.navigate([url], extras);
+        } else {
+          this.router.navigateByUrl(url, extras);
+        }
       });
     }
   }
