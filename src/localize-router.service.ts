@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Router, NavigationStart, ActivatedRouteSnapshot, NavigationExtras } from '@angular/router';
+import { Router, NavigationStart, ActivatedRouteSnapshot, NavigationExtras, Route } from '@angular/router';
 import { Subject } from 'rxjs/Subject';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/forkJoin';
@@ -125,8 +125,8 @@ export class LocalizeRouterService {
       // This value does not exist in Router before version 4
       // so we have to find it indirectly
       if (event.toString().match(/RouteConfigLoadEnd/)) {
-        Observable.of(event.route).toPromise().then(function (route) {
-          self.parser.initChildRoutes(route._loadedConfig.routes);
+        Observable.of(event.route).toPromise().then(function (route: Route) {
+          self.parser.initChildRoutes((<any>route)._loadedConfig.routes);
         });
       }
     };
