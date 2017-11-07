@@ -1,4 +1,4 @@
-import { NgModule }             from '@angular/core';
+import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { LocalizeRouterModule, LocalizeRouterSettings, LocalizeParser } from 'localize-router';
 import { LocalizeRouterHttpLoader } from 'localize-router-http-loader';

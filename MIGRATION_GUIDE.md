@@ -1,6 +1,8 @@
 # Migration guide from localize-router 0.x.x to 1.x.x
 
 The 1.0.0 release is introducing a few breaking changes.
+The biggest change is limit of Angular to at least version 4 due to use of newly introduced `InjectionToken` instead of `OpaqueToken`.
+
 This guide is provided to make the transition as painless as possible.
 
 Steps to migrate your code are:
@@ -10,7 +12,8 @@ Steps to migrate your code are:
 
 Here is a detailed list of the changes that you need to make:
 
-1. Update in your package.json `localize-router` to the latest 1.x version ([check the current release here](https://github.com/Greentube/localize-router/releases)).
+1. Update in your package.json `localize-router` to the latest 1.x version ([check the current release here](https://github.com/Greentube/localize-router/releases)). Update `ngx-translate` to at least version `8.0.0`.
+    
 
 2. If you were using `StaticParserLoader` you need to install [LocalizeRouterHttpLoader](https://github.com/Greentube/localize-router-http-loader):
 
