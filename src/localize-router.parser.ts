@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Routes, Route } from '@angular/router';
+import { Location } from '@angular/common';
 import { TranslateService } from '@ngx-translate/core';
 import { Observable } from 'rxjs/Observable';
 import { Observer } from 'rxjs/Observer';
-import { Location } from '@angular/common';
 import 'rxjs/add/observable/forkJoin';
 import 'rxjs/add/operator/toPromise';
 import 'rxjs/add/operator/share';
@@ -373,13 +373,15 @@ export class ManualParserLoader extends LocalizeParser {
    * @param translate
    * @param location
    * @param settings
-   * @param locales
-   * @param prefix
    */
-  constructor(translate: TranslateService, location: Location, settings: LocalizeRouterSettings, locales: Array<string> = ['en'], prefix: string = 'ROUTES.') {
+  constructor(
+    translate: TranslateService,
+    location: Location,
+    settings: LocalizeRouterSettings,
+  ) {
     super(translate, location, settings);
-    this.locales = locales;
-    this.prefix = prefix || '';
+    this.locales = settings.supportedLocales;
+    this.prefix = settings.localePrefix || '';
   }
 
   /**

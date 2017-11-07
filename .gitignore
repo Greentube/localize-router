@@ -46,4 +46,5 @@ Desktop.ini
 ############
 
 .DS_Store
+package-lock.json
 

@@ -1,16 +1,16 @@
-import { Inject, OpaqueToken, Provider } from '@angular/core';
+import { Inject, InjectionToken, Provider } from '@angular/core';
 
 /**
  * Guard to make sure we have single initialization of forRoot
- * @type {OpaqueToken<LocalizeRouterModule>}
+ * @type {InjectionToken<LocalizeRouterModule>}
  */
-export const LOCALIZE_ROUTER_FORROOT_GUARD = new OpaqueToken('LOCALIZE_ROUTER_FORROOT_GUARD');
+export const LOCALIZE_ROUTER_FORROOT_GUARD = new InjectionToken('LOCALIZE_ROUTER_FORROOT_GUARD');
 
 /**
  * Static provider for keeping track of routes
- * @type {OpaqueToken<Routes[]>}
+ * @type {InjectionToken<Routes[]>}
  */
-export const RAW_ROUTES = new OpaqueToken('RAW_ROUTES');
+export const RAW_ROUTES = new InjectionToken('RAW_ROUTES');
 
 /**
  * Type for Caching of default language
@@ -27,19 +27,31 @@ export namespace CacheMechanism {
 
 /**
  * Boolean to indicate whether to use cached language value
- * @type {OpaqueToken<boolean>}
+ * @type {InjectionToken<boolean>}
  */
-export const USE_CACHED_LANG = new OpaqueToken('USE_CACHED_LANG');
+export const USE_CACHED_LANG = new InjectionToken('USE_CACHED_LANG');
 /**
  * Cache mechanism type
- * @type {OpaqueToken<CacheMechanism>}
+ * @type {InjectionToken<CacheMechanism>}
  */
-export const CACHE_MECHANISM = new OpaqueToken('CACHE_MECHANISM');
+export const CACHE_MECHANISM = new InjectionToken('CACHE_MECHANISM');
 /**
  * Cache name
- * @type {OpaqueToken<string>}
+ * @type {InjectionToken<string>}
  */
-export const CACHE_NAME = new OpaqueToken('CACHE_NAME');
+export const CACHE_NAME = new InjectionToken('CACHE_NAME');
+
+/**
+ * Static provider for keeping track of supported locales
+ * @type {InjectionToken<string[]>}
+ */
+export const SUPPORTED_LOCALES = new InjectionToken('SUPPORTED_LOCALES');
+
+/**
+ * Static provider for keeping track of prefix
+ * @type {InjectionToken<string>}
+ */
+export const LOCALE_PREFIX = new InjectionToken('LOCALE_PREFIX');
 
 /**
  * Type for default language function
@@ -51,15 +63,15 @@ export interface DefaultLanguageFunction {
 
 /**
  * Function for calculating default language
- * @type {OpaqueToken<DefaultLanguageFunction>}
+ * @type {InjectionToken<DefaultLanguageFunction>}
  */
-export const DEFAULT_LANG_FUNCTION = new OpaqueToken('DEFAULT_LANG_FUNCTION');
+export const DEFAULT_LANG_FUNCTION = new InjectionToken('DEFAULT_LANG_FUNCTION');
 
 /**
  * Boolean to indicate whether prefix should be set for single language scenarios
- * @type {OpaqueToken<boolean>}
+ * @type {InjectionToken<boolean>}
  */
-export const ALWAYS_SET_PREFIX = new OpaqueToken('ALWAYS_SET_PREFIX');
+export const ALWAYS_SET_PREFIX = new InjectionToken('ALWAYS_SET_PREFIX');
 
 /**
  * Config interface for LocalizeRouter
@@ -71,6 +83,8 @@ export interface LocalizeRouterConfig {
   cacheName?: string;
   defaultLangFunction?: DefaultLanguageFunction;
   alwaysSetPrefix?: boolean;
+  supportedLocales?: string[];
+  localePrefix?: string;
 }
 
 const LOCALIZE_CACHE_NAME = 'LOCALIZE_DEFAULT_LANGUAGE';
@@ -83,13 +97,17 @@ export class LocalizeRouterSettings implements LocalizeRouterConfig {
    * @param {CacheMechanism} cacheMechanism
    * @param {string} cacheName
    * @param {DefaultLanguageFunction} defaultLangFunction
+   * @param {string[]} supportedLocales
+   * @param {string} localePrefix
    */
   constructor(
     @Inject(USE_CACHED_LANG) public useCachedLang: boolean = true,
     @Inject(ALWAYS_SET_PREFIX) public alwaysSetPrefix: boolean = true,
     @Inject(CACHE_MECHANISM) public cacheMechanism: CacheMechanism = CacheMechanism.LocalStorage,
     @Inject(CACHE_NAME) public cacheName: string = LOCALIZE_CACHE_NAME,
-    @Inject(DEFAULT_LANG_FUNCTION) public defaultLangFunction: DefaultLanguageFunction = void 0
+    @Inject(DEFAULT_LANG_FUNCTION) public defaultLangFunction: DefaultLanguageFunction = void 0,
+    @Inject(SUPPORTED_LOCALES) public supportedLocales: string[] = ['en'],
+    @Inject(LOCALE_PREFIX) public localePrefix: string = 'ROUTES.',
   ) {
   }
 }
