@@ -46,26 +46,25 @@ export class LocalizeRouterService {
         let url = this.traverseRouteSnapshot(rootSnapshot);
 
         if (!this.settings.alwaysSetPrefix) {
+          var urlSegments = url.split('/');
           //If the default language has no prefix make sure to remove and add it when necessary
-          if (this.parser.currentLang == this.parser.defaultLang) {
+          if (this.parser.currentLang === this.parser.defaultLang) {
             //Remove the language prefix from url when current language is the default language
             if (url.indexOf(this.parser.currentLang + '/') === -1) {
-              var urls = url.split('/');
               //Remove the current aka default language prefix from the url
-              urls = urls.splice(urls.indexOf(this.parser.currentLang), 1);
-              url = urls.join('/');
+              urlSegments = urlSegments.splice(urlSegments.indexOf(this.parser.currentLang), 1);
+              url = urlSegments.join('/');
             }
-          } else if (this.parser.currentLang != this.parser.defaultLang) {
+          } else if (this.parser.currentLang !== this.parser.defaultLang) {
             //When coming from a default language it's possible that the url doesn't contain the language, make sure it does.
             if (url.indexOf(this.parser.currentLang + '/') === -1) {
-              var urls = url.split('/');
               //If the url starts with a slash make sure to keep it.
-              if (urls[0] === '') {
-                urls.splice(1, 0, this.parser.currentLang);
+              if (urlSegments[0] === '') {
+                urlSegments.splice(1, 0, this.parser.currentLang);
               } else {
-                urls.splice(0, 0, this.parser.currentLang);
+                urlSegments.splice(0, 0, this.parser.currentLang);
               }
-              url = urls.join('/');
+              url = urlSegments.join('/');
             }
           }
         }
@@ -85,9 +84,9 @@ export class LocalizeRouterService {
    * @returns {string}
    */
   private traverseRouteSnapshot(snapshot: ActivatedRouteSnapshot): string {
-    if (snapshot.firstChild && snapshot.firstChild.routeConfig && snapshot.firstChild.routeConfig.path && snapshot.firstChild.routeConfig.path != '**') {
+    if (snapshot.firstChild && snapshot.firstChild.routeConfig && snapshot.firstChild.routeConfig.path && snapshot.firstChild.routeConfig.path !== '**') {
       return this.parseSegmentValue(snapshot) + '/' + this.traverseRouteSnapshot(snapshot.firstChild);
-    } else if (snapshot.firstChild && snapshot.firstChild.routeConfig && snapshot.firstChild.routeConfig.path && snapshot.firstChild.routeConfig.path == '**') {
+    } else if (snapshot.firstChild && snapshot.firstChild.routeConfig && snapshot.firstChild.routeConfig.path && snapshot.firstChild.routeConfig.path === '**') {
       return this.parseSegmentValue(snapshot.firstChild);
     }
     return this.parseSegmentValue(snapshot);
@@ -100,10 +99,12 @@ export class LocalizeRouterService {
    */
   private parseSegmentValue(snapshot: ActivatedRouteSnapshot): string {
     if (snapshot.routeConfig) {
-      if (snapshot.routeConfig.path == '**') {
+      if (snapshot.routeConfig.path === '**') {
         let urls = [];
         for (let subPathSegment of snapshot.url) {
-          if (subPathSegment.path) urls.push(subPathSegment.path);
+          if (subPathSegment.path) {
+            urls.push(subPathSegment.path);
+          }
         }
         return urls.join('/');
       } else {
