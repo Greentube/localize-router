@@ -50,7 +50,10 @@ export class LocalizeRouterService {
           if (this.parser.currentLang == this.parser.defaultLang) {
             //Remove the language prefix from url when current language is the default language
             if (url.indexOf(this.parser.currentLang + '/') === -1) {
-              url = url.substring((this.parser.currentLang + '/').length - 1);
+              var urls = url.split('/');
+              //Remove the current aka default language prefix from the url
+              urls = urls.splice(urls.indexOf(this.parser.currentLang), 1);
+              url = urls.join('/');
             }
           } else if (this.parser.currentLang != this.parser.defaultLang) {
             //When coming from a default language it's possible that the url doesn't contain the language, make sure it does.
