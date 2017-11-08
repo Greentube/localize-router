@@ -5,6 +5,7 @@ import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/forkJoin';
 
 import { LocalizeParser } from './localize-router.parser';
+import { LocalizeRouterSettings } from './localize-router.config';
 
 /**
  * Localization service
@@ -19,7 +20,7 @@ export class LocalizeRouterService {
    * @param parser
    * @param router
    */
-  constructor(public parser: LocalizeParser, private router: Router) {
+  constructor(public parser: LocalizeParser, public settings: LocalizeRouterSettings, private router: Router) {
     this.routerEvents = new Subject<string>();
   }
 
@@ -42,8 +43,30 @@ export class LocalizeRouterService {
       let rootSnapshot: ActivatedRouteSnapshot = this.router.routerState.snapshot.root;
 
       this.parser.translateRoutes(lang).subscribe(() => {
-        const url = this.traverseRouteSnapshot(rootSnapshot);
-        
+        let url = this.traverseRouteSnapshot(rootSnapshot);
+
+        if (!this.settings.alwaysSetPrefix) {
+          //If the default language has no prefix make sure to remove and add it when necessary
+          if (this.parser.currentLang == this.parser.defaultLang) {
+            //Remove the language prefix from url when current language is the default language
+            if (url.indexOf(this.parser.currentLang + '/') === -1) {
+              url = url.substring((this.parser.currentLang + '/').length - 1);
+            }
+          } else if (this.parser.currentLang != this.parser.defaultLang) {
+            //When coming from a default language it's possible that the url doesn't contain the language, make sure it does.
+            if (url.indexOf(this.parser.currentLang + '/') === -1) {
+              var urls = url.split('/');
+              //If the url starts with a slash make sure to keep it.
+              if (urls[0] === '') {
+                urls.splice(1, 0, this.parser.currentLang);
+              } else {
+                urls.splice(0, 0, this.parser.currentLang);
+              }
+              url = urls.join('/');
+            }
+          }
+        }
+
         if (useNavigateMethod) {
           this.router.navigate([url], extras);
         } else {
@@ -59,8 +82,10 @@ export class LocalizeRouterService {
    * @returns {string}
    */
   private traverseRouteSnapshot(snapshot: ActivatedRouteSnapshot): string {
-    if (snapshot.firstChild && snapshot.firstChild.routeConfig && snapshot.firstChild.routeConfig.path) {
+    if (snapshot.firstChild && snapshot.firstChild.routeConfig && snapshot.firstChild.routeConfig.path && snapshot.firstChild.routeConfig.path != '**') {
       return this.parseSegmentValue(snapshot) + '/' + this.traverseRouteSnapshot(snapshot.firstChild);
+    } else if (snapshot.firstChild && snapshot.firstChild.routeConfig && snapshot.firstChild.routeConfig.path && snapshot.firstChild.routeConfig.path == '**') {
+      return this.parseSegmentValue(snapshot.firstChild);
     }
     return this.parseSegmentValue(snapshot);
   }
@@ -72,8 +97,16 @@ export class LocalizeRouterService {
    */
   private parseSegmentValue(snapshot: ActivatedRouteSnapshot): string {
     if (snapshot.routeConfig) {
-      let subPathSegments = snapshot.routeConfig.path.split('/');
-      return subPathSegments.map((s: string, i: number) => s.indexOf(':') === 0 ? snapshot.url[i].path : s).join('/');
+      if (snapshot.routeConfig.path == '**') {
+        let urls = [];
+        for (let subPathSegment of snapshot.url) {
+          if (subPathSegment.path) urls.push(subPathSegment.path);
+        }
+        return urls.join('/');
+      } else {
+        let subPathSegments = snapshot.routeConfig.path.split('/');
+        return subPathSegments.map((s: string, i: number) => s.indexOf(':') === 0 ? snapshot.url[i].path : s).join('/');
+      }
     }
     return '';
   }
