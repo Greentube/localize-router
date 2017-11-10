@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Router, NavigationStart, ActivatedRouteSnapshot, NavigationExtras } from '@angular/router';
+import { Router, NavigationStart, ActivatedRouteSnapshot, NavigationExtras, Route } from '@angular/router';
 import { Subject } from 'rxjs/Subject';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/forkJoin';
@@ -35,13 +35,20 @@ export class LocalizeRouterService {
    * Change language and navigate to translated route
    * @param lang
    * @param extras
+   * @param useNavigateMethod
    */
-  changeLanguage(lang: string, extras?: NavigationExtras): void {
+  changeLanguage(lang: string, extras?: NavigationExtras, useNavigateMethod?: boolean): void {
     if (lang !== this.parser.currentLang) {
       let rootSnapshot: ActivatedRouteSnapshot = this.router.routerState.snapshot.root;
 
       this.parser.translateRoutes(lang).subscribe(() => {
-        this.router.navigateByUrl(this.traverseRouteSnapshot(rootSnapshot), extras);
+        const url = this.traverseRouteSnapshot(rootSnapshot);
+        
+        if (useNavigateMethod) {
+          this.router.navigate([url], extras);
+        } else {
+          this.router.navigateByUrl(url, extras);
+        }
       });
     }
   }
@@ -118,8 +125,8 @@ export class LocalizeRouterService {
       // This value does not exist in Router before version 4
       // so we have to find it indirectly
       if (event.toString().match(/RouteConfigLoadEnd/)) {
-        Observable.of(event.route).toPromise().then(function (route) {
-          self.parser.initChildRoutes(route._loadedConfig.routes);
+        Observable.of(event.route).toPromise().then(function (route: Route) {
+          self.parser.initChildRoutes((<any>route)._loadedConfig.routes);
         });
       }
     };

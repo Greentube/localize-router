@@ -6,7 +6,7 @@
 Based on and extension of [ngx-translate](https://github.com/ngx-translate/core).
 Demo project can be found [here](https://github.com/meeroslav/localize-router-example) or under sub folder `demo/cli`.
 
-> This documentation is for version 1.x.x. If you are migrating from the older version follow [migration guide](https://github.com/Greentube/localize-router/blob/master/MIGRATION_GUIDE.md) to upgrade to latest version.
+> This documentation is for version 1.x.x which requires Angular 4+. If you are migrating from the older version follow [migration guide](https://github.com/Greentube/localize-router/blob/master/MIGRATION_GUIDE.md) to upgrade to latest version.
 
 # Table of contents:
 - [Installation](#installation)
@@ -295,7 +295,9 @@ localizeService.translateRoute('/'); // -> e.g. '/en'
 localizeService.translateRoute('/about'); // -> '/de/uber' (e.g. for German language)
 localizeService.translateRoute('about'); // -> 'uber' (e.g. for German language)
 ```
-- `changeLanguage(lang: string)`: Translates current url to given language and changes the application's language
+- `changeLanguage(lang: string, extras?: NavigationExtras, useNavigateMethod?: boolean)`: Translates current url to given language and changes the application's language.
+`extras` will be passed down to Angular Router navigation methods.
+`userNavigateMethod` tells localize-router to use `navigate` rather than `navigateByUrl` method.  
 For german language and route defined as `:lang/users/:user_name/profile`
 ```
 yoursite.com/en/users/John%20Doe/profile -> yoursite.com/de/benutzer/John%20Doe/profil

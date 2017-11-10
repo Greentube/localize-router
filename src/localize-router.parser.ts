@@ -5,7 +5,7 @@ import { Observable } from 'rxjs/Observable';
 import { Observer } from 'rxjs/Observer';
 import { Location } from '@angular/common';
 import 'rxjs/add/observable/forkJoin';
-import 'rxjs/add/operator/toPromise';
+import 'rxjs/add/observable/toPromise';
 import 'rxjs/add/operator/share';
 import { CacheMechanism, LocalizeRouterSettings } from './localize-router.config';
 
@@ -88,7 +88,7 @@ export abstract class LocalizeParser {
 
     /** exclude certain routes */
     for (let i = children.length - 1; i >= 0; i--) {
-      if (children[i].data && children[i].data.skipRouteLocalization) {
+      if (children[i].data && children[i].data['skipRouteLocalization']) {
         if (this.settings.alwaysSetPrefix) {
           // add directly to routes
           this.routes.push(children[i]);
