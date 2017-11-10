@@ -4,6 +4,8 @@ import { TranslateService } from '@ngx-translate/core';
 import { Observable } from 'rxjs/Observable';
 import { Observer } from 'rxjs/Observer';
 import { Location } from '@angular/common';
+import 'rxjs/add/observable/forkJoin';
+import 'rxjs/add/operator/share';
 import 'rxjs/add/operator/toPromise';
 import { CacheMechanism, LocalizeRouterSettings } from './localize-router.config';
 
