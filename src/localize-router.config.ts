@@ -1,16 +1,18 @@
 import {Inject, InjectionToken, Provider} from '@angular/core';
+import {Routes} from '@angular/router';
+import {LocalizeRouterModule} from './localize-router.module';
 
 /**
  * Guard to make sure we have single initialization of forRoot
  * @type {InjectionToken<LocalizeRouterModule>}
  */
-export const LOCALIZE_ROUTER_FORROOT_GUARD = new InjectionToken('LOCALIZE_ROUTER_FORROOT_GUARD');
+export const LOCALIZE_ROUTER_FORROOT_GUARD = new InjectionToken<LocalizeRouterModule>('LOCALIZE_ROUTER_FORROOT_GUARD');
 
 /**
  * Static provider for keeping track of routes
  * @type {InjectionToken<Routes[]>}
  */
-export const RAW_ROUTES = new InjectionToken('RAW_ROUTES');
+export const RAW_ROUTES: InjectionToken<Routes[]> = new InjectionToken<Routes[]>('RAW_ROUTES');
 
 /**
  * Type for Caching of default language
@@ -29,17 +31,17 @@ export namespace CacheMechanism {
  * Boolean to indicate whether to use cached language value
  * @type {InjectionToken<boolean>}
  */
-export const USE_CACHED_LANG = new InjectionToken('USE_CACHED_LANG');
+export const USE_CACHED_LANG = new InjectionToken<boolean>('USE_CACHED_LANG');
 /**
  * Cache mechanism type
  * @type {InjectionToken<CacheMechanism>}
  */
-export const CACHE_MECHANISM = new InjectionToken('CACHE_MECHANISM');
+export const CACHE_MECHANISM = new InjectionToken<CacheMechanism>('CACHE_MECHANISM');
 /**
  * Cache name
  * @type {InjectionToken<string>}
  */
-export const CACHE_NAME = new InjectionToken('CACHE_NAME');
+export const CACHE_NAME = new InjectionToken<string>('CACHE_NAME');
 
 /**
  * Type for default language function
@@ -51,13 +53,13 @@ export type DefaultLanguageFunction = (languages: string[], cachedLang?: string,
  * Function for calculating default language
  * @type {InjectionToken<DefaultLanguageFunction>}
  */
-export const DEFAULT_LANG_FUNCTION = new InjectionToken('DEFAULT_LANG_FUNCTION');
+export const DEFAULT_LANG_FUNCTION = new InjectionToken<DefaultLanguageFunction>('DEFAULT_LANG_FUNCTION');
 
 /**
  * Boolean to indicate whether prefix should be set for single language scenarios
  * @type {InjectionToken<boolean>}
  */
-export const ALWAYS_SET_PREFIX = new InjectionToken('ALWAYS_SET_PREFIX');
+export const ALWAYS_SET_PREFIX = new InjectionToken<boolean>('ALWAYS_SET_PREFIX');
 
 /**
  * Config interface for LocalizeRouter
