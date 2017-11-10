@@ -117,8 +117,8 @@ export class LocalizeRouterService {
    */
   translateRoute(path: string | any[]): string | any[] {
     if (typeof path === 'string') {
-      let result = this.parser.translateRoute(path);
-      return !path.indexOf('/') ? `/${this.parser.urlPrefix}${result}` : result;
+      const url = this.parser.translateRoute(path);
+      return !path.indexOf('/') ? `/${this.parser.urlPrefix}${url}` : url;
     }
     // it's an array
     let result: any[] = [];
