@@ -3,6 +3,7 @@ import { Router, NavigationStart, ActivatedRouteSnapshot, NavigationExtras, Rout
 import { Subject } from 'rxjs/Subject';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/forkJoin';
+import 'rxjs/add/operator/toPromise';
 
 import { LocalizeParser } from './localize-router.parser';
 

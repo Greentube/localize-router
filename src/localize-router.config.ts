@@ -1,10 +1,11 @@
 import { Inject, InjectionToken, Provider } from '@angular/core';
+import { LocalizeRouterModule } from './localize-router.module';
 
 /**
  * Guard to make sure we have single initialization of forRoot
  * @type {InjectionToken<LocalizeRouterModule>}
  */
-export const LOCALIZE_ROUTER_FORROOT_GUARD = new InjectionToken('LOCALIZE_ROUTER_FORROOT_GUARD');
+export const LOCALIZE_ROUTER_FORROOT_GUARD = new InjectionToken<LocalizeRouterModule>('LOCALIZE_ROUTER_FORROOT_GUARD');
 
 /**
  * Static provider for keeping track of routes
