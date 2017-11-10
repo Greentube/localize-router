@@ -1,27 +1,22 @@
 {
   "rulesDirectory": [
-    "node_modules/codelyzer"
+    "node_modules/codelyzer",
+    "node_modules/tslint-eslint-rules"
+  ],
+  "extends": [
+    "tslint-eslint-rules",
+    "codelyzer"
   ],
   "rules": {
     "class-name": true,
     "curly": true,
     "forin": true,
-    "indent": [
-      true,
-      "spaces"
-    ],
+    "indent": [ true, "spaces", 2 ],
     "label-position": true,
     "member-access": false,
     "no-arg": true,
     "no-bitwise": true,
-    "no-console": [
-      true,
-      "debug",
-      "info",
-      "time",
-      "timeEnd",
-      "trace"
-    ],
+    "no-console": [ true, "log" ],
     "no-construct": true,
     "no-debugger": true,
     "no-duplicate-variable": true,
@@ -60,6 +55,19 @@
     "use-output-property-decorator": true,
     "use-host-property-decorator": false,
     "use-life-cycle-interface": true,
-    "use-pipe-transform-interface": true
+    "use-pipe-transform-interface": true,
+    "no-consecutive-blank-lines": [true, 1],
+    "whitespace": [
+      true,
+      "check-decl",
+      "check-operator",
+      "check-module",
+      "check-separator",
+      "check-type"
+    ],
+    "trailing-comma": true,
+    "quotemark": [true, "single", "avoid-escape"],
+
+    "object-curly-spacing": [true, "always"]
   }
 }
