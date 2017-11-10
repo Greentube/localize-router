@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Router, NavigationStart, ActivatedRouteSnapshot, NavigationExtras, Route } from '@angular/router';
+import { Router, NavigationStart, ActivatedRouteSnapshot, NavigationExtras, Route, UrlSegment } from '@angular/router';
 import { Subject } from 'rxjs/Subject';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/forkJoin';
@@ -47,27 +47,24 @@ export class LocalizeRouterService {
         let url = this.traverseRouteSnapshot(rootSnapshot);
 
         if (!this.settings.alwaysSetPrefix) {
-          var urlSegments = url.split('/');
+          let urlSegments = url.split('/');
+          const languageSegmentIndex = urlSegments.indexOf(this.parser.currentLang);
           //If the default language has no prefix make sure to remove and add it when necessary
           if (this.parser.currentLang === this.parser.defaultLang) {
             //Remove the language prefix from url when current language is the default language
-            if (url.indexOf(this.parser.currentLang + '/') === -1) {
+            if (languageSegmentIndex === 0 || (languageSegmentIndex === 1 && urlSegments[0] === '')) {
               //Remove the current aka default language prefix from the url
-              urlSegments = urlSegments.splice(urlSegments.indexOf(this.parser.currentLang), 1);
-              url = urlSegments.join('/');
+              urlSegments = urlSegments.slice(0, languageSegmentIndex).concat(urlSegments.slice(languageSegmentIndex + 1));
             }
-          } else if (this.parser.currentLang !== this.parser.defaultLang) {
+          } else {
             //When coming from a default language it's possible that the url doesn't contain the language, make sure it does.
-            if (url.indexOf(this.parser.currentLang + '/') === -1) {
+            if (languageSegmentIndex === -1) {
               //If the url starts with a slash make sure to keep it.
-              if (urlSegments[0] === '') {
-                urlSegments.splice(1, 0, this.parser.currentLang);
-              } else {
-                urlSegments.splice(0, 0, this.parser.currentLang);
-              }
-              url = urlSegments.join('/');
+              const injectionIndex = urlSegments[0] === '' ? 1 : 0;
+              urlSegments = urlSegments.slice(0, injectionIndex).concat(this.parser.currentLang, urlSegments.slice(injectionIndex));
             }
           }
+          url = urlSegments.join('/');
         }
 
         if (useNavigateMethod) {
@@ -85,10 +82,12 @@ export class LocalizeRouterService {
    * @returns {string}
    */
   private traverseRouteSnapshot(snapshot: ActivatedRouteSnapshot): string {
-    if (snapshot.firstChild && snapshot.firstChild.routeConfig && snapshot.firstChild.routeConfig.path && snapshot.firstChild.routeConfig.path !== '**') {
-      return this.parseSegmentValue(snapshot) + '/' + this.traverseRouteSnapshot(snapshot.firstChild);
-    } else if (snapshot.firstChild && snapshot.firstChild.routeConfig && snapshot.firstChild.routeConfig.path && snapshot.firstChild.routeConfig.path === '**') {
-      return this.parseSegmentValue(snapshot.firstChild);
+    if (snapshot.firstChild && snapshot.firstChild.routeConfig && snapshot.firstChild.routeConfig.path) {
+      if (snapshot.firstChild.routeConfig.path !== '**') {
+        return this.parseSegmentValue(snapshot) + '/' + this.traverseRouteSnapshot(snapshot.firstChild);
+      } else {
+        return this.parseSegmentValue(snapshot.firstChild);
+      }  
     }
     return this.parseSegmentValue(snapshot);
   }
@@ -101,13 +100,7 @@ export class LocalizeRouterService {
   private parseSegmentValue(snapshot: ActivatedRouteSnapshot): string {
     if (snapshot.routeConfig) {
       if (snapshot.routeConfig.path === '**') {
-        let urls = [];
-        for (let subPathSegment of snapshot.url) {
-          if (subPathSegment.path) {
-            urls.push(subPathSegment.path);
-          }
-        }
-        return urls.join('/');
+        return snapshot.url.filter((segment: UrlSegment) => segment.path).map((segment: UrlSegment) => segment.path).join('/');
       } else {
         let subPathSegments = snapshot.routeConfig.path.split('/');
         return subPathSegments.map((s: string, i: number) => s.indexOf(':') === 0 ? snapshot.url[i].path : s).join('/');
