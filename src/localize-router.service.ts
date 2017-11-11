@@ -3,6 +3,7 @@ import { Router, NavigationStart, ActivatedRouteSnapshot, NavigationExtras, Rout
 import { Subject } from 'rxjs/Subject';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/forkJoin';
+import 'rxjs/add/operator/toPromise';
 
 import { LocalizeParser } from './localize-router.parser';
 
@@ -43,7 +44,7 @@ export class LocalizeRouterService {
 
       this.parser.translateRoutes(lang).subscribe(() => {
         const url = this.traverseRouteSnapshot(rootSnapshot);
-        
+
         if (useNavigateMethod) {
           this.router.navigate([url], extras);
         } else {
@@ -86,8 +87,8 @@ export class LocalizeRouterService {
    */
   translateRoute(path: string | any[]): string | any[] {
     if (typeof path === 'string') {
-      let result = this.parser.translateRoute(path);
-      return !path.indexOf('/') ? `/${this.parser.urlPrefix}${result}` : result;
+      const url = this.parser.translateRoute(path);
+      return !path.indexOf('/') ? `/${this.parser.urlPrefix}${url}` : url;
     }
     // it's an array
     let result: any[] = [];

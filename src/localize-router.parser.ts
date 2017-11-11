@@ -5,8 +5,8 @@ import { Observable } from 'rxjs/Observable';
 import { Observer } from 'rxjs/Observer';
 import { Location } from '@angular/common';
 import 'rxjs/add/observable/forkJoin';
-import 'rxjs/add/observable/toPromise';
 import 'rxjs/add/operator/share';
+import 'rxjs/add/operator/toPromise';
 import { CacheMechanism, LocalizeRouterSettings } from './localize-router.config';
 
 const COOKIE_EXPIRY = 30; // 1 month
@@ -69,7 +69,6 @@ export abstract class LocalizeParser {
     }
     selectedLanguage = locationLang || this.defaultLang;
     this.translate.setDefaultLang(this.defaultLang);
-
 
     let children: Routes = [];
     /** if set prefix is enforced */
