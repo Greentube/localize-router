@@ -1,4 +1,5 @@
 import { Inject, InjectionToken, Provider } from '@angular/core';
+import { Routes } from '@angular/router';
 import { LocalizeRouterModule } from './localize-router.module';
 
 /**
@@ -11,7 +12,7 @@ export const LOCALIZE_ROUTER_FORROOT_GUARD = new InjectionToken<LocalizeRouterMo
  * Static provider for keeping track of routes
  * @type {InjectionToken<Routes[]>}
  */
-export const RAW_ROUTES = new InjectionToken('RAW_ROUTES');
+export const RAW_ROUTES: InjectionToken<Routes[]> = new InjectionToken<Routes[]>('RAW_ROUTES');
 
 /**
  * Type for Caching of default language
