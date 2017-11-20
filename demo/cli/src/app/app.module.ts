@@ -7,7 +7,7 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 import { HomeModule } from './home/home.module';
-import { UsersModule } from "./users/users.module";
+import { UsersModule } from './users/users.module';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 
 export function HttpLoaderFactory(http: HttpClient) {

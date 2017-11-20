@@ -15,6 +15,7 @@ coverage/
 !demo/cli/*js
 !karma.conf.js
 !webpack.config.js
+package-lock.json
 
 #################
 ## Misc
