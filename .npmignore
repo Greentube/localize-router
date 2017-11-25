@@ -20,8 +20,8 @@ karma.conf.js
 webpack.config.js
 tsconfig.json
 tslint.json
-!*.metadata.json
-!bundles/*.js
+CODE_OF_CONDUCT.md
+package-lock.json
 .*
 
 ############
