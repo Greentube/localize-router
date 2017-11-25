@@ -115,11 +115,6 @@ export abstract class LocalizeParser {
   }
 
   initChildRoutes(routes: Routes) {
-    if (!this._translationObject) {
-      // not lazy, it will be translated in main init
-      return routes;
-    }
-
     this._translateRouteTree(routes);
     return routes;
   }

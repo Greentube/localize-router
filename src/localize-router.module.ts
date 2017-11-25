@@ -1,6 +1,6 @@
 import {
   NgModule, ModuleWithProviders, APP_INITIALIZER, Optional, SkipSelf,
-  Injectable, Injector
+  Injectable, Injector, NgModuleFactoryLoader
 } from '@angular/core';
 import { LocalizeRouterService } from './localize-router.service';
 import { DummyLocalizeParser, LocalizeParser } from './localize-router.parser';
@@ -14,6 +14,7 @@ import {
   RAW_ROUTES,
   USE_CACHED_LANG
 } from './localize-router.config';
+import { LocalizeRouterConfigLoader } from './localize-router-config-loader';
 
 @Injectable()
 export class ParserInitializer {
@@ -92,6 +93,7 @@ export class LocalizeRouterModule {
         },
         LocalizeRouterService,
         ParserInitializer,
+        { provide: NgModuleFactoryLoader, useClass: LocalizeRouterConfigLoader },
         {
           provide: APP_INITIALIZER,
           multi: true,

@@ -23,6 +23,7 @@
     "./src/localize-router.service.ts",
     "./src/localize-router.parser.ts",
     "./src/localize-router.module.ts",
+    "./src/localize-router-config-loader.ts",
     "./tests/localize-router.service.spec.ts",
     "./tests/localize-router.parser.spec.ts",
     "./tests/localize-router.pipe.spec.ts"
