@@ -4,6 +4,8 @@ import { Subscription } from 'rxjs/Subscription';
 import 'rxjs/add/observable/forkJoin';
 import { equals } from './util';
 
+const VIEW_DESTROYED_STATE = 128;
+
 @Injectable()
 @Pipe({
   name: 'localize',
@@ -44,8 +46,11 @@ export class LocalizeRouterPipe implements PipeTransform {
     /** translate key and update values */
     this.value = this.localize.translateRoute(query);
     this.lastKey = query;
-    this._ref.markForCheck();
-
+    // if view is already destroyed, ignore firing change detection
+    if ((<any> this._ref)._view.state & VIEW_DESTROYED_STATE) {
+      return this.value;
+    }
+    this._ref.detectChanges();
     return this.value;
   }
 }
