@@ -43,7 +43,7 @@ class FakeTranslateService {
     }, {}));
   }
 
-  get (input: string) {
+  get(input: string) {
     return Observable.of(this.content[input] ? this.content[input] + this.currentLang : input);
   }
 
@@ -187,7 +187,8 @@ describe('LocalizeParser', () => {
     routes = [{ path: 'home' }];
     loader.load(routes);
     tick();
-    expect(routes[0]).toEqual({ path: 'de', children: [{ path: 'home_de', data: { localizeRouter: { path: 'home' }} }] });
+    expect(routes[0]).toEqual(
+      { path: 'de', children: [{ path: 'home_de', data: { localizeRouter: { path: 'home' } } }] });
     expect(routes[1]).toEqual({ path: '', redirectTo: 'de', pathMatch: 'full' });
     expect(loader.currentLang).toEqual('de');
     expect(translate.currentLang).toEqual('de');
@@ -203,7 +204,8 @@ describe('LocalizeParser', () => {
     routes = [{ path: 'home' }];
     loader.load(routes);
     tick();
-    expect(routes[0]).toEqual({ path: 'fr', children: [{ path: 'home_fr', data: { localizeRouter: { path: 'home' }} }] });
+    expect(routes[0]).toEqual(
+      { path: 'fr', children: [{ path: 'home_fr', data: { localizeRouter: { path: 'home' } } }] });
     expect(routes[1]).toEqual({ path: '', redirectTo: 'fr', pathMatch: 'full' });
     expect(loader.currentLang).toEqual('fr', 'loader currentLang should equal');
     expect(translate.currentLang).toEqual('fr', 'translate currentLang should equal');
@@ -358,11 +360,13 @@ describe('LocalizeParser', () => {
     routes = <any> [
       {
         path: 'home', children: [
-          { path: 'about', component: DummyComponent }
-        ]
+        { path: 'about', component: DummyComponent }
+      ]
       },
       {
-        path: 'contact', loadChildren: '#pathToSomeModule', _loadedConfig: { routes: [{ path: 'info', component: DummyComponent }] }
+        path: 'contact',
+        loadChildren: '#pathToSomeModule',
+        _loadedConfig: { routes: [{ path: 'info', component: DummyComponent }] }
       }
     ];
 
@@ -388,7 +392,8 @@ describe('LocalizeParser', () => {
     loader.load(routes);
     tick();
 
-    expect(routes[0]).toEqual({ path: 'de', children: [{ path: 'home_de', data: { localizeRouter: { path: 'home' }} }] });
+    expect(routes[0]).toEqual(
+      { path: 'de', children: [{ path: 'home_de', data: { localizeRouter: { path: 'home' } } }] });
     expect(routes[1]).toEqual({ path: '', redirectTo: 'de', pathMatch: 'full' });
     expect(loader.currentLang).toEqual('de', 'loader currentLang should equal');
     expect(translate.currentLang).toEqual('de', 'translate currentLang should equal');
@@ -437,7 +442,7 @@ describe('LocalizeParser', () => {
 
     expect(routes[0]).toEqual({
       path: 'de',
-      children: [{ path: 'home_de', component: DummyComponent, data: { localizeRouter: { path: 'home' }} }]
+      children: [{ path: 'home_de', component: DummyComponent, data: { localizeRouter: { path: 'home' } } }]
     });
     expect(routes[1]).toEqual({ path: '', redirectTo: 'de', pathMatch: 'full' });
     expect(loader.currentLang).toEqual('de', 'loader currentLang should equal');
@@ -455,7 +460,8 @@ describe('LocalizeParser', () => {
     loader.load(routes);
     tick();
 
-    expect(routes[0]).toEqual({ path: 'home_de', component: DummyComponent, data: { localizeRouter: { path: 'home' }} });
+    expect(routes[0]).toEqual(
+      { path: 'home_de', component: DummyComponent, data: { localizeRouter: { path: 'home' } } });
     expect(loader.currentLang).toEqual('de', 'loader currentLang should equal');
     expect(translate.currentLang).toEqual('de', 'translate currentLang should equal');
   }));
@@ -470,8 +476,12 @@ describe('LocalizeParser', () => {
     loader.load(routes);
     tick();
 
-    expect(routes[0]).toEqual({ path: 'de', children: [{ path: 'home_de', component: DummyComponent, data: { localizeRouter: { path: 'home' }} }] });
-    expect(routes[1]).toEqual({ path: 'home_de', component: DummyComponent, data: { localizeRouter: { path: 'home' }} });
+    expect(routes[0]).toEqual({
+      path: 'de',
+      children: [{ path: 'home_de', component: DummyComponent, data: { localizeRouter: { path: 'home' } } }]
+    });
+    expect(routes[1]).toEqual(
+      { path: 'home_de', component: DummyComponent, data: { localizeRouter: { path: 'home' } } });
     expect(loader.currentLang).toEqual('de', 'loader currentLang should equal');
     expect(translate.currentLang).toEqual('de', 'translate currentLang should equal');
   }));
@@ -485,7 +495,8 @@ describe('LocalizeParser', () => {
     tick();
 
     expect(routes.length).toEqual(3);
-    expect(routes[0]).toEqual({ path: 'de', children: [{ path: 'home_de', data: { localizeRouter: { path: 'home' }} }] });
+    expect(routes[0]).toEqual(
+      { path: 'de', children: [{ path: 'home_de', data: { localizeRouter: { path: 'home' } } }] });
     expect(routes[1]).toEqual({ path: '', redirectTo: 'de', pathMatch: 'full' });
     expect(routes[2]).toEqual({ path: 'about', data: { skipRouteLocalization: true } });
   }));

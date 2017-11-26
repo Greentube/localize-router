@@ -31,7 +31,7 @@ class FakeRouter {
   routes: Routes;
   fakeRouterEvents: Subject<Event> = new Subject<Event>();
 
-  resetConfig = (routes: Routes) => {  this.routes = routes; };
+  resetConfig = (routes: Routes) => { this.routes = routes; };
 
   get events(): Observable<Event> {
     return this.fakeRouterEvents;
@@ -140,6 +140,7 @@ describe('LocalizeRouterService', () => {
     localizeRouterService = new LocalizeRouterService(parser, settings, router);
     localizeRouterService.init();
     parser.currentLang = 'de';
+    (<any>router).fakeRouterEvents.next(new NavigationStart(1, '/de/new/path'));
     parser.locales = ['de', 'en'];
     spyOn(parser, 'translateRoutes').and.returnValue(Observable.of(void 0));
 

@@ -26,7 +26,7 @@ describe('util', () => {
     a = NaN;
     b = NaN;
 
-    expect(equals(a,b)).toBe(true);
+    expect(equals(a, b)).toBe(true);
   });
   it('should return false if type is different', () => {
     expect(equals(null, 0)).toBe(false);
@@ -49,10 +49,10 @@ describe('util', () => {
     expect(equals([1, 2, 3], [1, 2, 3])).toBe(true);
   });
   it('should return false if keys dont match', () => {
-    expect(equals({text: 123, same: 1}, {text: 321, same: 1})).toBe(false);
-    expect(equals({text: 123}, {non_text: 123})).toBe(false);
-    expect(equals({text: 123}, {text: 123, non_text: 123})).toBe(false);
-    expect(equals({text: 123, same: 1}, {text: 123, same: 1})).toBe(true);
+    expect(equals({ text: 123, same: 1 }, { text: 321, same: 1 })).toBe(false);
+    expect(equals({ text: 123 }, { non_text: 123 })).toBe(false);
+    expect(equals({ text: 123 }, { text: 123, non_text: 123 })).toBe(false);
+    expect(equals({ text: 123, same: 1 }, { text: 123, same: 1 })).toBe(true);
   });
   it('should ignore if inherited fields dont match', () => {
     class Class1 {
@@ -62,6 +62,7 @@ describe('util', () => {
 
       constructor() { }
     }
+
     class Class2 {
       same: boolean;
 
