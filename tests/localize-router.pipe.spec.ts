@@ -5,8 +5,6 @@ import { getTestBed, TestBed } from '@angular/core/testing';
 import { Subject } from 'rxjs/Subject';
 
 class FakeChangeDetectorRef extends ChangeDetectorRef {
-  _view = { state: 0 };
-
   markForCheck(): void {
   }
 
@@ -87,79 +85,79 @@ describe('LocalizeRouterPipe', () => {
 
   it('should translate a complex segment route if it changed', () => {
     localize.parser.currentLang = 'en';
-    spyOn(ref, 'detectChanges').and.callThrough();
+    spyOn(ref, 'markForCheck').and.callThrough();
 
     localizePipe.transform(['/path', null, 'my', 5]);
-    ref.detectChanges.calls.reset();
+    ref.markForCheck.calls.reset();
 
     localizePipe.transform(['/path', 4, 'my', 5]);
-    expect(ref.detectChanges).toHaveBeenCalled();
+    expect(ref.markForCheck).toHaveBeenCalled();
   });
 
   it('should not translate a complex segment route if it`s not changed', () => {
     localize.parser.currentLang = 'en';
-    spyOn(ref, 'detectChanges').and.callThrough();
+    spyOn(ref, 'markForCheck').and.callThrough();
 
     localizePipe.transform(['/path', 4, 'my', 5]);
-    ref.detectChanges.calls.reset();
+    ref.markForCheck.calls.reset();
 
     localizePipe.transform(['/path', 4, 'my', 5]);
-    expect(ref.detectChanges).not.toHaveBeenCalled();
+    expect(ref.markForCheck).not.toHaveBeenCalled();
   });
 
   it('should call markForChanges when it translates a string', () => {
     localize.parser.currentLang = 'en';
-    spyOn(ref, 'detectChanges').and.callThrough();
+    spyOn(ref, 'markForCheck').and.callThrough();
 
     localizePipe.transform('route');
-    expect(ref.detectChanges).toHaveBeenCalled();
+    expect(ref.markForCheck).toHaveBeenCalled();
   });
 
   it('should not call markForChanges when query is not string', () => {
     localize.parser.currentLang = 'en';
-    spyOn(ref, 'detectChanges').and.callThrough();
+    spyOn(ref, 'markForCheck').and.callThrough();
 
     localizePipe.transform(null);
-    expect(ref.detectChanges).not.toHaveBeenCalled();
+    expect(ref.markForCheck).not.toHaveBeenCalled();
   });
 
   it('should not call markForChanges when query is empty string', () => {
     localize.parser.currentLang = 'en';
-    spyOn(ref, 'detectChanges').and.callThrough();
+    spyOn(ref, 'markForCheck').and.callThrough();
 
     localizePipe.transform('');
-    expect(ref.detectChanges).not.toHaveBeenCalled();
+    expect(ref.markForCheck).not.toHaveBeenCalled();
   });
 
   it('should not call markForChanges when no language selected', () => {
     localize.parser.currentLang = null;
-    spyOn(ref, 'detectChanges').and.callThrough();
+    spyOn(ref, 'markForCheck').and.callThrough();
 
     localizePipe.transform('route');
-    expect(ref.detectChanges).not.toHaveBeenCalled();
+    expect(ref.markForCheck).not.toHaveBeenCalled();
   });
 
   it('should not call markForChanges if same route already translated', () => {
     localize.parser.currentLang = 'en';
-    spyOn(ref, 'detectChanges').and.callThrough();
+    spyOn(ref, 'markForCheck').and.callThrough();
     localizePipe.transform('route');
     localizePipe.transform('route');
-    expect(ref.detectChanges.calls.count()).toEqual(1);
+    expect(ref.markForCheck.calls.count()).toEqual(1);
   });
 
   it('should subscribe to service`s routerEvents', () => {
     let query = 'MY_TEXT';
     localize.parser.currentLang = 'en';
     spyOn(localizePipe, 'transform').and.callThrough();
-    spyOn(ref, 'detectChanges').and.callThrough();
+    spyOn(ref, 'markForCheck').and.callThrough();
 
     localizePipe.transform(query);
-    ref.detectChanges.calls.reset();
+    ref.markForCheck.calls.reset();
     (<any>localizePipe.transform)['calls'].reset();
 
     localize.parser.currentLang = 'de';
     localize.routerEvents.next('de');
     expect(localizePipe.transform).toHaveBeenCalled();
-    expect(ref.detectChanges).toHaveBeenCalled();
+    expect(ref.markForCheck).toHaveBeenCalled();
   });
 });
