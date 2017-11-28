@@ -1,7 +1,6 @@
 import { PipeTransform, Pipe, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { LocalizeRouterService } from './localize-router.service';
 import { Subscription } from 'rxjs/Subscription';
-import { equals } from './util';
 
 @Pipe({
   name: 'localize',
@@ -35,7 +34,7 @@ export class LocalizeRouterPipe implements PipeTransform, OnDestroy {
     if (!query || query.length === 0 || !this.localize.parser.currentLang) {
       return query;
     }
-    if (!this.markForTransform && equals(query, this.lastKey) && this.lastLanguage === this.localize.parser.currentLang) {
+    if (!this.markForTransform && query === this.lastKey && this.lastLanguage === this.localize.parser.currentLang) {
       return this.value;
     }
     this.lastKey = query;
