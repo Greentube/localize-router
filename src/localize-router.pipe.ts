@@ -48,9 +48,7 @@ export class LocalizeRouterPipe implements PipeTransform, OnDestroy {
   }
 
   ngOnDestroy() {
-    if (this.changes$$) {
       this.changes$$.unsubscribe();
-    }
   }
 
 }
