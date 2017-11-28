@@ -1,7 +1,6 @@
 import { PipeTransform, Pipe, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { LocalizeRouterService } from './localize-router.service';
 import { Subscription } from 'rxjs/Subscription';
-import 'rxjs/add/observable/forkJoin';
 import { equals } from './util';
 
 @Pipe({

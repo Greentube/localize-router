@@ -1,8 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Router, NavigationStart, ActivatedRouteSnapshot, NavigationExtras, UrlSegment } from '@angular/router';
 import { Subject } from 'rxjs/Subject';
-import 'rxjs/add/observable/forkJoin';
-import 'rxjs/add/operator/toPromise';
 import 'rxjs/add/operator/filter';
 import 'rxjs/add/operator/pairwise';
 
