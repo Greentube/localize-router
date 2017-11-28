@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Optional } from '@angular/core';
 import { Routes, Route } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Observable } from 'rxjs/Observable';
@@ -14,7 +14,6 @@ const COOKIE_EXPIRY = 30; // 1 month
 /**
  * Abstract class for parsing localization
  */
-@Injectable()
 export abstract class LocalizeParser {
   locales: Array<string>;
   currentLang: string;
@@ -370,7 +369,7 @@ export class ManualParserLoader extends LocalizeParser {
    * @param locales
    * @param prefix
    */
-  constructor(translate: TranslateService, location: Location, settings: LocalizeRouterSettings, locales: Array<string> = ['en'], prefix: string = 'ROUTES.') {
+  constructor(translate: TranslateService, location: Location, settings: LocalizeRouterSettings, @Optional() locales: string[] = ['en'], @Optional() prefix: string = 'ROUTES.') {
     super(translate, location, settings);
     this.locales = locales;
     this.prefix = prefix || '';
