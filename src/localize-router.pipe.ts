@@ -1,13 +1,12 @@
-import { PipeTransform, Pipe, Injectable, ChangeDetectorRef, OnDestroy } from '@angular/core';
+import { PipeTransform, Pipe, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { LocalizeRouterService } from './localize-router.service';
 import { Subscription } from 'rxjs/Subscription';
 import 'rxjs/add/observable/forkJoin';
 import { equals } from './util';
 
-@Injectable()
 @Pipe({
   name: 'localize',
-  pure: false // required to update the value when the promise is resolved
+  pure: false // required to become stateful and keep value updated on event changes.
 })
 export class LocalizeRouterPipe implements PipeTransform, OnDestroy {
   private markForTransform = true;
