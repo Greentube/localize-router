@@ -1,4 +1,3 @@
-import { Optional } from '@angular/core';
 import { Routes, Route } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Observable } from 'rxjs/Observable';
@@ -8,6 +7,7 @@ import 'rxjs/add/observable/forkJoin';
 import 'rxjs/add/operator/share';
 import 'rxjs/add/operator/toPromise';
 import { CacheMechanism, LocalizeRouterSettings } from './localize-router.config';
+import { Inject } from '@angular/core';
 
 const COOKIE_EXPIRY = 30; // 1 month
 
@@ -32,9 +32,9 @@ export abstract class LocalizeParser {
    * @param location
    * @param settings
    */
-  constructor(private translate: TranslateService,
-              private location: Location,
-              private settings: LocalizeRouterSettings) {
+  constructor(@Inject(TranslateService) private translate: TranslateService,
+              @Inject(Location) private location: Location,
+              @Inject(LocalizeRouterSettings) private settings: LocalizeRouterSettings) {
   }
 
   /**
@@ -369,7 +369,7 @@ export class ManualParserLoader extends LocalizeParser {
    * @param locales
    * @param prefix
    */
-  constructor(translate: TranslateService, location: Location, settings: LocalizeRouterSettings, @Optional() locales: string[] = ['en'], @Optional() prefix: string = 'ROUTES.') {
+  constructor(translate: TranslateService, location: Location, settings: LocalizeRouterSettings, locales: string[] = ['en'], prefix: string = 'ROUTES.') {
     super(translate, location, settings);
     this.locales = locales;
     this.prefix = prefix || '';

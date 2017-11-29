@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Inject } from '@angular/core';
 import { Router, NavigationStart, ActivatedRouteSnapshot, NavigationExtras, UrlSegment } from '@angular/router';
 import { Subject } from 'rxjs/Subject';
 import 'rxjs/add/observable/forkJoin';
@@ -13,7 +13,6 @@ import { LocalizeRouterSettings } from './localize-router.config';
  * Localization service
  * modifyRoutes
  */
-@Injectable()
 export class LocalizeRouterService {
   routerEvents: Subject<string>;
 
@@ -23,7 +22,7 @@ export class LocalizeRouterService {
    * @param settings
    * @param router
    */
-  constructor(public parser: LocalizeParser, public settings: LocalizeRouterSettings, private router: Router) {
+  constructor(@Inject(LocalizeParser) public parser: LocalizeParser, @Inject(LocalizeRouterSettings) public settings: LocalizeRouterSettings, @Inject(Router) private router: Router) {
     this.routerEvents = new Subject<string>();
   }
 

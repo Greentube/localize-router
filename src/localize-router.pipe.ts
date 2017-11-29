@@ -1,4 +1,4 @@
-import { PipeTransform, Pipe, Injectable, ChangeDetectorRef } from '@angular/core';
+import { PipeTransform, Pipe, ChangeDetectorRef } from '@angular/core';
 import { LocalizeRouterService } from './localize-router.service';
 import { Subscription } from 'rxjs/Subscription';
 import 'rxjs/add/observable/forkJoin';
@@ -6,7 +6,6 @@ import { equals } from './util';
 
 const VIEW_DESTROYED_STATE = 128;
 
-@Injectable()
 @Pipe({
   name: 'localize',
   pure: false // required to update the value when the promise is resolved
