@@ -237,9 +237,6 @@ export abstract class LocalizeParser {
     if (pathSlices.length && this.locales.indexOf(pathSlices[0]) !== -1) {
       return pathSlices[0];
     }
-    if (!this.settings.alwaysSetPrefix) {
-      return this.defaultLang;
-    }
     return null;
   }
 
