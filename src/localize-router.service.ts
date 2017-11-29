@@ -147,8 +147,8 @@ export class LocalizeRouterService {
    */
   private _routeChanged(): (eventPair: [NavigationStart, NavigationStart]) => void {
     return ([previousEvent, currentEvent]: [NavigationStart, NavigationStart]) => {
-      const previousLang = this.parser.getLocationLang(previousEvent.url);
-      const currentLang = this.parser.getLocationLang(currentEvent.url);
+      const previousLang = this.parser.getLocationLang(previousEvent.url) || this.parser.defaultLang;
+      const currentLang = this.parser.getLocationLang(currentEvent.url) || this.parser.defaultLang;
 
       if (currentLang !== previousLang) {
         this.parser.translateRoutes(currentLang).subscribe(() => {
