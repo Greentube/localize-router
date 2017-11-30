@@ -85,75 +85,75 @@ describe('LocalizeRouterPipe', () => {
 
   it('should translate a complex segment route if it changed', () => {
     localize.parser.currentLang = 'en';
-    spyOn(ref, 'markForCheck').and.callThrough();
+    const translateRouteSpy = spyOn(localize, 'translateRoute').and.callThrough();
 
     localizePipe.transform(['/path', null, 'my', 5]);
-    ref.markForCheck.calls.reset();
+    translateRouteSpy.calls.reset();
 
     localizePipe.transform(['/path', 4, 'my', 5]);
-    expect(ref.markForCheck).toHaveBeenCalled();
+    expect(translateRouteSpy).toHaveBeenCalled();
   });
 
   it('should not translate a complex segment route if it`s not changed', () => {
     localize.parser.currentLang = 'en';
-    spyOn(ref, 'markForCheck').and.callThrough();
+    const translateRouteSpy = spyOn(localize, 'translateRoute').and.callThrough();
 
     localizePipe.transform(['/path', 4, 'my', 5]);
-    ref.markForCheck.calls.reset();
+    translateRouteSpy.calls.reset();
 
     localizePipe.transform(['/path', 4, 'my', 5]);
-    expect(ref.markForCheck).not.toHaveBeenCalled();
+    expect(translateRouteSpy).not.toHaveBeenCalled();
   });
 
-  it('should call markForChanges when it translates a string', () => {
+  it('should not translate if same route already translated', () => {
     localize.parser.currentLang = 'en';
-    spyOn(ref, 'markForCheck').and.callThrough();
+    const translateRouteSpy = spyOn(localize, 'translateRoute').and.callThrough();
+    localizePipe.transform('route');
+    localizePipe.transform('route');
+    expect(translateRouteSpy.calls.count()).toEqual(1);
+  });
+
+  it('should translate when query is a string', () => {
+    localize.parser.currentLang = 'en';
+    const translateRouteSpy = spyOn(localize, 'translateRoute').and.callThrough();
 
     localizePipe.transform('route');
-    expect(ref.markForCheck).toHaveBeenCalled();
+    expect(translateRouteSpy).toHaveBeenCalled();
   });
 
-  it('should not call markForChanges when query is not string', () => {
+  it('should not translate when query is null', () => {
     localize.parser.currentLang = 'en';
-    spyOn(ref, 'markForCheck').and.callThrough();
+    const translateRouteSpy = spyOn(localize, 'translateRoute').and.callThrough();
 
     localizePipe.transform(null);
-    expect(ref.markForCheck).not.toHaveBeenCalled();
+    expect(translateRouteSpy).not.toHaveBeenCalled();
   });
 
-  it('should not call markForChanges when query is empty string', () => {
+  it('should not translate when query is empty string', () => {
     localize.parser.currentLang = 'en';
-    spyOn(ref, 'markForCheck').and.callThrough();
+    const translateRouteSpy = spyOn(localize, 'translateRoute').and.callThrough();
 
     localizePipe.transform('');
-    expect(ref.markForCheck).not.toHaveBeenCalled();
+    expect(translateRouteSpy).not.toHaveBeenCalled();
   });
 
-  it('should not call markForChanges when no language selected', () => {
+  it('should not translate when no language selected', () => {
     localize.parser.currentLang = null;
-    spyOn(ref, 'markForCheck').and.callThrough();
+    const translateRouteSpy = spyOn(localize, 'translateRoute').and.callThrough();
 
     localizePipe.transform('route');
-    expect(ref.markForCheck).not.toHaveBeenCalled();
-  });
-
-  it('should not call markForChanges if same route already translated', () => {
-    localize.parser.currentLang = 'en';
-    spyOn(ref, 'markForCheck').and.callThrough();
-    localizePipe.transform('route');
-    localizePipe.transform('route');
-    expect(ref.markForCheck.calls.count()).toEqual(1);
+    expect(translateRouteSpy).not.toHaveBeenCalled();
   });
 
   it('should subscribe to service`s routerEvents', () => {
     let query = 'MY_TEXT';
     localize.parser.currentLang = 'en';
-    spyOn(localizePipe, 'transform').and.callThrough();
+    const transmformSpy = spyOn(localizePipe, 'transform').and.callThrough();
     spyOn(ref, 'markForCheck').and.callThrough();
 
     localizePipe.transform(query);
     ref.markForCheck.calls.reset();
-    (<any>localizePipe.transform)['calls'].reset();
+    transmformSpy.calls.reset();
 
     localize.parser.currentLang = 'de';
     localize.routerEvents.next('de');

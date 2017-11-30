@@ -1,13 +1,13 @@
 import { PipeTransform, Pipe, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { LocalizeRouterService } from './localize-router.service';
 import { Subscription } from 'rxjs/Subscription';
+import { equals } from './util';
 
 @Pipe({
   name: 'localize',
   pure: false // required to become stateful and keep value updated on event changes.
 })
 export class LocalizeRouterPipe implements PipeTransform, OnDestroy {
-  private markForTransform = true;
   private value: string | any[] = '';
   private lastKey: string | any[];
   private lastLanguage: string;
@@ -20,7 +20,7 @@ export class LocalizeRouterPipe implements PipeTransform, OnDestroy {
    */
   constructor(private localize: LocalizeRouterService, private _ref: ChangeDetectorRef) {
     this.changes$$ = this.localize.routerEvents.subscribe(() => {
-      this.markForTransform = true;
+      this.transform(this.lastKey);
       this._ref.markForCheck();
     });
   }
@@ -34,7 +34,7 @@ export class LocalizeRouterPipe implements PipeTransform, OnDestroy {
     if (!query || query.length === 0 || !this.localize.parser.currentLang) {
       return query;
     }
-    if (!this.markForTransform && query === this.lastKey && this.lastLanguage === this.localize.parser.currentLang) {
+    if (this.lastLanguage === this.localize.parser.currentLang && equals(query, this.lastKey)) {
       return this.value;
     }
     this.lastKey = query;
@@ -43,7 +43,6 @@ export class LocalizeRouterPipe implements PipeTransform, OnDestroy {
     /** translate key and update values */
     this.value = this.localize.translateRoute(query);
     this.lastKey = query;
-    this.markForTransform = false;
     return this.value;
   }
 
