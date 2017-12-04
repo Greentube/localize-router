@@ -53,6 +53,7 @@ In order to use Http loader for config files, you must include `localize-router-
 ```ts
 import {BrowserModule} from "@angular/platform-browser";
 import {NgModule} from '@angular/core';
+import {Location} from '@angular/common';
 import {HttpClientModule, HttpClient} from '@angular/common/http';
 import {TranslateModule} from '@ngx-translate/core';
 import {LocalizeRouterModule} from 'localize-router';
