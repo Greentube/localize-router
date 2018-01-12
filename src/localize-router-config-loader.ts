@@ -28,8 +28,8 @@ export class LocalizeRouterConfigLoader extends SystemJsNgModuleLoader {
           const module = factory.create(parentInjector);
           const getMethod = module.injector.get.bind(module.injector);
 
-          module.injector['get'] = (token: any) => {
-            const getResult = getMethod(token);
+          module.injector['get'] = (token: any, notFoundValue: any) => {
+            const getResult = getMethod(token, notFoundValue);
 
             if (token === ROUTES) {
               // translate lazy routes
