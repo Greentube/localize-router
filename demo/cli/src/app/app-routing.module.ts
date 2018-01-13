@@ -6,6 +6,8 @@ import { TranslateService } from '@ngx-translate/core';
 import { Location } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 
+//LocalizeRouterHttpLoader need to be updated
+
 // export function HttpLoaderFactory(translate: TranslateService, location: Location, settings: LocalizeRouterSettings, http: HttpClient) {
 //   return new LocalizeRouterHttpLoader(translate, location, settings, http);
 // }
