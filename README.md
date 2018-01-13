@@ -122,12 +122,12 @@ export class LocalizeUniversalLoader extends LocalizeParser {
    * Gets config from the server
    * @param routes
    */
-  public load(routes: Routes): Promise<any> {
+  public load(routes: Routes, translate: TranslateService): Promise<any> {
     return new Promise((resolve: any) => {
       let data: any = JSON.parse(fs.readFileSync(`assets/locales.json`, 'utf8'));
       this.locales = data.locales;
       this.prefix = data.prefix;
-      this.init(routes).then(resolve);
+      this.init(routes, translate).then(resolve);
     });
   }
 }
