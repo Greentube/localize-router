@@ -70,9 +70,9 @@ import {routes} from './app.routes';
     LocalizeRouterModule.forRoot(routes, {
       parser: {
         provide: LocalizeParser,
-        useFactory: (translate, location, settings, http) =>
-            new LocalizeRouterHttpLoader(translate, location, settings, http),
-        deps: [TranslateService, Location, LocalizeRouterSettings, HttpClient]
+        useFactory: (location, settings, http) =>
+            new LocalizeRouterHttpLoader(location, settings, http),
+        deps: [Location, LocalizeRouterSettings, HttpClient]
       }
     }),
     RouterModule.forRoot(routes)
@@ -107,9 +107,9 @@ Apart from providing routes which are mandatory, and parser loader you can provi
    LocalizeRouterModule.forRoot(routes, {
        parser: {
            provide: LocalizeParser,
-           useFactory: (translate, location, settings) =>
-               new ManualParserLoader(translate, location, settings, ['en','de',...], 'YOUR_PREFIX'),
-           deps: [TranslateService, Location, LocalizeRouterSettings]
+           useFactory: (location, settings) =>
+               new ManualParserLoader(location, settings, ['en','de',...], 'YOUR_PREFIX'),
+           deps: [Location, LocalizeRouterSettings]
        }
    })
    ```
@@ -132,8 +132,8 @@ export class LocalizeUniversalLoader extends LocalizeParser {
   }
 }
 
-export function localizeLoaderFactory(translate: TranslateService, location: Location, settings: LocalizeRouterSettings) {
-  return new LocalizeUniversalLoader(translate, location, settings);
+export function localizeLoaderFactory(location: Location, settings: LocalizeRouterSettings) {
+  return new LocalizeUniversalLoader(location, settings);
 }
 ```
 
@@ -259,8 +259,8 @@ In order to use Ahead-Of-Time compilation any custom loaders must be exported as
 This is the implementation currently in the solution:
 
 ```ts
-export function localizeLoaderFactory(translate: TranslateService, location: Location, http: Http) {
-  return new StaticParserLoader(translate, location, http);
+export function localizeLoaderFactory(location: Location, http: Http) {
+  return new StaticParserLoader(location, http);
 }
 ```
 
