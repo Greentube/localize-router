@@ -1,13 +1,17 @@
 import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { LocalizeRouterModule, LocalizeRouterSettings, LocalizeParser } from 'localize-router';
+import { LocalizeRouterModule, LocalizeRouterSettings, LocalizeParser, ManualParserLoader } from 'localize-router';
 import { LocalizeRouterHttpLoader } from 'localize-router-http-loader';
 import { TranslateService } from '@ngx-translate/core';
 import { Location } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 
-export function HttpLoaderFactory(translate: TranslateService, location: Location, settings: LocalizeRouterSettings, http: HttpClient) {
-  return new LocalizeRouterHttpLoader(translate, location, settings, http);
+// export function HttpLoaderFactory(translate: TranslateService, location: Location, settings: LocalizeRouterSettings, http: HttpClient) {
+//   return new LocalizeRouterHttpLoader(translate, location, settings, http);
+// }
+
+export function HttpLoaderFactory(location: Location, settings: LocalizeRouterSettings) {
+  return new ManualParserLoader(location, settings, ["en", "de"], null);
 }
 
 const routes = [
@@ -21,7 +25,7 @@ const routes = [
       parser: {
         provide: LocalizeParser,
         useFactory: HttpLoaderFactory,
-        deps: [TranslateService, Location, LocalizeRouterSettings, HttpClient]
+        deps: [Location, LocalizeRouterSettings]
       }
     })
   ],

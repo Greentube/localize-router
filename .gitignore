@@ -48,3 +48,5 @@ Desktop.ini
 
 .DS_Store
 
+demo/cli/yarn.lock
+yarn.lock

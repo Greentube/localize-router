@@ -19,6 +19,7 @@ export abstract class LocalizeParser {
   currentLang: string;
   routes: Routes;
   defaultLang: string;
+  translate: TranslateService;
 
   protected prefix: string;
 
@@ -28,12 +29,10 @@ export abstract class LocalizeParser {
 
   /**
    * Loader constructor
-   * @param translate
    * @param location
    * @param settings
    */
-  constructor(@Inject(TranslateService) private translate: TranslateService,
-              @Inject(Location) private location: Location,
+  constructor(@Inject(Location) private location: Location,
               @Inject(LocalizeRouterSettings) private settings: LocalizeRouterSettings) {
   }
 
@@ -42,17 +41,18 @@ export abstract class LocalizeParser {
    * @param routes
    * @returns {Promise<any>}
    */
-  abstract load(routes: Routes): Promise<any>;
+  abstract load(routes: Routes, translate: TranslateService): Promise<any>;
 
   /**
    * Initialize language and routes
    * @param routes
    * @returns {Promise<any>}
    */
-  protected init(routes: Routes): Promise<any> {
+  protected init(routes: Routes, translate: TranslateService): Promise<any> {
     let selectedLanguage: string;
 
     this.routes = routes;
+    this.translate = translate;
 
     if (!this.locales || !this.locales.length) {
       return Promise.resolve();
@@ -369,8 +369,8 @@ export class ManualParserLoader extends LocalizeParser {
    * @param locales
    * @param prefix
    */
-  constructor(translate: TranslateService, location: Location, settings: LocalizeRouterSettings, locales: string[] = ['en'], prefix: string = 'ROUTES.') {
-    super(translate, location, settings);
+  constructor(location: Location, settings: LocalizeRouterSettings, locales: string[] = ['en'], prefix: string = 'ROUTES.') {
+    super(location, settings);
     this.locales = locales;
     this.prefix = prefix || '';
   }
@@ -380,17 +380,17 @@ export class ManualParserLoader extends LocalizeParser {
    * @param routes
    * @returns {Promise<any>}
    */
-  load(routes: Routes): Promise<any> {
+  load(routes: Routes, translate: TranslateService): Promise<any> {
     return new Promise((resolve: any) => {
-      this.init(routes).then(resolve);
+      this.init(routes, translate).then(resolve);
     });
   }
 }
 
 export class DummyLocalizeParser extends LocalizeParser {
-  load(routes: Routes): Promise<any> {
+  load(routes: Routes, translate: TranslateService): Promise<any> {
     return new Promise((resolve: any) => {
-      this.init(routes).then(resolve);
+      this.init(routes, translate).then(resolve);
     });
   }
 }
