@@ -8,7 +8,7 @@ import { MembersListComponent } from './members/members-list/members-list.compon
 import { MembersComponent } from './members/members.component';
 import { HomeComponent } from './home/home.component';
 import { RoutingModule } from './app-routing.module';
-import { MatButtonModule, MatCardModule, MatToolbarModule, MatGridListModule } from '@angular/material';
+import { MatButtonModule, MatCardModule, MatToolbarModule, MatGridListModule, MatChipsModule } from '@angular/material';
 import { MembersService } from './members/shared/members.service';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
@@ -40,6 +40,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     MatToolbarModule,
     MatButtonModule,
     MatCardModule,
+    MatChipsModule,
     MatGridListModule,
     RoutingModule
   ],

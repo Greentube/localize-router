@@ -2,8 +2,13 @@
   "HOME": "Home",
   "MEMBERS": "Members",
   "NAMED_ROUTES": "Angular App with named routes",
-  "WELCOME_INFO": "Welcome to Angular 2 Named Router Outlets",
+  "WELCOME_INFO": "Welcome to Angular Austria Members list",
   "SELECT_A_ROUTE": "Select a route above or click the button below to see what different router-outlets produce.",
   "SELECT_MEMBER": "Please select member",
-  "NO_MEMBER_SELECTED": "No member selected"
+  "NO_MEMBER_SELECTED": "No member selected",
+  "CHANGE_LANG": "Change language to:",
+
+  "ROUTES.home": "home",
+  "ROUTES.members": "members",
+  "ROUTES.membersList": "membersList"
 }

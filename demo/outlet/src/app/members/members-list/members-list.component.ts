@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MembersService, Member } from '../shared';
 import { Observable } from 'rxjs/Observable';
+import { LocalizeRouterService } from 'localize-router';
 
 @Component({
   selector: 'app-members-list',
@@ -14,7 +15,8 @@ export class MembersListComponent implements OnInit {
   constructor(
     private router: Router,
     private route: ActivatedRoute,
-    private service: MembersService
+    private service: MembersService,
+    private localize: LocalizeRouterService
   ) { }
 
   ngOnInit() {
@@ -31,6 +33,8 @@ export class MembersListComponent implements OnInit {
 
   showBio(id: string) {
     this.selectedMember = id;
-    this.router.navigate(['/members', {outlets: {'bio': [id]}}]);
+
+    const route = this.localize.translateRoute(['/members', {outlets: {'bio': [id]}}]) as any[];
+    this.router.navigate(route);
   }
 }

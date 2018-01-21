@@ -1,0 +1,14 @@
+{
+  "HOME": "Start",
+  "MEMBERS": "Die Mitglieder",
+  "NAMED_ROUTES": "Angular App mit bennante Routen",
+  "WELCOME_INFO": "Wilkommen zu Angular Austria Mitglieder Liste",
+  "SELECT_A_ROUTE": "** Select a route above or click the button below to see what different router-outlets produce.",
+  "SELECT_MEMBER": "** Please select member",
+  "NO_MEMBER_SELECTED": "** No member selected",
+  "CHANGE_LANG": "Die Sprache tauchen zu:",
+
+  "ROUTES.home": "start",
+  "ROUTES.members": "mitglieder",
+  "ROUTES.membersList": "mitgliederListe"
+}

@@ -4,6 +4,13 @@ import { HomeComponent } from './home/home.component';
 import { MembersComponent } from './members/members.component';
 import { MembersListComponent } from './members/members-list/members-list.component';
 import { BioComponent } from './members/bio/bio.component';
+import { LocalizeRouterModule, LocalizeRouterSettings, LocalizeParser, ManualParserLoader } from 'localize-router';
+import { TranslateService } from '@ngx-translate/core';
+import { Location } from '@angular/common';
+
+export function ManualLoaderFactory(translate: TranslateService, location: Location, settings: LocalizeRouterSettings) {
+  return new ManualParserLoader(translate, location, settings, ['en', 'de']);
+}
 
 const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -15,8 +22,16 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule],
-  providers: []
+  imports: [
+    RouterModule.forRoot(routes),
+    LocalizeRouterModule.forRoot(routes, {
+      parser: {
+        provide: LocalizeParser,
+        useFactory: ManualLoaderFactory,
+        deps: [TranslateService, Location, LocalizeRouterSettings]
+      }
+    })
+  ],
+  exports: [ RouterModule, LocalizeRouterModule ]
 })
 export class RoutingModule { }
