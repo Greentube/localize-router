@@ -1,0 +1,11 @@
+<mat-card-title>{{ 'MEMBERS' | translate }}</mat-card-title>
+<mat-grid-list cols="3" gutterSize="4px">
+  <mat-grid-tile
+    *ngFor="let member of (members$ | async)"
+    [ngClass]="{ selected: member.login == selectedMember }"
+    [style.background-image]="'url(' + member.avatar_url + ')'"
+    [style.background-size]="'contain'"
+    [style.background-repeat]="'no-repeat'"
+    (click)="showBio(member.login)"
+  ></mat-grid-tile>
+</mat-grid-list>

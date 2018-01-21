@@ -1,0 +1,15 @@
+<mat-toolbar color="primary" class="mat-elevation-z2">
+  {{ 'NAMED_ROUTES' | translate }}
+
+  <span class="app-toolbar-filler"></span>
+  <button routerLink="home" mat-button>{{ 'HOME' | translate }}</button>
+  <button mat-button
+          [routerLink]="['/members', { outlets: { 'list': ['membersList'], 'bio': ['none'] } }]">
+    {{ 'MEMBERS' | translate }}
+  </button>
+</mat-toolbar>
+
+<div class="app-content">
+  <router-outlet></router-outlet>
+</div>
+

@@ -1,0 +1,7 @@
+<div *ngIf="!currentMember">
+  <mat-card-title>{{ 'SELECT_MEMBER' | translate }}</mat-card-title>
+  <mat-card-subtitle>{{ 'NO_MEMBER_SELECTED' | translate }}</mat-card-subtitle>
+</div>
+
+<mat-card-title>{{currentMember?.name}}</mat-card-title>
+<mat-card-subtitle>{{currentMember?.bio}}</mat-card-subtitle>

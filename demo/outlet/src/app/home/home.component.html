@@ -1,0 +1,18 @@
+<div class="card-wrapper">
+  <mat-card>
+    <mat-card-content>
+      <mat-card-title>
+        {{ 'WELCOME_INFO' | translate }}
+      </mat-card-title>
+      <mat-card-subtitle>
+        {{ 'SELECT_A_ROUTE' | translate }}
+      </mat-card-subtitle>
+      <mat-card-actions>
+        <button mat-raised-button class="mat-primary"
+                [routerLink]="['/members', {outlets: {list: ['membersList'], bio: ['none']}}]">
+          {{ 'MEMBERS' | translate }}
+        </button>
+      </mat-card-actions>
+    </mat-card-content>
+  </mat-card>
+</div>
