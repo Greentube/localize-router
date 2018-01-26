@@ -351,7 +351,7 @@ export abstract class LocalizeParser {
     if (!this._translationObject) {
       return key;
     }
-    let res = this._translationObject[this.prefix + key];
+    let res = this.translate.getParsedResult(this._translationObject, this.prefix + key);
     return res || key;
   }
 }
