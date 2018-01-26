@@ -12,7 +12,7 @@ coverage/
 *.js
 # overrides for js
 !config/*
-!demo/cli/*js
+!demo/**/*js
 !karma.conf.js
 !webpack.config.js
 package-lock.json
@@ -48,5 +48,3 @@ Desktop.ini
 
 .DS_Store
 
-demo/cli/yarn.lock
-yarn.lock

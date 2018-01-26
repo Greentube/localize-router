@@ -1,0 +1,9 @@
+.columns {
+  display: flex;
+  flex-direction: row;
+}
+
+mat-card {
+  flex: 1 1 50%;
+  width: 50%;
+}

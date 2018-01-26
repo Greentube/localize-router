@@ -70,9 +70,9 @@ import {routes} from './app.routes';
     LocalizeRouterModule.forRoot(routes, {
       parser: {
         provide: LocalizeParser,
-        useFactory: (location, settings, http) =>
-            new LocalizeRouterHttpLoader(location, settings, http),
-        deps: [Location, LocalizeRouterSettings, HttpClient]
+        useFactory: (translate, location, settings, http) =>
+            new LocalizeRouterHttpLoader(translate, location, settings, http),
+        deps: [TranslateService, Location, LocalizeRouterSettings, HttpClient]
       }
     }),
     RouterModule.forRoot(routes)
@@ -107,9 +107,9 @@ Apart from providing routes which are mandatory, and parser loader you can provi
    LocalizeRouterModule.forRoot(routes, {
        parser: {
            provide: LocalizeParser,
-           useFactory: (location, settings) =>
-               new ManualParserLoader(location, settings, ['en','de',...], 'YOUR_PREFIX'),
-           deps: [Location, LocalizeRouterSettings]
+           useFactory: (translate, location, settings) =>
+               new ManualParserLoader(translate, location, settings, ['en','de',...], 'YOUR_PREFIX'),
+           deps: [TranslateService, Location, LocalizeRouterSettings]
        }
    })
    ```
@@ -122,18 +122,18 @@ export class LocalizeUniversalLoader extends LocalizeParser {
    * Gets config from the server
    * @param routes
    */
-  public load(routes: Routes, translate: TranslateService): Promise<any> {
+  public load(routes: Routes): Promise<any> {
     return new Promise((resolve: any) => {
       let data: any = JSON.parse(fs.readFileSync(`assets/locales.json`, 'utf8'));
       this.locales = data.locales;
       this.prefix = data.prefix;
-      this.init(routes, translate).then(resolve);
+      this.init(routes).then(resolve);
     });
   }
 }
 
-export function localizeLoaderFactory(location: Location, settings: LocalizeRouterSettings) {
-  return new LocalizeUniversalLoader(location, settings);
+export function localizeLoaderFactory(translate: TranslateService, location: Location, settings: LocalizeRouterSettings) {
+  return new LocalizeUniversalLoader(translate, location, settings);
 }
 ```
 
@@ -259,8 +259,8 @@ In order to use Ahead-Of-Time compilation any custom loaders must be exported as
 This is the implementation currently in the solution:
 
 ```ts
-export function localizeLoaderFactory(location: Location, http: Http) {
-  return new StaticParserLoader(location, http);
+export function localizeLoaderFactory(translate: TranslateService, location: Location, http: Http) {
+  return new StaticParserLoader(translate, location, http);
 }
 ```
 

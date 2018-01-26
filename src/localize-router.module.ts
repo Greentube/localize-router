@@ -6,7 +6,7 @@ import { LocalizeRouterService } from './localize-router.service';
 import { DummyLocalizeParser, LocalizeParser } from './localize-router.parser';
 import { RouterModule, Routes } from '@angular/router';
 import { LocalizeRouterPipe } from './localize-router.pipe';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslateModule } from '@ngx-translate/core';
 import { CommonModule } from '@angular/common';
 import {
   ALWAYS_SET_PREFIX,
@@ -32,9 +32,7 @@ export class ParserInitializer {
    * @returns {Promise<any>}
    */
   appInitializer(): Promise<any> {
-    const translate: TranslateService =  this.injector.get(TranslateService);
-
-    const res = this.parser.load(this.routes, translate);
+    const res = this.parser.load(this.routes);
     res.then(() => {
       const localize: LocalizeRouterService = this.injector.get(LocalizeRouterService);
       localize.init();
