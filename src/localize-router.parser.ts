@@ -22,7 +22,6 @@ export abstract class LocalizeParser {
 
   protected prefix: string;
 
-  private _translationObject: any;
   private _wildcardRoute: Route;
   private _languageRoute: Route;
 
@@ -131,7 +130,6 @@ export abstract class LocalizeParser {
       }
 
       this.translate.use(language).subscribe((translations: any) => {
-        this._translationObject = translations;
         this.currentLang = language;
 
         if (this._languageRoute) {
@@ -348,11 +346,15 @@ export abstract class LocalizeParser {
    * @returns {any}
    */
   private translateText(key: string): string {
-    if (!this._translationObject) {
+    if(key.charAt(0) === ':') {
+      // do not translate named parameters
       return key;
     }
-    let res = this._translationObject[this.prefix + key];
-    return res || key;
+    let res = this.translate.instant(this.prefix + key);
+    if(! res || (typeof res === 'string' && res.substring(0, this.prefix.length) === this.prefix)) {
+      res = key;
+    }
+    return res;
   }
 }
 
