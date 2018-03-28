@@ -50,6 +50,10 @@ class FakeTranslateService {
   getBrowserLang() {
     return this.browserLang;
   }
+
+  getParsedResult(translations: any, key: any): any {
+    return translations[key];
+  }
 }
 
 class FakeLocation {
