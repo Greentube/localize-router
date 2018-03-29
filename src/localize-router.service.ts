@@ -87,9 +87,12 @@ export class LocalizeRouterService {
    * @returns {string}
    */
   private traverseRouteSnapshot(snapshot: ActivatedRouteSnapshot): string {
-    if (snapshot.firstChild && snapshot.firstChild.routeConfig && snapshot.firstChild.routeConfig.path) {
+    if (snapshot.firstChild && snapshot.firstChild.routeConfig) {
       if (snapshot.firstChild.routeConfig.path !== '**') {
-        return this.parseSegmentValue(snapshot) + '/' + this.traverseRouteSnapshot(snapshot.firstChild);
+        if (snapshot.firstChild.routeConfig.path) {
+          return this.parseSegmentValue(snapshot) + '/' + this.traverseRouteSnapshot(snapshot.firstChild);
+        }
+        return this.parseSegmentValue(snapshot) + this.traverseRouteSnapshot(snapshot.firstChild);
       } else {
         return this.parseSegmentValue(snapshot.firstChild);
       }
