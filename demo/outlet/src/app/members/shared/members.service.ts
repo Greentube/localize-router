@@ -13,10 +13,7 @@ export class MembersService {
   private members$;
 
   constructor(private http: HttpClient) {
-    let observables = [];
-    this.usernames.forEach((username: string) => {
-      observables.push(this.getMemberByHandle(username));
-    });
+    const observables = this.usernames.map((username: string) => this.getMemberByHandle(username));
 
     this.members$ = Observable.forkJoin(...observables);
     this.members$.subscribe();
