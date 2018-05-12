@@ -3,6 +3,7 @@ import { Router, NavigationStart, ActivatedRouteSnapshot, NavigationExtras, UrlS
 import { Subject } from 'rxjs/Subject';
 import 'rxjs/add/observable/forkJoin';
 import 'rxjs/add/operator/toPromise';
+import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/filter';
 import 'rxjs/add/operator/pairwise';
 
@@ -72,6 +73,7 @@ export class LocalizeRouterService {
           url = urlSegments.join('/');
         }
 
+        this.router.resetConfig(this.parser.routes);
         if (useNavigateMethod) {
           this.router.navigate([url], extras);
         } else {
@@ -153,8 +155,11 @@ export class LocalizeRouterService {
       const currentLang = this.parser.getLocationLang(currentEvent.url) || this.parser.defaultLang;
 
       if (currentLang !== previousLang) {
-        this.parser.translateRoutes(currentLang).subscribe(() => {
+        this.parser.translateRoutes(currentLang)
+        .do(_ => this.router.resetConfig(this.parser.routes))
+        .subscribe(() => {
           // Fire route change event
+          this.router.resetConfig(this.parser.routes);
           this.routerEvents.next(currentLang);
         });
       }
