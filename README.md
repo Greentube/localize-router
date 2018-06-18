@@ -294,8 +294,8 @@ let selectedLanguage = localizeService.parser.currentLang;
 - `translateRoute(path: string | any[]): string | any[]`: Translates given path. If `path` starts with backslash then path is prepended with currently set language.
 ```ts
 localizeService.translateRoute('/'); // -> e.g. '/en'
-localizeService.translateRoute('/about'); // -> '/de/uber' (e.g. for German language)
-localizeService.translateRoute('about'); // -> 'uber' (e.g. for German language)
+localizeService.translateRoute('/about'); // -> '/de/ueber-uns' (e.g. for German language)
+localizeService.translateRoute('about'); // -> 'ueber-uns' (e.g. for German language)
 ```
 - `changeLanguage(lang: string, extras?: NavigationExtras, useNavigateMethod?: boolean)`: Translates current url to given language and changes the application's language.
 `extras` will be passed down to Angular Router navigation methods.
