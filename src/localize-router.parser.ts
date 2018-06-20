@@ -1,14 +1,12 @@
-import { Routes, Route } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
-import { Observable } from 'rxjs/Observable';
-import { Observer } from 'rxjs/Observer';
 import { Location } from '@angular/common';
+import { Inject } from '@angular/core';
+import { Route, Routes } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 import 'rxjs/add/observable/forkJoin';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/share';
 import 'rxjs/add/operator/toPromise';
 import { CacheMechanism, LocalizeRouterSettings } from './localize-router.config';
-import { Inject } from '@angular/core';
 
 const COOKIE_EXPIRY = 30; // 1 month
 
@@ -111,7 +109,7 @@ export abstract class LocalizeParser {
 
     /** translate routes */
     const res = this.translateRoutes(selectedLanguage);
-    return res.toPromise();
+    return res;
   }
 
   initChildRoutes(routes: Routes) {
@@ -124,7 +122,7 @@ export abstract class LocalizeParser {
    * @param language
    * @returns {Promise<any>}
    */
-  translateRoutes(language: string): Observable<any> {
+  translateRoutes(language: string): Promise<any> {
       this._cachedLang = language;
       if (this._languageRoute) {
         this._languageRoute.path = language;
@@ -146,7 +144,7 @@ export abstract class LocalizeParser {
           this._translateRouteTree(this.routes);
         }
 
-      });
+      }).toPromise();
   }
 
   /**
