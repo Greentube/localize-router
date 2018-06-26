@@ -1,7 +1,6 @@
 import { PipeTransform, Pipe, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { LocalizeRouterService } from './localize-router.service';
-import { Subscription } from 'rxjs/Subscription';
-import 'rxjs/add/observable/forkJoin';
+import { Subscription } from 'rxjs';
 import { equals } from './util';
 
 const VIEW_DESTROYED_STATE = 128;
@@ -26,7 +25,7 @@ export class LocalizeRouterPipe implements PipeTransform, OnDestroy {
       this.transform(this.lastKey);
     });
   }
-  
+
   ngOnDestroy() {
     if (this.subscription) {
       this.subscription.unsubscribe();
