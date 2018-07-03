@@ -11,14 +11,13 @@ import { LocalizeParser } from './localize-router.parser';
 @Injectable()
 export class LocalizeRouterConfigLoader extends SystemJsNgModuleLoader {
 
-  constructor(@Inject(forwardRef(() => LocalizeParser)) private localize: LocalizeParser, _compiler: Compiler, @Optional() config?: SystemJsNgModuleLoaderConfig) {
-    super(_compiler, config);
+  constructor(@Inject(forwardRef(() => LocalizeParser)) private localize: LocalizeParser,
+    _compiler: Compiler, @Optional() config?: SystemJsNgModuleLoaderConfig) {
+      super(_compiler, config);
   }
 
   /**
    * Extend load with custom functionality
-   * @param {string} path
-   * @returns {Promise<NgModuleFactory<any>>}
    */
   load(path: string): Promise<NgModuleFactory<any>> {
     return super.load(path).then((factory: NgModuleFactory<any>) => {

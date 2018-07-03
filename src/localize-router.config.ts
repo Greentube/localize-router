@@ -4,13 +4,11 @@ import { LocalizeRouterModule } from './localize-router.module';
 
 /**
  * Guard to make sure we have single initialization of forRoot
- * @type {InjectionToken<LocalizeRouterModule>}
  */
 export const LOCALIZE_ROUTER_FORROOT_GUARD = new InjectionToken<LocalizeRouterModule>('LOCALIZE_ROUTER_FORROOT_GUARD');
 
 /**
  * Static provider for keeping track of routes
- * @type {InjectionToken<Routes[]>}
  */
 export const RAW_ROUTES: InjectionToken<Routes[]> = new InjectionToken<Routes[]>('RAW_ROUTES');
 
@@ -29,17 +27,14 @@ export namespace CacheMechanism {
 
 /**
  * Boolean to indicate whether to use cached language value
- * @type {InjectionToken<boolean>}
  */
 export const USE_CACHED_LANG = new InjectionToken<boolean>('USE_CACHED_LANG');
 /**
  * Cache mechanism type
- * @type {InjectionToken<CacheMechanism>}
  */
 export const CACHE_MECHANISM = new InjectionToken<CacheMechanism>('CACHE_MECHANISM');
 /**
  * Cache name
- * @type {InjectionToken<string>}
  */
 export const CACHE_NAME = new InjectionToken<string>('CACHE_NAME');
 
@@ -51,13 +46,11 @@ export type DefaultLanguageFunction = (languages: string[], cachedLang?: string,
 
 /**
  * Function for calculating default language
- * @type {InjectionToken<DefaultLanguageFunction>}
  */
 export const DEFAULT_LANG_FUNCTION = new InjectionToken<DefaultLanguageFunction>('DEFAULT_LANG_FUNCTION');
 
 /**
  * Boolean to indicate whether prefix should be set for single language scenarios
- * @type {InjectionToken<boolean>}
  */
 export const ALWAYS_SET_PREFIX = new InjectionToken<boolean>('ALWAYS_SET_PREFIX');
 
@@ -78,11 +71,6 @@ const LOCALIZE_CACHE_NAME = 'LOCALIZE_DEFAULT_LANGUAGE';
 export class LocalizeRouterSettings implements LocalizeRouterConfig {
   /**
    * Settings for localize router
-   * @param {boolean} useCachedLang
-   * @param {boolean} alwaysSetPrefix
-   * @param {CacheMechanism} cacheMechanism
-   * @param {string} cacheName
-   * @param {DefaultLanguageFunction} defaultLangFunction
    */
   constructor(
     @Inject(USE_CACHED_LANG) public useCachedLang: boolean = true,

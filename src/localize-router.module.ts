@@ -23,14 +23,10 @@ export class ParserInitializer {
 
   /**
    * CTOR
-   * @param injector
    */
   constructor(private injector: Injector) {
   }
 
-  /**
-   * @returns {Promise<any>}
-   */
   appInitializer(): Promise<any> {
     const res = this.parser.load(this.routes);
     res.then(() => {
@@ -41,11 +37,6 @@ export class ParserInitializer {
     return res;
   }
 
-  /**
-   * @param parser
-   * @param routes
-   * @returns {()=>Promise<any>}
-   */
   generateInitializer(parser: LocalizeParser, routes: Routes[]): () => Promise<any> {
     this.parser = parser;
     this.routes = routes.reduce((a, b) => a.concat(b));
@@ -53,12 +44,6 @@ export class ParserInitializer {
   }
 }
 
-/**
- * @param p
- * @param parser
- * @param routes
- * @returns {any}
- */
 export function getAppInitializer(p: ParserInitializer, parser: LocalizeParser, routes: Routes[]): any {
   return p.generateInitializer(parser, routes).bind(p);
 }
@@ -118,10 +103,6 @@ export class LocalizeRouterModule {
   }
 }
 
-/**
- * @param localizeRouterModule
- * @returns {string}
- */
 export function provideForRootGuard(localizeRouterModule: LocalizeRouterModule): string {
   if (localizeRouterModule) {
     throw new Error(

@@ -1,11 +1,7 @@
 import { Routes, Route } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { Observable } from 'rxjs/Observable';
-import { Observer } from 'rxjs/Observer';
+import { Observable, Observer } from 'rxjs';
 import { Location } from '@angular/common';
-import 'rxjs/add/observable/forkJoin';
-import 'rxjs/add/operator/share';
-import 'rxjs/add/operator/toPromise';
 import { CacheMechanism, LocalizeRouterSettings } from './localize-router.config';
 import { Inject } from '@angular/core';
 
@@ -28,26 +24,19 @@ export abstract class LocalizeParser {
 
   /**
    * Loader constructor
-   * @param translate
-   * @param location
-   * @param settings
    */
   constructor(@Inject(TranslateService) private translate: TranslateService,
-              @Inject(Location) private location: Location,
-              @Inject(LocalizeRouterSettings) private settings: LocalizeRouterSettings) {
+    @Inject(Location) private location: Location,
+    @Inject(LocalizeRouterSettings) private settings: LocalizeRouterSettings) {
   }
 
   /**
    * Load routes and fetch necessary data
-   * @param routes
-   * @returns {Promise<any>}
    */
   abstract load(routes: Routes): Promise<any>;
 
   /**
    * Initialize language and routes
-   * @param routes
-   * @returns {Promise<any>}
    */
   protected init(routes: Routes): Promise<any> {
     let selectedLanguage: string;
@@ -58,8 +47,8 @@ export abstract class LocalizeParser {
       return Promise.resolve();
     }
     /** detect current language */
-    let locationLang = this.getLocationLang();
-    let browserLang = this._getBrowserLang();
+    const locationLang = this.getLocationLang();
+    const browserLang = this._getBrowserLang();
 
     if (this.settings.defaultLangFunction) {
       this.defaultLang = this.settings.defaultLangFunction(this.locales, this._cachedLang, browserLang);
@@ -75,7 +64,7 @@ export abstract class LocalizeParser {
       const baseRoute = { path: '', redirectTo: this.defaultLang, pathMatch: 'full' };
 
       /** extract potential wildcard route */
-      let wildcardIndex = routes.findIndex((route: Route) => route.path === '**');
+      const wildcardIndex = routes.findIndex((route: Route) => route.path === '**');
       if (wildcardIndex !== -1) {
         this._wildcardRoute = routes.splice(wildcardIndex, 1)[0];
       }
@@ -120,8 +109,6 @@ export abstract class LocalizeParser {
 
   /**
    * Translate routes to selected language
-   * @param language
-   * @returns {Promise<any>}
    */
   translateRoutes(language: string): Observable<any> {
     return new Observable<any>((observer: Observer<any>) => {
@@ -154,8 +141,6 @@ export abstract class LocalizeParser {
 
   /**
    * Translate the route node and recursively call for all it's children
-   * @param routes
-   * @private
    */
   private _translateRouteTree(routes: Routes): void {
     routes.forEach((route: Route) => {
@@ -177,14 +162,10 @@ export abstract class LocalizeParser {
   /**
    * Translate property
    * If first time translation then add original to route data object
-   * @param route
-   * @param property
-   * @param prefixLang
-   * @private
    */
   private _translateProperty(route: Route, property: string, prefixLang?: boolean): void {
     // set property to data if not there yet
-    let routeData: any = route.data = route.data || {};
+    const routeData: any = route.data = route.data || {};
     if (!routeData.localizeRouter) {
       routeData.localizeRouter = {};
     }
@@ -192,7 +173,7 @@ export abstract class LocalizeParser {
       routeData.localizeRouter[property] = (<any>route)[property];
     }
 
-    let result = this.translateRoute(routeData.localizeRouter[property]);
+    const result = this.translateRoute(routeData.localizeRouter[property]);
     (<any>route)[property] = prefixLang ? `/${this.urlPrefix}${result}` : result;
   }
 
@@ -202,15 +183,13 @@ export abstract class LocalizeParser {
 
   /**
    * Translate route and return observable
-   * @param path
-   * @returns {string}
    */
   translateRoute(path: string): string {
-    let queryParts = path.split('?');
+    const queryParts = path.split('?');
     if (queryParts.length > 2) {
-      throw 'There should be only one query parameter block in the URL';
+      throw Error('There should be only one query parameter block in the URL');
     }
-    let pathSegments = queryParts[0].split('/');
+    const pathSegments = queryParts[0].split('/');
 
     /** collect observables  */
     return pathSegments
@@ -221,11 +200,9 @@ export abstract class LocalizeParser {
 
   /**
    * Get language from url
-   * @returns {string}
-   * @private
    */
   getLocationLang(url?: string): string {
-    let queryParamSplit = (url || this.location.path()).split('?');
+    const queryParamSplit = (url || this.location.path()).split('?');
     let pathSlices: string[] = [];
     if (queryParamSplit.length > 0) {
       pathSlices = queryParamSplit[0].split('/');
@@ -241,8 +218,6 @@ export abstract class LocalizeParser {
 
   /**
    * Get user's language set in the browser
-   * @returns {string}
-   * @private
    */
   private _getBrowserLang(): string {
     return this._returnIfInLocales(this.translate.getBrowserLang());
@@ -250,8 +225,6 @@ export abstract class LocalizeParser {
 
   /**
    * Get language from local storage or cookie
-   * @returns {string}
-   * @private
    */
   private get _cachedLang(): string {
     if (!this.settings.useCachedLang) {
@@ -267,8 +240,6 @@ export abstract class LocalizeParser {
 
   /**
    * Save language to local storage or cookie
-   * @param value
-   * @private
    */
   private set _cachedLang(value: string) {
     if (!this.settings.useCachedLang) {
@@ -284,9 +255,6 @@ export abstract class LocalizeParser {
 
   /**
    * Cache value to local storage
-   * @param value
-   * @returns {string}
-   * @private
    */
   private _cacheWithLocalStorage(value?: string): string {
     if (typeof window === 'undefined' || typeof window.localStorage === 'undefined') {
@@ -306,8 +274,6 @@ export abstract class LocalizeParser {
 
   /**
    * Cache value via cookies
-   * @param value
-   * @private
    */
   private _cacheWithCookies(value?: string): string {
     if (typeof document === 'undefined' || typeof document.cookie === 'undefined') {
@@ -316,7 +282,7 @@ export abstract class LocalizeParser {
     try {
       const name = encodeURIComponent(this.settings.cacheName);
       if (value) {
-        let d: Date = new Date();
+        const d: Date = new Date();
         d.setTime(d.getTime() + COOKIE_EXPIRY * 86400000); // * days
         document.cookie = `${name}=${encodeURIComponent(value)};expires=${d.toUTCString()}`;
         return;
@@ -331,9 +297,6 @@ export abstract class LocalizeParser {
 
   /**
    * Check if value exists in locales list
-   * @param value
-   * @returns {any}
-   * @private
    */
   private _returnIfInLocales(value: string): string {
     if (value && this.locales.indexOf(value) !== -1) {
@@ -344,15 +307,14 @@ export abstract class LocalizeParser {
 
   /**
    * Get translated value
-   * @param key
-   * @returns {any}
    */
   private translateText(key: string): string {
     if (!this._translationObject) {
       return key;
     }
-    let res = this.translate.getParsedResult(this._translationObject, this.prefix + key);
-    return res || key;
+    const fullKey = this.prefix + key;
+    const res = this.translate.getParsedResult(this._translationObject, fullKey);
+    return res !== fullKey ? res : key;
   }
 }
 
@@ -363,13 +325,9 @@ export class ManualParserLoader extends LocalizeParser {
 
   /**
    * CTOR
-   * @param translate
-   * @param location
-   * @param settings
-   * @param locales
-   * @param prefix
    */
-  constructor(translate: TranslateService, location: Location, settings: LocalizeRouterSettings, locales: string[] = ['en'], prefix: string = 'ROUTES.') {
+  constructor(translate: TranslateService, location: Location, settings: LocalizeRouterSettings,
+    locales: string[] = ['en'], prefix: string = 'ROUTES.') {
     super(translate, location, settings);
     this.locales = locales;
     this.prefix = prefix || '';
@@ -377,8 +335,6 @@ export class ManualParserLoader extends LocalizeParser {
 
   /**
    * Initialize or append routes
-   * @param routes
-   * @returns {Promise<any>}
    */
   load(routes: Routes): Promise<any> {
     return new Promise((resolve: any) => {

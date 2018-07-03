@@ -1,7 +1,6 @@
 import { PipeTransform, Pipe, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { LocalizeRouterService } from './localize-router.service';
-import { Subscription } from 'rxjs/Subscription';
-import 'rxjs/add/observable/forkJoin';
+import { Subscription } from 'rxjs';
 import { equals } from './util';
 
 const VIEW_DESTROYED_STATE = 128;
@@ -18,15 +17,13 @@ export class LocalizeRouterPipe implements PipeTransform, OnDestroy {
 
   /**
    * CTOR
-   * @param localize
-   * @param _ref
    */
   constructor(private localize: LocalizeRouterService, private _ref: ChangeDetectorRef) {
     this.subscription = this.localize.routerEvents.subscribe(() => {
       this.transform(this.lastKey);
     });
   }
-  
+
   ngOnDestroy() {
     if (this.subscription) {
       this.subscription.unsubscribe();
@@ -35,8 +32,6 @@ export class LocalizeRouterPipe implements PipeTransform, OnDestroy {
 
   /**
    * Transform current url to localized one
-   * @param query
-   * @returns {string | any[]}
    */
   transform(query: string | any[]): string | any[] {
     if (!query || query.length === 0 || !this.localize.parser.currentLang) {
