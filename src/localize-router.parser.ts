@@ -106,12 +106,7 @@ export abstract class LocalizeParser {
 
     /** translate routes */
     const res = this.translateRoutes(selectedLanguage);
-    return new Promise((resolve, reject) => {
-      res.subscribe(
-        (data) => { resolve(data); },
-        (error) => { reject(error); }
-      );
-    });
+    return res.toPromise();
   }
 
   initChildRoutes(routes: Routes) {
