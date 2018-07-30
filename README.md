@@ -35,7 +35,7 @@ and don't forget to thank the original developer!
     - [LocalizeParser](#localizeparser)
 - [License](#license)
 
-## Installation
+## Installation (for old non-Angular6 version - I haven't put this into NPM yet)
 
 ```
 npm install --save localize-router
