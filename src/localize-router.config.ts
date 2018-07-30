@@ -1,4 +1,4 @@
-import { Inject, InjectionToken, Provider } from '@angular/core';
+import { Inject, InjectionToken, Provider, Injectable } from '@angular/core';
 import { Routes } from '@angular/router';
 import { LocalizeRouterModule } from './localize-router.module';
 
@@ -75,6 +75,7 @@ export interface LocalizeRouterConfig {
 
 const LOCALIZE_CACHE_NAME = 'LOCALIZE_DEFAULT_LANGUAGE';
 
+@Injectable()
 export class LocalizeRouterSettings implements LocalizeRouterConfig {
   /**
    * Settings for localize router

@@ -1,18 +1,15 @@
-import { Inject } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Router, NavigationStart, ActivatedRouteSnapshot, NavigationExtras, UrlSegment } from '@angular/router';
-import { Subject } from 'rxjs/Subject';
-import 'rxjs/add/observable/forkJoin';
-import 'rxjs/add/operator/toPromise';
-import 'rxjs/add/operator/filter';
-import 'rxjs/add/operator/pairwise';
-
+import { Subject } from 'rxjs';
 import { LocalizeParser } from './localize-router.parser';
 import { LocalizeRouterSettings } from './localize-router.config';
+import { filter, pairwise } from 'rxjs/operators';
 
 /**
  * Localization service
  * modifyRoutes
  */
+@Injectable()
 export class LocalizeRouterService {
   routerEvents: Subject<string>;
 
@@ -22,7 +19,7 @@ export class LocalizeRouterService {
    * @param settings
    * @param router
    */
-  constructor(@Inject(LocalizeParser) public parser: LocalizeParser, @Inject(LocalizeRouterSettings) public settings: LocalizeRouterSettings, @Inject(Router) private router: Router) {
+  constructor(public parser: LocalizeParser, public settings: LocalizeRouterSettings, private router: Router) {
     this.routerEvents = new Subject<string>();
   }
 
@@ -32,10 +29,9 @@ export class LocalizeRouterService {
   init(): void {
     this.router.resetConfig(this.parser.routes);
     // subscribe to router events
-    this.router.events
-      .filter(event => event instanceof NavigationStart)
-      .pairwise()
-      .subscribe(this._routeChanged());
+    this.router.events.pipe(
+      filter((event: any) => event instanceof NavigationStart)).pipe(
+      pairwise()).subscribe(this._routeChanged());
   }
 
   /**

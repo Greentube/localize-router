@@ -3,10 +3,10 @@ import {
   Injectable, Injector, NgModuleFactoryLoader
 } from '@angular/core';
 import { LocalizeRouterService } from './localize-router.service';
-import { DummyLocalizeParser, LocalizeParser } from './localize-router.parser';
+import { LocalizeParser } from './localize-router.parser';
 import { RouterModule, Routes } from '@angular/router';
 import { LocalizeRouterPipe } from './localize-router.pipe';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { CommonModule } from '@angular/common';
 import {
   ALWAYS_SET_PREFIX,
@@ -15,6 +15,7 @@ import {
   USE_CACHED_LANG
 } from './localize-router.config';
 import { LocalizeRouterConfigLoader } from './localize-router-config-loader';
+import { LocalizeParserMock } from './mocks/localize-parser.mock';
 
 @Injectable()
 export class ParserInitializer {
@@ -84,8 +85,10 @@ export class LocalizeRouterModule {
         { provide: CACHE_NAME, useValue: config.cacheName },
         { provide: CACHE_MECHANISM, useValue: config.cacheMechanism },
         { provide: DEFAULT_LANG_FUNCTION, useValue: config.defaultLangFunction },
+        TranslateService,
+        Location,
         LocalizeRouterSettings,
-        config.parser || { provide: LocalizeParser, useClass: DummyLocalizeParser },
+        config.parser || { provide: LocalizeParser, useClass: LocalizeParserMock },
         {
           provide: RAW_ROUTES,
           multi: true,
