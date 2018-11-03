@@ -2,7 +2,7 @@ import { LocalizeRouterPipe } from '../src/localize-router.pipe';
 import { LocalizeRouterService } from '../src/localize-router.service';
 import { Injector, ChangeDetectorRef } from '@angular/core';
 import { getTestBed, TestBed } from '@angular/core/testing';
-import { Subject } from 'rxjs/Subject';
+import { Subject } from 'rxjs';
 
 class FakeChangeDetectorRef extends ChangeDetectorRef {
   _view = { state: 0 };

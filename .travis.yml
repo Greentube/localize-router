@@ -6,7 +6,7 @@ cache:
 notifications:
   email: false
 node_js:
-  - '5'
+  - '8'
 before_install:
   - export CHROME_BIN=chromium-browser
   - npm i -g npm@^3
