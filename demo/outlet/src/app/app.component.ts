@@ -10,7 +10,6 @@ export class AppComponent {
   title = 'app';
 
   constructor(private localize: LocalizeRouterService) {
-    console.log('ROUTES', this.localize.parser.routes);
   }
 
   changeLanguage(lang: string) {

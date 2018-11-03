@@ -5,7 +5,7 @@
     <span class="app-toolbar-filler"></span>
     <button [routerLink]="['/home'] | localize" [routerLinkActive]="['mat-accent']" mat-button>{{ 'HOME' | translate }}</button>
     <button mat-button [routerLinkActive]="['mat-accent']"
-            [routerLink]="['/members', { outlets: { list: ['membersList'], bio: null } }] | localize">
+            [routerLink]="['/members', { random: 'ABC' }, { outlets: { list: ['membersList'], bio: null } }] | localize">
       {{ 'MEMBERS' | translate }}
     </button>
   </mat-toolbar-row>
@@ -14,7 +14,7 @@
     <button type="button" (click)="changeLanguage('de')" mat-raised-button color="accent" >DE</button>
     <button type="button" (click)="changeLanguage('en')" mat-raised-button color="accent" >EN</button>
     <span class="app-toolbar-filler"></span>
-        <a [routerLink]="'/en'" mat-raised-button color="primary" [routerLinkActive]="['mat-accent']">EN</a>
+        <a [routerLink]="'/'" mat-raised-button color="primary" [routerLinkActive]="['mat-accent']">EN</a>
         <a [routerLink]="'/de'" mat-raised-button color="primary" [routerLinkActive]="['mat-accent']">DE</a>
   </mat-toolbar-row>
 </mat-toolbar>
