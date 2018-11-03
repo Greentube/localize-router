@@ -140,8 +140,9 @@ describe('LocalizeParser', () => {
     expect(loader.getLocationLang('/en/')).toEqual('en');
     expect(loader.getLocationLang('en?q=str')).toEqual('en');
     expect(loader.getLocationLang('en/?q=str')).toEqual('en');
-    expect(loader.getLocationLang('/en?q=str')).toEqual('en');
-    expect(loader.getLocationLang('/en/q=str')).toEqual('en');
+    expect(loader.getLocationLang('/en#str')).toEqual('en');
+    expect(loader.getLocationLang('/en/q#str')).toEqual('en');
+    expect(loader.getLocationLang('/en?q#str')).toEqual('en');
   });
 
   it('should return null on getLocationLang if lang not found', () => {
