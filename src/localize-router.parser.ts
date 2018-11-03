@@ -202,11 +202,11 @@ export abstract class LocalizeParser {
    * @returns {string}
    */
   translateRoute(path: string): string {
-    let queryParts = path.split('?');
+    const queryParts = path.split('?');
     if (queryParts.length > 2) {
       throw 'There should be only one query parameter block in the URL';
     }
-    let pathSegments = queryParts[0].split('/');
+    const pathSegments = queryParts[0].split('/');
 
     /** collect observables  */
     return pathSegments
@@ -221,11 +221,10 @@ export abstract class LocalizeParser {
    * @private
    */
   getLocationLang(url?: string): string {
-    let queryParamSplit = (url || this.location.path()).split('?');
-    let pathSlices: string[] = [];
-    if (queryParamSplit.length > 0) {
-      pathSlices = queryParamSplit[0].split('/');
-    }
+    const pathSlices = (url || this.location.path() || '')
+      .split('#')[0]
+      .split('?')[0]
+      .split('/');
     if (pathSlices.length > 1 && this.locales.indexOf(pathSlices[1]) !== -1) {
       return pathSlices[1];
     }
@@ -348,6 +347,10 @@ export abstract class LocalizeParser {
       return key;
     }
     let res = this.translate.getParsedResult(this._translationObject, this.prefix + key);
+    // ignore non-translated text like 'ROUTES.home'
+    if (res === this.prefix + key) {
+      return key;
+    }
     return res || key;
   }
 }

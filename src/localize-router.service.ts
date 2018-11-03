@@ -1,5 +1,12 @@
 import { Inject } from '@angular/core';
-import { Router, NavigationStart, ActivatedRouteSnapshot, NavigationExtras, UrlSegment } from '@angular/router';
+import {
+  Router,
+  NavigationStart,
+  ActivatedRouteSnapshot,
+  UrlSegment,
+  PRIMARY_OUTLET,
+  NavigationExtras
+} from '@angular/router';
 import { Subject } from 'rxjs';
 import { pairwise, filter } from 'rxjs/operators';
 import { LocalizeParser } from './localize-router.parser';
@@ -38,42 +45,25 @@ export class LocalizeRouterService {
   /**
    * Change language and navigate to translated route
    * @param lang
-   * @param extras
-   * @param useNavigateMethod
    */
-  changeLanguage(lang: string, extras?: NavigationExtras, useNavigateMethod?: boolean): void {
+  changeLanguage(lang: string): void {
     if (lang !== this.parser.currentLang) {
-      let rootSnapshot: ActivatedRouteSnapshot = this.router.routerState.snapshot.root;
+      const rootSnapshot: ActivatedRouteSnapshot = this.router.routerState.snapshot.root;
+      const previousLanguage = this.parser.currentLang;
 
       this.parser.translateRoutes(lang).subscribe(() => {
-        let url = this.traverseRouteSnapshot(rootSnapshot);
+        const urlSegments = this.traverseSnapshot(
+          rootSnapshot,
+          true,
+          previousLanguage === this.parser.defaultLang);
 
-        if (!this.settings.alwaysSetPrefix) {
-          let urlSegments = url.split('/');
-          const languageSegmentIndex = urlSegments.indexOf(this.parser.currentLang);
-          //If the default language has no prefix make sure to remove and add it when necessary
-          if (this.parser.currentLang === this.parser.defaultLang) {
-            //Remove the language prefix from url when current language is the default language
-            if (languageSegmentIndex === 0 || (languageSegmentIndex === 1 && urlSegments[0] === '')) {
-              //Remove the current aka default language prefix from the url
-              urlSegments = urlSegments.slice(0, languageSegmentIndex).concat(urlSegments.slice(languageSegmentIndex + 1));
-            }
-          } else {
-            //When coming from a default language it's possible that the url doesn't contain the language, make sure it does.
-            if (languageSegmentIndex === -1) {
-              //If the url starts with a slash make sure to keep it.
-              const injectionIndex = urlSegments[0] === '' ? 1 : 0;
-              urlSegments = urlSegments.slice(0, injectionIndex).concat(this.parser.currentLang, urlSegments.slice(injectionIndex));
-            }
-          }
-          url = urlSegments.join('/');
-        }
+        const navigationExtras: NavigationExtras = {
+          ...rootSnapshot.queryParamMap.keys.length ? { queryParams: rootSnapshot.queryParams } : {},
+          ...rootSnapshot.fragment ? { fragment: rootSnapshot.fragment } : {}
+        };
 
-        if (useNavigateMethod) {
-          this.router.navigate([url], extras);
-        } else {
-          this.router.navigateByUrl(url, extras);
-        }
+        // use navigate to keep extras unchanged
+        this.router.navigate(urlSegments, navigationExtras);
       });
     }
   }
@@ -81,17 +71,57 @@ export class LocalizeRouterService {
   /**
    * Traverses through the tree to assemble new translated url
    * @param snapshot
+   * @param isRoot
+   * @param wasDefaultLanguage
    * @returns {string}
    */
-  private traverseRouteSnapshot(snapshot: ActivatedRouteSnapshot): string {
-    if (snapshot.firstChild && snapshot.firstChild.routeConfig && snapshot.firstChild.routeConfig.path) {
-      if (snapshot.firstChild.routeConfig.path !== '**') {
-        return this.parseSegmentValue(snapshot) + '/' + this.traverseRouteSnapshot(snapshot.firstChild);
+  private traverseSnapshot(snapshot: ActivatedRouteSnapshot,
+                           isRoot: boolean = false,
+                           wasDefaultLanguage: boolean = false): any[] {
+
+    if (isRoot) {
+      if (!snapshot.firstChild) {
+        return [''];
+      }
+      if (this.settings.alwaysSetPrefix) {
+        return [ `/${this.parser.currentLang}`, ...this.traverseSnapshot(snapshot.firstChild.firstChild) ];
+      }
+
+      // if it was default route, the second route param is already important
+      // otherwise the second part is language and we should skip it
+      const firstChild = wasDefaultLanguage ?
+        snapshot.firstChild :
+        snapshot.firstChild.firstChild;
+
+      if (this.parser.currentLang !== this.parser.defaultLang) {
+        return [ `/${this.parser.currentLang}`, ...this.traverseSnapshot(firstChild) ];
+
       } else {
-        return this.parseSegmentValue(snapshot.firstChild);
+        return [...this.traverseSnapshot(firstChild)];
       }
     }
-    return this.parseSegmentValue(snapshot);
+
+    const urlPart = this.parseSegmentValue(snapshot);
+
+    const outletChildren = snapshot.children
+      .filter(child => child.outlet !== PRIMARY_OUTLET);
+
+    const outlets = outletChildren
+      .reduce((acc, cur) => ({
+        outlets: {
+          ...acc.outlets,
+          [cur.outlet]: this.parseSegmentValue(cur)
+        }
+      }), { outlets: {} });
+
+    const primaryChild = snapshot.children.find(child => child.outlet === PRIMARY_OUTLET);
+
+    return [
+      urlPart,
+      ...snapshot.params ? [snapshot.params] : [],
+      ...outletChildren.length ? [outlets] : [],
+      ...primaryChild ? this.traverseSnapshot(primaryChild) : []
+    ];
   }
 
   /**
@@ -102,10 +132,15 @@ export class LocalizeRouterService {
   private parseSegmentValue(snapshot: ActivatedRouteSnapshot): string {
     if (snapshot.routeConfig) {
       if (snapshot.routeConfig.path === '**') {
-        return snapshot.url.filter((segment: UrlSegment) => segment.path).map((segment: UrlSegment) => segment.path).join('/');
+        return snapshot.url
+          .filter((segment: UrlSegment) => segment.path)
+          .map((segment: UrlSegment) => segment.path)
+          .join('/');
       } else {
         let subPathSegments = snapshot.routeConfig.path.split('/');
-        return subPathSegments.map((s: string, i: number) => s.indexOf(':') === 0 ? snapshot.url[i].path : s).join('/');
+        return subPathSegments
+          .map((s: string, i: number) => s.indexOf(':') === 0 ? snapshot.url[i].path : s)
+          .join('/');
       }
     }
     return '';
@@ -118,6 +153,10 @@ export class LocalizeRouterService {
    * @returns {string | any[]}
    */
   translateRoute(path: string | any[]): string | any[] {
+    // path is null (e.g. resetting auxiliary outlet)
+    if (!path) {
+      return path;
+    }
     if (typeof path === 'string') {
       const url = this.parser.translateRoute(path);
       return !path.indexOf('/') ? `/${this.parser.urlPrefix}${url}` : url;
@@ -133,7 +172,18 @@ export class LocalizeRouterService {
           result.push(res);
         }
       } else {
-        result.push(segment);
+        // translate router outlets block
+        if (segment && segment.outlets) {
+          let outlets: any = {};
+          for (let key in segment.outlets) {
+            if (segment.outlets.hasOwnProperty(key)) {
+              outlets[key] = this.translateRoute(segment.outlets[key]);
+            }
+          }
+          result.push({ ...segment, outlets: outlets });
+        } else {
+          result.push(segment);
+        }
       }
     });
     return result;

@@ -13,7 +13,7 @@ export function ManualLoaderFactory(translate: TranslateService, location: Locat
 }
 
 const routes: Routes = [
-  { path: '', redirectTo: 'home', pathMatch: 'full' },
+  { path: '', component: HomeComponent },
   { path: 'home', component: HomeComponent },
   { path: 'members', component: MembersComponent, children: [
     { path: 'membersList', component: MembersListComponent, outlet: 'list' },
@@ -29,7 +29,9 @@ const routes: Routes = [
         provide: LocalizeParser,
         useFactory: ManualLoaderFactory,
         deps: [TranslateService, Location, LocalizeRouterSettings]
-      }
+      },
+      alwaysSetPrefix: false,
+      useCachedLang: false
     })
   ],
   exports: [ RouterModule, LocalizeRouterModule ]

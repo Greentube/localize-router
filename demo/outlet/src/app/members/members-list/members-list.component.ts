@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, NavigationExtras, Router } from '@angular/router';
 import { MembersService, Member } from '../shared';
 import { Observable } from 'rxjs/Observable';
 import { LocalizeRouterService } from 'localize-router';
@@ -21,20 +21,26 @@ export class MembersListComponent implements OnInit {
 
   ngOnInit() {
     this.members$ = this.service.getMembers();
-    this.route.parent.children
-      .find(r => r.outlet === 'bio')
-      .params
-      .subscribe((params: any) => {
-        if (params.id) {
-          this.selectedMember = params.id;
-        }
-      });
+    const outlet = this.route.parent.children.find(r => r.outlet === 'bio');
+    if (outlet) {
+     outlet.params
+        .subscribe((params: any) => {
+          if (params.id) {
+            this.selectedMember = params.id;
+          }
+        });
+    }
   }
 
   showBio(id: string) {
     this.selectedMember = id;
 
-    const route = this.localize.translateRoute(['/members', {outlets: {'bio': [id]}}]) as any[];
-    this.router.navigate(route);
+    const navigationExtras: NavigationExtras = {
+      queryParams: { 'session_id': '1234567' },
+      fragment: 'anchor'
+    };
+
+    const route = this.localize.translateRoute(['/members', { outlets: { 'bio' : [id], list: ['membersList'] }}]) as any[];
+    this.router.navigate(route, navigationExtras);
   }
 }
