@@ -356,7 +356,7 @@ export abstract class LocalizeParser {
     if (res === this.prefix + key) {
       return key;
     }
-    return res;
+    return res || key;
   }
 }
 
