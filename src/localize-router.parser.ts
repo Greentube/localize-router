@@ -1,9 +1,10 @@
 import { Routes, Route } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { Observable, Observer } from 'rxjs';
+import { Observable } from 'rxjs';
 import { Location } from '@angular/common';
 import { CacheMechanism, LocalizeRouterSettings } from './localize-router.config';
 import { Inject } from '@angular/core';
+import { map } from 'rxjs/operators';
 
 const COOKIE_EXPIRY = 30; // 1 month
 
@@ -105,8 +106,7 @@ export abstract class LocalizeParser {
     }
 
     /** translate routes */
-    const res = this.translateRoutes(selectedLanguage);
-    return res.toPromise();
+    return this.translateRoutes(selectedLanguage).toPromise();
   }
 
   initChildRoutes(routes: Routes) {
@@ -120,32 +120,29 @@ export abstract class LocalizeParser {
    * @returns {Promise<any>}
    */
   translateRoutes(language: string): Observable<any> {
-    return new Observable<any>((observer: Observer<any>) => {
-      this._cachedLang = language;
-      if (this._languageRoute) {
-        this._languageRoute.path = language;
-      }
+    this._cachedLang = language;
+    if (this._languageRoute) {
+      this._languageRoute.path = language;
+    }
 
-      this.translate.use(language).subscribe((translations: any) => {
-        this._translationObject = translations;
-        this.currentLang = language;
+    return this.translate.use(language)
+      .pipe(
+        map(translations => {
+          this._translationObject = translations;
+          this.currentLang = language;
 
-        if (this._languageRoute) {
           if (this._languageRoute) {
             this._translateRouteTree(this._languageRoute.children);
-          }
-          // if there is wildcard route
-          if (this._wildcardRoute && this._wildcardRoute.redirectTo) {
-            this._translateProperty(this._wildcardRoute, 'redirectTo', true);
-          }
-        } else {
-          this._translateRouteTree(this.routes);
-        }
 
-        observer.next(void 0);
-        observer.complete();
-      });
-    });
+            // if there is wildcard route
+            if (this._wildcardRoute && this._wildcardRoute.redirectTo) {
+              this._translateProperty(this._wildcardRoute, 'redirectTo', true);
+            }
+          } else {
+            this._translateRouteTree(this.routes);
+          }
+        })
+      );
   }
 
   /**
