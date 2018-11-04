@@ -76,16 +76,13 @@ export abstract class LocalizeParser {
       }
       children = this.routes.splice(0, this.routes.length, baseRoute);
     } else {
-      children = [...this.routes]; // shallow copy of routes
+      children = this.routes.splice(0, this.routes.length);
     }
 
     /** exclude certain routes */
     for (let i = children.length - 1; i >= 0; i--) {
       if (children[i].data && children[i].data['skipRouteLocalization']) {
-        if (this.settings.alwaysSetPrefix) {
-          // add directly to routes
-          this.routes.push(children[i]);
-        }
+        this.routes.push(children[i]);
         children.splice(i, 1);
       }
     }
@@ -95,6 +92,8 @@ export abstract class LocalizeParser {
       if (this.locales.length > 1 || this.settings.alwaysSetPrefix) {
         this._languageRoute = { children: children };
         this.routes.unshift(this._languageRoute);
+      } else {
+        this.routes.unshift(...children);
       }
     }
 
@@ -112,9 +111,14 @@ export abstract class LocalizeParser {
     return routes;
   }
 
-  setInstantBaseRouteTranslation(language: string) {
-    if (this._languageRoute) {
-      this._languageRoute.path = language;
+  mutateRouterRootRoute(currentLanguage: string, previousLanguage: string, routes: Routes) {
+    const previousTranslatedLanguage = this.settings.alwaysSetPrefix || previousLanguage !== this.defaultLang ?
+      previousLanguage : '';
+    const currentTranslatedLanguage = this.settings.alwaysSetPrefix || currentLanguage !== this.defaultLang ?
+      currentLanguage : '';
+    const baseRoute = routes.find(route => route.path === previousTranslatedLanguage);
+    if (baseRoute) {
+      baseRoute.path = currentTranslatedLanguage;
     }
   }
 
@@ -124,10 +128,7 @@ export abstract class LocalizeParser {
    * @returns {Promise<any>}
    */
   translateRoutes(language: string): Observable<any> {
-    this._cachedLang = language;
-    if (this._languageRoute) {
-      this._languageRoute.path = language;
-    }
+    this.setRootLanguage(language);
 
     return this.translate.use(language)
       .pipe(
@@ -147,6 +148,14 @@ export abstract class LocalizeParser {
           }
         })
       );
+  }
+
+  private setRootLanguage(language: string) {
+    this._cachedLang = language;
+    if (this._languageRoute) {
+      this._languageRoute.path = this.settings.alwaysSetPrefix || language !== this.defaultLang ?
+        language : '';
+    }
   }
 
   /**

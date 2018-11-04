@@ -28,10 +28,10 @@ class FakeTranslateService {
 }
 
 class FakeRouter {
-  routes: Routes;
+  config: Routes;
   fakeRouterEvents: Subject<Event> = new Subject<Event>();
 
-  resetConfig = (routes: Routes) => { this.routes = routes; };
+  resetConfig = (routes: Routes) => { this.config = routes; };
 
   get events(): Observable<Event> {
     return this.fakeRouterEvents;

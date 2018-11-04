@@ -482,11 +482,9 @@ describe('LocalizeParser', () => {
     tick();
 
     expect(routes[0]).toEqual({
-      path: 'de',
+      path: '',
       children: [{ path: 'home_de', component: DummyComponent, data: { localizeRouter: { path: 'home' } } }]
     });
-    expect(routes[1]).toEqual(
-      { path: 'home_de', component: DummyComponent, data: { localizeRouter: { path: 'home' } } });
     expect(loader.currentLang).toEqual('de', 'loader currentLang should equal');
     expect(translate.currentLang).toEqual('de', 'translate currentLang should equal');
   }));

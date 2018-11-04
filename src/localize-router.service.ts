@@ -211,8 +211,8 @@ export class LocalizeRouterService {
       const currentLang = this.parser.getLocationLang(currentEvent.url) || this.parser.defaultLang;
 
       if (currentLang !== previousLang) {
-        this.parser.setInstantBaseRouteTranslation(currentLang);
-        this.router.resetConfig(this.parser.routes);
+        // mutate router config directly to avoid getting out of sync
+        this.parser.mutateRouterRootRoute(currentLang, previousLang, this.router.config);
         this.parser.translateRoutes(currentLang)
           .pipe(
             // reset routes again once they are all translated
