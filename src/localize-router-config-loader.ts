@@ -11,7 +11,9 @@ import { LocalizeParser } from './localize-router.parser';
 @Injectable()
 export class LocalizeRouterConfigLoader extends SystemJsNgModuleLoader {
 
-  constructor(@Inject(forwardRef(() => LocalizeParser)) private localize: LocalizeParser, _compiler: Compiler, @Optional() config?: SystemJsNgModuleLoaderConfig) {
+  constructor(@Inject(forwardRef(() => LocalizeParser)) private localize: LocalizeParser,
+              _compiler: Compiler,
+              @Optional() config?: SystemJsNgModuleLoaderConfig) {
     super(_compiler, config);
   }
 

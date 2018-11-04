@@ -47,23 +47,21 @@ export abstract class LocalizeParser {
    * @returns {Promise<any>}
    */
   protected init(routes: Routes): Promise<any> {
-    let selectedLanguage: string;
-
     this.routes = routes;
 
     if (!this.locales || !this.locales.length) {
       return Promise.resolve();
     }
     /** detect current language */
-    let locationLang = this.getLocationLang();
-    let browserLang = this._getBrowserLang();
+    const locationLang = this.getLocationLang();
+    const browserLang = this._getBrowserLang();
 
     if (this.settings.defaultLangFunction) {
       this.defaultLang = this.settings.defaultLangFunction(this.locales, this._cachedLang, browserLang);
     } else {
       this.defaultLang = this._cachedLang || browserLang || this.locales[0];
     }
-    selectedLanguage = locationLang || this.defaultLang;
+    const selectedLanguage = locationLang || this.defaultLang;
     this.translate.setDefaultLang(this.defaultLang);
 
     let children: Routes = [];
@@ -72,7 +70,7 @@ export abstract class LocalizeParser {
       const baseRoute = { path: '', redirectTo: this.defaultLang, pathMatch: 'full' };
 
       /** extract potential wildcard route */
-      let wildcardIndex = routes.findIndex((route: Route) => route.path === '**');
+      const wildcardIndex = routes.findIndex((route: Route) => route.path === '**');
       if (wildcardIndex !== -1) {
         this._wildcardRoute = routes.splice(wildcardIndex, 1)[0];
       }
@@ -177,7 +175,7 @@ export abstract class LocalizeParser {
    */
   private _translateProperty(route: Route, property: string, prefixLang?: boolean): void {
     // set property to data if not there yet
-    let routeData: any = route.data = route.data || {};
+    const routeData: any = route.data = route.data || {};
     if (!routeData.localizeRouter) {
       routeData.localizeRouter = {};
     }
@@ -185,7 +183,7 @@ export abstract class LocalizeParser {
       routeData.localizeRouter[property] = (<any>route)[property];
     }
 
-    let result = this.translateRoute(routeData.localizeRouter[property]);
+    const result = this.translateRoute(routeData.localizeRouter[property]);
     (<any>route)[property] = prefixLang ? `/${this.urlPrefix}${result}` : result;
   }
 
@@ -308,7 +306,7 @@ export abstract class LocalizeParser {
     try {
       const name = encodeURIComponent(this.settings.cacheName);
       if (value) {
-        let d: Date = new Date();
+        const d: Date = new Date();
         d.setTime(d.getTime() + COOKIE_EXPIRY * 86400000); // * days
         document.cookie = `${name}=${encodeURIComponent(value)};expires=${d.toUTCString()}`;
         return;
@@ -343,9 +341,10 @@ export abstract class LocalizeParser {
     if (!this._translationObject) {
       return key;
     }
-    let res = this.translate.getParsedResult(this._translationObject, this.prefix + key);
+    const prefixedKey = this.prefix + key;
+    const res = this.translate.getParsedResult(this._translationObject, prefixedKey);
     // ignore non-translated text like 'ROUTES.home'
-    if (res === this.prefix + key) {
+    if (res === prefixedKey) {
       return key;
     }
     return res || key;
