@@ -112,6 +112,12 @@ export abstract class LocalizeParser {
     return routes;
   }
 
+  setInstantBaseRouteTranslation(language: string) {
+    if (this._languageRoute) {
+      this._languageRoute.path = language;
+    }
+  }
+
   /**
    * Translate routes to selected language
    * @param language

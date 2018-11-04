@@ -8,7 +8,7 @@ import {
   NavigationExtras
 } from '@angular/router';
 import { Subject } from 'rxjs';
-import { pairwise, filter } from 'rxjs/operators';
+import { pairwise, filter, tap } from 'rxjs/operators';
 import { LocalizeParser } from './localize-router.parser';
 import { LocalizeRouterSettings } from './localize-router.config';
 
@@ -25,7 +25,11 @@ export class LocalizeRouterService {
    * @param settings
    * @param router
    */
-  constructor(@Inject(LocalizeParser) public parser: LocalizeParser, @Inject(LocalizeRouterSettings) public settings: LocalizeRouterSettings, @Inject(Router) private router: Router) {
+  constructor(
+    @Inject(LocalizeParser) public parser: LocalizeParser,
+    @Inject(LocalizeRouterSettings) public settings: LocalizeRouterSettings,
+    @Inject(Router) private router: Router
+  ) {
     this.routerEvents = new Subject<string>();
   }
 
@@ -35,11 +39,12 @@ export class LocalizeRouterService {
   init(): void {
     this.router.resetConfig(this.parser.routes);
     // subscribe to router events
-    this.router.events.pipe(
-      filter(event => event instanceof NavigationStart),
-      pairwise()
-    )
-    .subscribe(this._routeChanged());
+    this.router.events
+      .pipe(
+        filter(event => event instanceof NavigationStart),
+        pairwise()
+      )
+      .subscribe(this._routeChanged());
   }
 
   /**
@@ -51,20 +56,26 @@ export class LocalizeRouterService {
       const rootSnapshot: ActivatedRouteSnapshot = this.router.routerState.snapshot.root;
       const previousLanguage = this.parser.currentLang;
 
-      this.parser.translateRoutes(lang).subscribe(() => {
-        const urlSegments = this.traverseSnapshot(
-          rootSnapshot,
-          true,
-          previousLanguage === this.parser.defaultLang);
+      this.parser.translateRoutes(lang)
+        .pipe(
+          // reset routes
+          tap(() => this.router.resetConfig(this.parser.routes))
+        )
+        .subscribe(() => {
+          const urlSegments = this.traverseSnapshot(
+            rootSnapshot,
+            true,
+            previousLanguage === this.parser.defaultLang
+          );
 
-        const navigationExtras: NavigationExtras = {
-          ...rootSnapshot.queryParamMap.keys.length ? { queryParams: rootSnapshot.queryParams } : {},
-          ...rootSnapshot.fragment ? { fragment: rootSnapshot.fragment } : {}
-        };
+          const navigationExtras: NavigationExtras = {
+            ...rootSnapshot.queryParamMap.keys.length ? { queryParams: rootSnapshot.queryParams } : {},
+            ...rootSnapshot.fragment ? { fragment: rootSnapshot.fragment } : {}
+          };
 
-        // use navigate to keep extras unchanged
-        this.router.navigate(urlSegments, navigationExtras);
-      });
+          // use navigate to keep extras unchanged
+          this.router.navigate(urlSegments, navigationExtras);
+        });
     }
   }
 
@@ -84,7 +95,7 @@ export class LocalizeRouterService {
         return [''];
       }
       if (this.settings.alwaysSetPrefix) {
-        return [ `/${this.parser.currentLang}`, ...this.traverseSnapshot(snapshot.firstChild.firstChild) ];
+        return [`/${this.parser.currentLang}`, ...this.traverseSnapshot(snapshot.firstChild.firstChild)];
       }
 
       // if it was default route, the second route param is already important
@@ -94,7 +105,7 @@ export class LocalizeRouterService {
         snapshot.firstChild.firstChild;
 
       if (this.parser.currentLang !== this.parser.defaultLang) {
-        return [ `/${this.parser.currentLang}`, ...this.traverseSnapshot(firstChild) ];
+        return [`/${this.parser.currentLang}`, ...this.traverseSnapshot(firstChild)];
 
       } else {
         return [...this.traverseSnapshot(firstChild)];
@@ -200,10 +211,17 @@ export class LocalizeRouterService {
       const currentLang = this.parser.getLocationLang(currentEvent.url) || this.parser.defaultLang;
 
       if (currentLang !== previousLang) {
-        this.parser.translateRoutes(currentLang).subscribe(() => {
-          // Fire route change event
-          this.routerEvents.next(currentLang);
-        });
+        this.parser.setInstantBaseRouteTranslation(currentLang);
+        this.router.resetConfig(this.parser.routes);
+        this.parser.translateRoutes(currentLang)
+          .pipe(
+            // reset routes again once they are all translated
+            tap(() => this.router.resetConfig(this.parser.routes))
+          )
+          .subscribe(() => {
+            // Fire route change event
+            this.routerEvents.next(currentLang);
+          });
       }
     };
   }
