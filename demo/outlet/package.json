@@ -27,7 +27,7 @@
     "zone.js": "~0.8.26",
     "@ngx-translate/core": "^11.0.0",
     "@ngx-translate/http-loader": "^4.0.0",
-    "localize-router": "2.0.0-alpha.1",
+    "localize-router": "2.0.0-RC.1",
     "localize-router-http-loader": "~1.0.2"
   },
   "devDependencies": {
