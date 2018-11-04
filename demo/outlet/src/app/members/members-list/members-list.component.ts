@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, NavigationExtras, Router } from '@angular/router';
 import { MembersService, Member } from '../shared';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { LocalizeRouterService } from 'localize-router';
 
 @Component({
