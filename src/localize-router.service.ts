@@ -54,19 +54,14 @@ export class LocalizeRouterService {
   changeLanguage(lang: string): void {
     if (lang !== this.parser.currentLang) {
       const rootSnapshot: ActivatedRouteSnapshot = this.router.routerState.snapshot.root;
-      const previousLanguage = this.parser.currentLang;
 
       this.parser.translateRoutes(lang)
         .pipe(
-          // reset routes
+          // set new routes to router
           tap(() => this.router.resetConfig(this.parser.routes))
         )
         .subscribe(() => {
-          const urlSegments = this.traverseSnapshot(
-            rootSnapshot,
-            true,
-            previousLanguage === this.parser.defaultLang
-          );
+          const urlSegments = this.traverseSnapshot(rootSnapshot, true);
 
           const navigationExtras: NavigationExtras = {
             ...rootSnapshot.queryParamMap.keys.length ? { queryParams: rootSnapshot.queryParams } : {},
@@ -83,32 +78,21 @@ export class LocalizeRouterService {
    * Traverses through the tree to assemble new translated url
    * @param snapshot
    * @param isRoot
-   * @param wasDefaultLanguage
    * @returns {string}
    */
-  private traverseSnapshot(snapshot: ActivatedRouteSnapshot,
-                           isRoot: boolean = false,
-                           wasDefaultLanguage: boolean = false): any[] {
+  private traverseSnapshot(
+    snapshot: ActivatedRouteSnapshot,
+    isRoot: boolean = false
+  ): any[] {
 
     if (isRoot) {
       if (!snapshot.firstChild) {
         return [''];
       }
-      if (this.settings.alwaysSetPrefix) {
+      if (this.settings.alwaysSetPrefix || this.parser.currentLang !== this.parser.defaultLang) {
         return [`/${this.parser.currentLang}`, ...this.traverseSnapshot(snapshot.firstChild.firstChild)];
-      }
-
-      // if it was default route, the second route param is already important
-      // otherwise the second part is language and we should skip it
-      const firstChild = wasDefaultLanguage ?
-        snapshot.firstChild :
-        snapshot.firstChild.firstChild;
-
-      if (this.parser.currentLang !== this.parser.defaultLang) {
-        return [`/${this.parser.currentLang}`, ...this.traverseSnapshot(firstChild)];
-
       } else {
-        return [...this.traverseSnapshot(firstChild)];
+        return [...this.traverseSnapshot(snapshot.firstChild.firstChild)];
       }
     }
 
@@ -129,7 +113,7 @@ export class LocalizeRouterService {
 
     return [
       urlPart,
-      ...snapshot.params ? [snapshot.params] : [],
+      ...Object.keys(snapshot.params).length ? [snapshot.params] : [],
       ...outletChildren.length ? [outlets] : [],
       ...primaryChild ? this.traverseSnapshot(primaryChild) : []
     ];
@@ -143,14 +127,16 @@ export class LocalizeRouterService {
   private parseSegmentValue(snapshot: ActivatedRouteSnapshot): string {
     if (snapshot.routeConfig) {
       if (snapshot.routeConfig.path === '**') {
-        return snapshot.url
+        return this.parser.translateRoute(snapshot.url
           .filter((segment: UrlSegment) => segment.path)
           .map((segment: UrlSegment) => segment.path)
-          .join('/');
-      } else {
-        let subPathSegments = snapshot.routeConfig.path.split('/');
+          .join('/'));
+      } else if (snapshot.routeConfig.data) {
+        const subPathSegments = snapshot.routeConfig.data.localizeRouter.path.split('/');
         return subPathSegments
-          .map((s: string, i: number) => s.indexOf(':') === 0 ? snapshot.url[i].path : s)
+          .map((s: string, i: number) => s.indexOf(':') === 0 ?
+            snapshot.url[i].path :
+            this.parser.translateRoute(s))
           .join('/');
       }
     }
