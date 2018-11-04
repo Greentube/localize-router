@@ -10,12 +10,14 @@ coverage/
 *.d.ts
 *.metadata.json
 *.js
+package-lock.json
 # overrides for js
 !config/*
 !demo/**/*js
 !karma.conf.js
 !webpack.config.js
-package-lock.json
+# overrides for demo
+!demo/**/package-lock.json
 
 #################
 ## Misc
