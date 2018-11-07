@@ -61,7 +61,10 @@ export class LocalizeRouterService {
           tap(() => this.router.resetConfig(this.parser.routes))
         )
         .subscribe(() => {
-          const urlSegments = this.traverseSnapshot(rootSnapshot, true);
+          const urlSegments = this.traverseSnapshot(rootSnapshot, true)
+            .filter((path: string, i: number) => {
+              return !i || path; // filter out empty paths
+            });
 
           const navigationExtras: NavigationExtras = {
             ...rootSnapshot.queryParamMap.keys.length ? { queryParams: rootSnapshot.queryParams } : {},
