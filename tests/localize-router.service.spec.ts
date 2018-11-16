@@ -136,6 +136,33 @@ describe('LocalizeRouterService', () => {
     expect(parser.translateRoute).toHaveBeenCalledWith('about');
   });
 
+  it('should not append empty prefix', () => {
+    const settings = {
+      alwaysSetPrefix: false
+    } as any
+
+    localizeRouterService = new LocalizeRouterService(parser, settings, router);
+    parser.currentLang = 'en';
+    parser.defaultLang = 'en';
+    parser.locales = ['de', 'en'];
+    (<any>parser).settings = settings
+
+    spyOn(parser, 'translateRoute').and.callThrough();
+    
+    let res = localizeRouterService.translateRoute(['/my/path', 123, 'about']);
+    expect(res[0]).toEqual('/my/path');
+
+    res = localizeRouterService.translateRoute('/my/path');
+    expect(res).toEqual('/my/path');
+    
+    parser.currentLang = 'de'
+    res = localizeRouterService.translateRoute(['/my/path', 123, 'about']);
+    expect(res[0]).toEqual('/de/my/path');
+
+    res = localizeRouterService.translateRoute('/my/path');
+    expect(res).toEqual('/de/my/path');
+  })
+
   it('should translate routes if language had changed on route event', () => {
     localizeRouterService = new LocalizeRouterService(parser, settings, router);
     localizeRouterService.init();

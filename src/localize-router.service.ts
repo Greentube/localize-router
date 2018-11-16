@@ -158,8 +158,17 @@ export class LocalizeRouterService {
       return path;
     }
     if (typeof path === 'string') {
-      const url = this.parser.translateRoute(path);
-      return !path.indexOf('/') ? `/${this.parser.urlPrefix}${url}` : url;
+      const translatedUrl = this.parser.translateRoute(path);
+      let url = translatedUrl;
+      
+      if (!path.indexOf('/')) {
+        const prefix = this.parser.urlPrefix;
+        if (prefix !== '') {
+          url = '/' + prefix + translatedUrl;
+        }
+      }
+
+      return url;
     }
     // it's an array
     let result: any[] = [];
@@ -167,7 +176,13 @@ export class LocalizeRouterService {
       if (typeof segment === 'string') {
         const res = this.parser.translateRoute(segment);
         if (!index && !segment.indexOf('/')) {
-          result.push(`/${this.parser.urlPrefix}${res}`);
+          const prefix = this.parser.urlPrefix;
+          let translatedPath = res;
+
+          if (prefix !== '') {
+            translatedPath = `/${this.parser.urlPrefix}${res}`
+          }
+          result.push(translatedPath);
         } else {
           result.push(res);
         }
