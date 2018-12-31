@@ -81,7 +81,7 @@ export class LocalizeRouterService {
    * Traverses through the tree to assemble new translated url
    * @param snapshot
    * @param isRoot
-   * @returns {string}
+   * @returns {string[]}
    */
   private traverseSnapshot(
     snapshot: ActivatedRouteSnapshot,
@@ -99,7 +99,7 @@ export class LocalizeRouterService {
       }
     }
 
-    const urlPart = this.parseSegmentValue(snapshot);
+    const urlParts = this.parseSegmentValue(snapshot);
 
     const outletChildren = snapshot.children
       .filter(child => child.outlet !== PRIMARY_OUTLET);
@@ -115,8 +115,7 @@ export class LocalizeRouterService {
     const primaryChild = snapshot.children.find(child => child.outlet === PRIMARY_OUTLET);
 
     return [
-      urlPart,
-      ...Object.keys(snapshot.params).length ? [snapshot.params] : [],
+      ...urlParts,
       ...outletChildren.length ? [outlets] : [],
       ...primaryChild ? this.traverseSnapshot(primaryChild) : []
     ];
@@ -125,25 +124,24 @@ export class LocalizeRouterService {
   /**
    * Extracts new segment value based on routeConfig and url
    * @param snapshot
-   * @returns {string}
+   * @returns {string[]}
    */
-  private parseSegmentValue(snapshot: ActivatedRouteSnapshot): string {
+  private parseSegmentValue(snapshot: ActivatedRouteSnapshot): string[] {
     if (snapshot.routeConfig) {
       if (snapshot.routeConfig.path === '**') {
-        return this.parser.translateRoute(snapshot.url
+        return snapshot.url
           .filter((segment: UrlSegment) => segment.path)
-          .map((segment: UrlSegment) => segment.path)
-          .join('/'));
+          .map((segment: UrlSegment) => this.parser.translateRoute(segment.path));
       } else if (snapshot.routeConfig.data) {
         const subPathSegments = snapshot.routeConfig.data.localizeRouter.path.split('/');
         return subPathSegments
           .map((s: string, i: number) => s.indexOf(':') === 0 ?
             snapshot.url[i].path :
-            this.parser.translateRoute(s))
-          .join('/');
+            this.parser.translateRoute(s)
+          );
       }
     }
-    return '';
+    return [''];
   }
 
   /**
