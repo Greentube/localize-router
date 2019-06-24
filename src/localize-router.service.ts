@@ -134,7 +134,7 @@ export class LocalizeRouterService {
           .filter((segment: UrlSegment) => segment.path)
           .map((segment: UrlSegment) => segment.path)
           .join('/'));
-      } else if (snapshot.routeConfig.data) {
+      } else if (snapshot.routeConfig.data && snapshot.routeConfig.data.localizeRouter) {
         const subPathSegments = snapshot.routeConfig.data.localizeRouter.path.split('/');
         return subPathSegments
           .map((s: string, i: number) => s.indexOf(':') === 0 ?
