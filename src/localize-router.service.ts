@@ -1,4 +1,4 @@
-import { Inject } from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
 import {
   Router,
   NavigationStart,
@@ -16,6 +16,7 @@ import { LocalizeRouterSettings } from './localize-router.config';
  * Localization service
  * modifyRoutes
  */
+@Injectable()
 export class LocalizeRouterService {
   routerEvents: Subject<string>;
 

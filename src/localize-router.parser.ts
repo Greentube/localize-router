@@ -29,10 +29,11 @@ export abstract class LocalizeParser {
    * @param location
    * @param settings
    */
-  constructor(@Inject(TranslateService) private translate: TranslateService,
-              @Inject(Location) private location: Location,
-              @Inject(LocalizeRouterSettings) private settings: LocalizeRouterSettings) {
-  }
+  constructor(
+    @Inject(TranslateService) private translate: TranslateService,
+    @Inject(Location) private location: Location,
+    @Inject(LocalizeRouterSettings) private settings: LocalizeRouterSettings
+  ) { }
 
   /**
    * Load routes and fetch necessary data
@@ -260,7 +261,7 @@ export abstract class LocalizeParser {
    */
   private get _cachedLang(): string {
     if (!this.settings.useCachedLang) {
-      return;
+      return '';
     }
     if (this.settings.cacheMechanism === CacheMechanism.LocalStorage) {
       return this._cacheWithLocalStorage();
@@ -268,6 +269,7 @@ export abstract class LocalizeParser {
     if (this.settings.cacheMechanism === CacheMechanism.Cookie) {
       return this._cacheWithCookies();
     }
+    return '';
   }
 
   /**
@@ -295,17 +297,17 @@ export abstract class LocalizeParser {
    */
   private _cacheWithLocalStorage(value?: string): string {
     if (typeof window === 'undefined' || typeof window.localStorage === 'undefined') {
-      return;
+      return '';
     }
     try {
       if (value) {
         window.localStorage.setItem(this.settings.cacheName, value);
-        return;
+        return '';
       }
       return this._returnIfInLocales(window.localStorage.getItem(this.settings.cacheName));
     } catch (e) {
       // weird Safari issue in private mode, where LocalStorage is defined but throws error on access
-      return;
+      return '';
     }
   }
 
@@ -316,7 +318,7 @@ export abstract class LocalizeParser {
    */
   private _cacheWithCookies(value?: string): string {
     if (typeof document === 'undefined' || typeof document.cookie === 'undefined') {
-      return;
+      return '';
     }
     try {
       const name = encodeURIComponent(this.settings.cacheName);
@@ -324,13 +326,13 @@ export abstract class LocalizeParser {
         const d: Date = new Date();
         d.setTime(d.getTime() + COOKIE_EXPIRY * 86400000); // * days
         document.cookie = `${name}=${encodeURIComponent(value)};expires=${d.toUTCString()}`;
-        return;
+        return '';
       }
       const regexp = new RegExp('(?:^' + name + '|;\\s*' + name + ')=(.*?)(?:;|$)', 'g');
       const result = regexp.exec(document.cookie);
       return decodeURIComponent(result[1]);
     } catch (e) {
-      return; // should not happen but better safe than sorry
+      return ''; // should not happen but better safe than sorry
     }
   }
 

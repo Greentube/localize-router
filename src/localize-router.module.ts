@@ -10,7 +10,9 @@ import { TranslateModule } from '@ngx-translate/core';
 import { CommonModule } from '@angular/common';
 import {
   ALWAYS_SET_PREFIX,
-  CACHE_MECHANISM, CACHE_NAME, DEFAULT_LANG_FUNCTION, LOCALIZE_ROUTER_FORROOT_GUARD, LocalizeRouterConfig, LocalizeRouterSettings,
+  CACHE_MECHANISM, CACHE_NAME, DEFAULT_LANG_FUNCTION,
+  LOCALIZE_ROUTER_FORROOT_GUARD,
+  LocalizeRouterConfig, LocalizeRouterSettings,
   RAW_ROUTES,
   USE_CACHED_LANG
 } from './localize-router.config';
@@ -70,7 +72,7 @@ export function getAppInitializer(p: ParserInitializer, parser: LocalizeParser, 
 })
 export class LocalizeRouterModule {
 
-  static forRoot(routes: Routes, config: LocalizeRouterConfig = {}): ModuleWithProviders {
+  static forRoot(routes: Routes, config: LocalizeRouterConfig = {}): ModuleWithProviders<LocalizeRouterModule> {
     return {
       ngModule: LocalizeRouterModule,
       providers: [
@@ -104,7 +106,7 @@ export class LocalizeRouterModule {
     };
   }
 
-  static forChild(routes: Routes): ModuleWithProviders {
+  static forChild(routes: Routes): ModuleWithProviders<LocalizeRouterModule> {
     return {
       ngModule: LocalizeRouterModule,
       providers: [
